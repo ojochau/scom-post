@@ -21,12 +21,12 @@ const formatNumber = (value: number | string, decimal?: number) => {
   return FormatUtils.formatNumber(value, { decimalFigures: decimal ?? 0 })
 }
 
-const getDuration = (date: number) => {
-  const startDate = FormatUtils.unixToFormattedDate(date);
+const getDuration = (date: Date|string) => {
+  const startDate = moment(date);
   const endDate = moment(new Date());
   let duration = moment.duration(endDate.diff(startDate));
   let days = duration.asDays();
-  if (days >= 1) return moment.unix(date).format('MMM DD');
+  if (days >= 1) return startDate.format('MMM DD');
   let hours = duration.asHours();
   if (hours >= 1) return `${formatNumber(hours, 0)}h`;
   let minutes = duration.asMinutes();
