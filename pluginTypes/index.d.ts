@@ -1,32 +1,30 @@
-/// <amd-module name="@scom/scom-post/index.css.ts" />
-declare module "@scom/scom-post/index.css.ts" {
-    export const spinnerStyle: string;
-    export const labelStyle: string;
-    export const multiLineTextStyle: string;
-    export const customStyles: string;
-    export const analyticStyle: string;
-}
 /// <amd-module name="@scom/scom-post/global/interface.ts" />
 declare module "@scom/scom-post/global/interface.ts" {
-    export interface IPostAnalytics {
-        reply: string | number;
-        repost: string | number;
-        voted: string | number;
-        bookmark: string | number;
-        view: string | number;
+    export interface IAuthor {
+        id: string;
+        username: string;
+        description: string;
+        avatar: string;
+        pubKey?: string;
+    }
+    export interface IPost {
+        id: string;
+        author: IAuthor;
+        replyTo?: IPost;
+        publishDate: Date | string;
+        stat?: IPostStat;
+        data: IPostData[];
+    }
+    export interface IPostStat {
+        reply?: number;
+        repost?: number;
+        upvote?: number;
+        downvote?: number;
+        view?: number;
     }
     export interface IPostData {
-        username: string;
-        owner?: string;
-        description?: string;
-        dataUri?: string;
-        publishDate?: number;
-        avatar?: string;
-        replies?: IReply[];
-        analytics?: IPostAnalytics;
-    }
-    export interface IReply {
-        cid: string;
+        module: string;
+        data: any;
     }
 }
 /// <amd-module name="@scom/scom-post/store/index.ts" />
@@ -42,29 +40,40 @@ declare module "@scom/scom-post/store/index.ts" {
 declare module "@scom/scom-post/global/utils.ts" {
     const getImageIpfsUrl: (url: string) => string;
     const formatNumber: (value: number | string, decimal?: number) => string;
-    const getDuration: (date: number) => string;
+    const getDuration: (date: Date | string) => string;
     export { getImageIpfsUrl, formatNumber, getDuration };
 }
 /// <amd-module name="@scom/scom-post/global/index.ts" />
 declare module "@scom/scom-post/global/index.ts" {
+    import { Control } from '@ijstech/components';
+    import { IPostData } from "@scom/scom-post/global/interface.ts";
     export * from "@scom/scom-post/global/utils.ts";
     export * from "@scom/scom-post/global/interface.ts";
+    export const MAX_HEIGHT = 352;
+    export const getEmbedElement: (postData: IPostData, parent: Control, callback?: any) => Promise<any>;
+}
+/// <amd-module name="@scom/scom-post/index.css.ts" />
+declare module "@scom/scom-post/index.css.ts" {
+    export const getIconStyleClass: (img: string, color: string) => string;
+    export const hoverStyle: string;
+}
+/// <amd-module name="@scom/scom-post/assets.ts" />
+declare module "@scom/scom-post/assets.ts" {
+    function fullPath(path: string): string;
+    const _default: {
+        fullPath: typeof fullPath;
+    };
+    export default _default;
 }
 /// <amd-module name="@scom/scom-post" />
 declare module "@scom/scom-post" {
-    import { ControlElement, Module, Container, Markdown } from '@ijstech/components';
-    import { IPostData } from "@scom/scom-post/global/interface.ts";
-    type onReplyClickedCallback = (data: IPostData) => void;
+    import { ControlElement, Module, Container, Control } from '@ijstech/components';
+    import { IPost, IPostData, IPostStat, IAuthor } from "@scom/scom-post/global/index.ts";
+    export { IPost, IPostData, IPostStat, IAuthor };
     interface ScomPostElement extends ControlElement {
-        data: IPostData;
-        isAnalyticsShown?: boolean;
-        isBorderShown?: boolean;
-        theme?: Markdown["theme"];
-    }
-    interface IPostConfig {
-        data: IPostData;
-        isBorderShown?: boolean;
-        isAnalyticsShown?: boolean;
+        data?: IPost;
+        type?: PostType;
+        isPrimary?: boolean;
     }
     global {
         namespace JSX {
@@ -73,34 +82,57 @@ declare module "@scom/scom-post" {
             }
         }
     }
-    export default class ScomPost extends Module {
+    interface IPostConfig {
+        data?: IPost;
+        type?: PostType;
+        isPrimary?: boolean;
+    }
+    type PostType = 'full' | 'standard' | 'short';
+    type callbackType = (target: Control, data: IPost) => void;
+    export class ScomPost extends Module {
+        private pnlInfo;
         private imgAvatar;
         private lblOwner;
         private lblUsername;
-        private pnlLoader;
         private lblDate;
-        private pageViewer;
-        private pnlAvatar;
+        private pnlWrapper;
+        private pnlMore;
         private gridPost;
         private btnViewMore;
-        private pnlStatusDetail;
+        private pnlDetail;
         private pnlOverlay;
         private groupAnalysis;
+        private pnlBd;
+        private pnlActiveBd;
+        private pnlContent;
         private _data;
-        onReplyClicked: onReplyClickedCallback;
+        private _replies;
+        onReplyClicked: callbackType;
+        onShareClicked: callbackType;
+        onProfileClicked: callbackType;
         constructor(parent?: Container, options?: any);
         static create(options?: ScomPostElement, parent?: Container): Promise<ScomPost>;
-        get isAnalyticsShown(): boolean;
-        set isAnalyticsShown(value: boolean);
-        get isBorderShown(): boolean;
-        set isBorderShown(value: boolean);
-        set theme(value: Markdown["theme"]);
+        get isPrimary(): boolean;
+        set isPrimary(value: boolean);
+        get type(): PostType;
+        set type(value: PostType);
+        get postData(): IPost;
+        set postData(value: IPost);
         setData(data: IPostConfig): Promise<void>;
         getData(): IPostConfig;
+        get replies(): IPost[];
+        get isFullType(): boolean;
         clear(): void;
         private renderUI;
+        private renderPostType;
+        private renderReplyTo;
         private renderAnalytics;
+        addReply(parentPostId: string, post: IPost): void;
+        appendReplyPanel(): void;
+        appendShowMorePanel(): void;
+        private onShowMore;
         private onViewMore;
+        private onProfileShown;
         init(): Promise<void>;
         render(): any;
     }

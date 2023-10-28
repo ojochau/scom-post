@@ -1,33 +1,26 @@
-// import { Control, IconName } from "@ijstech/components";
-
-export interface IPostAnalytics {
-  reply: string | number;
-  repost: string | number;
-  voted: string | number;
-  bookmark: string | number;
-  view: string | number;
-}
-
-export interface IPostData {
+export interface IAuthor {
+  id: string;
   username: string;
-  owner?: string;
-  description?: string;
-  dataUri?: string;
-  publishDate?: number;
-  avatar?: string;
-  replies?: IReply[];
-  analytics?: IPostAnalytics;
-}
-
-export interface IReply {
-  cid: string;
-}
-
-// export interface IAnalytic {
-//   name: string;
-//   value?: number|string;
-//   icon?: IconName;
-//   class?: string;
-//   onRender?: () => Control;
-//   onClick?: () => void
-// }
+  description: string;
+  avatar: string;
+  pubKey?: string;
+};
+export interface IPost {
+  id: string;
+  author: IAuthor; // authorId: string;
+  replyTo?: IPost; // replyToId?: string;
+  publishDate: Date|string;
+  stat?: IPostStat;
+  data: IPostData[];
+};
+export interface IPostStat{
+  reply?: number;
+  repost?: number;
+  upvote?: number; //like
+  downvote?: number;
+  view?: number;
+};
+export interface IPostData {
+  module: string; //e.g. @scom/scom-markdown, @scom/scom-image, @scom/scom-video
+  data: any;
+};
