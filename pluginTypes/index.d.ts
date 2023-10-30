@@ -73,7 +73,8 @@ declare module "@scom/scom-post" {
     interface ScomPostElement extends ControlElement {
         data?: IPost;
         type?: PostType;
-        isPrimary?: boolean;
+        isReply?: boolean;
+        isActive?: boolean;
     }
     global {
         namespace JSX {
@@ -85,7 +86,8 @@ declare module "@scom/scom-post" {
     interface IPostConfig {
         data?: IPost;
         type?: PostType;
-        isPrimary?: boolean;
+        isReply?: boolean;
+        isActive?: boolean;
     }
     type PostType = 'full' | 'standard' | 'short';
     type callbackType = (target: Control, data: IPost) => void;
@@ -95,6 +97,7 @@ declare module "@scom/scom-post" {
         private lblOwner;
         private lblUsername;
         private lblDate;
+        private imgVerified;
         private pnlWrapper;
         private pnlMore;
         private gridPost;
@@ -112,8 +115,10 @@ declare module "@scom/scom-post" {
         onProfileClicked: callbackType;
         constructor(parent?: Container, options?: any);
         static create(options?: ScomPostElement, parent?: Container): Promise<ScomPost>;
-        get isPrimary(): boolean;
-        set isPrimary(value: boolean);
+        get isReply(): boolean;
+        set isReply(value: boolean);
+        get isActive(): boolean;
+        set isActive(value: boolean);
         get type(): PostType;
         set type(value: PostType);
         get postData(): IPost;
