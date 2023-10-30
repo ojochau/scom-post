@@ -185,11 +185,17 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             await self.ready();
             return self;
         }
-        get isPrimary() {
-            return this._data.isPrimary ?? false;
+        get isReply() {
+            return this._data.isReply ?? false;
         }
-        set isPrimary(value) {
-            this._data.isPrimary = value ?? false;
+        set isReply(value) {
+            this._data.isReply = value ?? false;
+        }
+        get isActive() {
+            return this._data.isActive ?? false;
+        }
+        set isActive(value) {
+            this._data.isActive = value ?? false;
         }
         get type() {
             return this._data.type ?? 'standard';
@@ -225,7 +231,6 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             this.btnViewMore.visible = false;
             this.pnlContent.clearInnerHTML();
             this.pnlBd.visible = false;
-            this.gridPost.padding = { top: '0px', left: '0px', right: '0px' };
             this.pnlContent.minHeight = '12rem';
             if (this.pnlMore) {
                 this.pnlMore.remove();
@@ -233,6 +238,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             }
             this._replies = [];
             this.pnlActiveBd.visible = false;
+            this.imgVerified.visible = false;
         }
         async renderUI() {
             this.clear();
@@ -243,12 +249,12 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             this.lblUsername.link.href = '';
             this.imgAvatar.url = author?.avatar ?? '';
             this.lblDate.caption = `${(0, global_1.getDuration)(publishDate)}`;
-            this.gridPost.padding = { left: '1.25rem', right: '1.25rem', top: '1rem', bottom: '1rem' };
-            if (replyTo && this.isPrimary) {
+            this.imgVerified.visible = true;
+            this.imgVerified.display = 'flex';
+            if (replyTo && this.isReply) {
                 this.renderReplyTo(replyTo);
             }
-            if (this.isPrimary) {
-                this.pnlInfo.templateColumns = ['minmax(auto, 6.25rem)', 'auto'];
+            if (this.isActive) {
                 this.pnlWrapper.border.radius = '0 0.25rem 0.25rem 0';
                 this.pnlActiveBd.visible = true;
             }
@@ -272,12 +278,12 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             }
         }
         renderPostType() {
-            this.pnlInfo.templateColumns = ['auto'];
             if (this.isFullType) {
                 this.gridPost.templateAreas = [
                     ['avatar', 'user'],
                     ['content', 'content']
                 ];
+                this.gridPost.gap = { column: '0.75rem', row: '0px' };
                 this.pnlInfo.templateAreas = [
                     ['name', 'username', 'date']
                 ];
@@ -291,12 +297,14 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     ['name', 'date'],
                     ['username', 'username']
                 ];
+                this.gridPost.gap = { column: '0.75rem', row: '1.313rem' };
             }
             else {
                 this.gridPost.templateAreas = [
                     ['avatar', 'user'],
                     ['avatar', 'content']
                 ];
+                this.gridPost.gap = { column: '0.75rem', row: '1.313rem' };
                 this.pnlInfo.templateAreas = [
                     ['name', 'username', 'date']
                 ];
@@ -309,7 +317,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                 postEl.onShareClicked = this.onShareClicked;
                 postEl.onProfileClicked = this.onProfileClicked;
                 this.insertAdjacentElement('afterbegin', postEl);
-                postEl.setData({ data: replyTo });
+                postEl.setData({ data: replyTo, isReply: true });
             }
         }
         renderAnalytics(analytics) {
@@ -352,7 +360,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                 const value = components_5.FormatUtils.formatNumber(item.value, { shortScale: true, decimalFigures: 0 });
                 let itemEl = (this.$render("i-hstack", { verticalAlignment: "center", gap: '0.5rem', tooltip: { content: value, placement: 'bottomLeft' }, class: (0, index_css_1.getIconStyleClass)(item.hoveredIcon, item.hoveredColor) },
                     this.$render("i-panel", { width: '1rem', height: '1rem', background: { image: item.icon }, display: "inline-flex" }),
-                    this.$render("i-label", { caption: value, font: { color: Theme.text.secondary, size: '1.125rem' } })));
+                    this.$render("i-label", { caption: value, font: { color: Theme.colors.secondary.light, size: '1.125rem' } })));
                 this.groupAnalysis.appendChild(itemEl);
                 itemEl.onClick = () => {
                     if (item.onClick)
@@ -421,26 +429,29 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             this.onShareClicked = this.getAttribute('onShareClicked', true) || this.onShareClicked;
             this.onProfileClicked = this.getAttribute('onProfileClicked', true) || this.onProfileClicked;
             const data = this.getAttribute('data', true);
-            const isPrimary = this.getAttribute('isPrimary', true);
+            const isReply = this.getAttribute('isReply', true, false);
+            const isActive = this.getAttribute('isActive', true, false);
             const type = this.getAttribute('type', true);
             if (data)
-                await this.setData({ data, isPrimary, type });
+                await this.setData({ data, isReply, isActive, type });
         }
         render() {
-            return (this.$render("i-vstack", { id: "pnlWrapper", width: "100%", cursor: "pointer", margin: { top: '0.5rem' }, border: { radius: '0.5rem' }, background: { color: 'var(--background-paper)' } },
-                this.$render("i-grid-layout", { id: "gridPost", templateColumns: ['2.75rem', 'auto'], templateRows: ['auto'], gap: { column: '0.75rem', row: '1.313rem' }, position: 'relative' },
+            return (this.$render("i-vstack", { id: "pnlWrapper", width: "100%", cursor: "pointer", margin: { top: '0.5rem' }, border: { radius: '0.5rem' }, background: { color: Theme.background.paper } },
+                this.$render("i-grid-layout", { id: "gridPost", templateColumns: ['2.75rem', 'auto'], templateRows: ['auto'], gap: { column: '0.75rem', row: '1.313rem' }, padding: { left: '1.25rem', right: '1.25rem', top: '1rem', bottom: '1rem' }, position: 'relative' },
                     this.$render("i-panel", { id: "pnlActiveBd", visible: false, width: '0.25rem', height: '100%', left: "0px", top: "0px", border: { radius: '0.25rem 0 0 0.25rem' }, background: { color: Theme.background.gradient } }),
                     this.$render("i-panel", { id: "pnlAvatar", grid: { area: 'avatar' } },
                         this.$render("i-image", { id: "imgAvatar", width: '2.75rem', height: '2.75rem', display: "block", background: { color: Theme.background.gradient }, border: { radius: '50%' }, overflow: 'hidden', objectFit: 'cover' }),
                         this.$render("i-panel", { id: "pnlBd", visible: false, width: 2, height: 'calc(100% - 2.5rem)', left: "calc(50% - 1px)", top: "2.75rem", background: { color: Theme.colors.secondary.light } })),
                     this.$render("i-hstack", { horizontalAlignment: "space-between", gap: "0.5rem", width: "100%", grid: { area: 'user' }, position: 'relative' },
-                        this.$render("i-grid-layout", { id: "pnlInfo", gap: { column: '0.25rem', row: '0.5rem' } },
-                            this.$render("i-label", { id: "lblOwner", textOverflow: "ellipsis", font: { size: '0.875rem', weight: 500 }, grid: { area: 'name' } }),
+                        this.$render("i-grid-layout", { id: "pnlInfo", templateRows: ['max-content'], templateColumns: ['auto'], gap: { column: '0.25rem', row: '0.5rem' } },
+                            this.$render("i-hstack", { verticalAlignment: 'center', gap: "0.25rem", grid: { area: 'name' } },
+                                this.$render("i-label", { id: "lblOwner", textOverflow: "ellipsis", font: { size: '0.875rem', weight: 500 } }),
+                                this.$render("i-image", { id: "imgVerified", url: assets_1.default.fullPath('img/verified.svg'), width: '0.875rem', height: '0.875rem', visible: false })),
                             this.$render("i-hstack", { gap: '0.25rem', grid: { area: 'date' } },
                                 this.$render("i-panel", { border: { left: { width: '1px', style: 'solid', color: Theme.text.secondary } } }),
                                 this.$render("i-label", { id: "lblDate", font: { size: '0.875rem', color: Theme.text.secondary } })),
                             this.$render("i-label", { id: "lblUsername", textOverflow: "ellipsis", font: { color: Theme.text.secondary }, grid: { area: 'username' } })),
-                        this.$render("i-hstack", { id: "pnlSubscribe", stack: { basis: '30%' }, horizontalAlignment: "end", gap: "0.5rem", position: "absolute", top: '-0.5rem', right: '0px' },
+                        this.$render("i-hstack", { id: "pnlSubscribe", stack: { basis: '30%' }, horizontalAlignment: "end", gap: "0.5rem", position: "absolute", top: '-0.25rem', right: '0px' },
                             this.$render("i-button", { id: "btnSubscribe", minHeight: 32, padding: { left: '1rem', right: '1rem' }, background: { color: Theme.colors.primary.main }, font: { color: Theme.colors.primary.contrastText }, border: { radius: '30px' }, visible: false, caption: 'Subscribe' }),
                             this.$render("i-panel", { onClick: this.onProfileShown },
                                 this.$render("i-icon", { name: "ellipsis-h", width: '1rem', height: '1rem', fill: Theme.text.secondary, class: index_css_1.hoverStyle })))),

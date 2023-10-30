@@ -28,7 +28,8 @@ export { IPost, IPostData, IPostStat, IAuthor }
 interface ScomPostElement extends ControlElement {
   data?: IPost;
   type?: PostType;
-  isPrimary?: boolean;
+  isReply?: boolean;
+  isActive?: boolean;
 }
 
 declare global {
@@ -42,7 +43,8 @@ declare global {
 interface IPostConfig {
   data?: IPost;
   type?: PostType;
-  isPrimary?: boolean;
+  isReply?: boolean;
+  isActive?: boolean;
 }
 
 type PostType = 'full' | 'standard' | 'short';
@@ -55,6 +57,7 @@ export class ScomPost extends Module {
   private lblOwner: Label;
   private lblUsername: Label;
   private lblDate: Label;
+  private imgVerified: Image;
 
   private pnlWrapper: Panel;
   private pnlMore: GridLayout;
@@ -83,12 +86,20 @@ export class ScomPost extends Module {
     return self;
   }
 
-  get isPrimary() {
-    return this._data.isPrimary ?? false;
+  get isReply() {
+    return this._data.isReply ?? false;
   }
-  set isPrimary(value: boolean) {
-    this._data.isPrimary = value ?? false;
+  set isReply(value: boolean) {
+    this._data.isReply = value ?? false;
   }
+
+  get isActive() {
+    return this._data.isActive ?? false;
+  }
+  set isActive(value: boolean) {
+    this._data.isActive = value ?? false;
+  }
+
 
   get type() {
     return this._data.type ?? 'standard';
@@ -130,7 +141,6 @@ export class ScomPost extends Module {
     this.btnViewMore.visible = false;
     this.pnlContent.clearInnerHTML();
     this.pnlBd.visible = false;
-    this.gridPost.padding = {top: '0px', left: '0px', right: '0px'};
     this.pnlContent.minHeight = '12rem';
     if (this.pnlMore) {
       this.pnlMore.remove();
@@ -138,6 +148,7 @@ export class ScomPost extends Module {
     }
     this._replies = [];
     this.pnlActiveBd.visible = false;
+    this.imgVerified.visible = false;
   }
 
   private async renderUI() {
@@ -151,20 +162,20 @@ export class ScomPost extends Module {
     this.lblUsername.link.href = '';
     this.imgAvatar.url = author?.avatar ?? '';
     this.lblDate.caption = `${getDuration(publishDate)}`;
+    this.imgVerified.visible = true;
+    this.imgVerified.display = 'flex';
 
-    this.gridPost.padding = {left: '1.25rem', right: '1.25rem', top: '1rem', bottom: '1rem'};
-    if (replyTo && this.isPrimary) {  
+    if (replyTo && this.isReply) {  
       this.renderReplyTo(replyTo);
     }
-    if (this.isPrimary) {
-      this.pnlInfo.templateColumns = ['minmax(auto, 6.25rem)', 'auto'];
+    if (this.isActive) {
       this.pnlWrapper.border.radius = '0 0.25rem 0.25rem 0';
       this.pnlActiveBd.visible = true;
     } else {
       this.pnlWrapper.border.radius = '0.5rem';
       this.pnlActiveBd.visible = false;
     }
-
+  
     this.renderAnalytics(stat);
 
     // let _height = 0;
@@ -183,12 +194,12 @@ export class ScomPost extends Module {
   }
 
   private renderPostType() {
-    this.pnlInfo.templateColumns = ['auto']
     if (this.isFullType) {
       this.gridPost.templateAreas = [
         ['avatar', 'user'],
         ['content', 'content']
       ]
+      this.gridPost.gap = {column: '0.75rem', row: '0px'};
       this.pnlInfo.templateAreas = [
         ['name', 'username', 'date']
       ]
@@ -201,11 +212,13 @@ export class ScomPost extends Module {
         ['name', 'date'],
         ['username', 'username']
       ]
+      this.gridPost.gap = {column: '0.75rem', row: '1.313rem'};
     } else {
       this.gridPost.templateAreas = [
         ['avatar', 'user'],
         ['avatar', 'content']
       ]
+      this.gridPost.gap = {column: '0.75rem', row: '1.313rem'};
       this.pnlInfo.templateAreas = [
         ['name', 'username', 'date']
       ]
@@ -219,7 +232,7 @@ export class ScomPost extends Module {
       postEl.onShareClicked = this.onShareClicked;
       postEl.onProfileClicked = this.onProfileClicked;
       this.insertAdjacentElement('afterbegin', postEl);
-      postEl.setData({ data: replyTo });
+      postEl.setData({ data: replyTo, isReply: true });
     }
   }
 
@@ -274,7 +287,7 @@ export class ScomPost extends Module {
           ></i-panel>
           <i-label
             caption={value}
-            font={{color: Theme.text.secondary, size: '1.125rem'}}
+            font={{color: Theme.colors.secondary.light, size: '1.125rem'}}
           ></i-label>
         </i-hstack>
       )
@@ -354,9 +367,10 @@ export class ScomPost extends Module {
     this.onShareClicked = this.getAttribute('onShareClicked', true) || this.onShareClicked;
     this.onProfileClicked = this.getAttribute('onProfileClicked', true) || this.onProfileClicked;
     const data = this.getAttribute('data', true);
-    const isPrimary = this.getAttribute('isPrimary', true);
+    const isReply = this.getAttribute('isReply', true, false);
+    const isActive = this.getAttribute('isActive', true, false);
     const type = this.getAttribute('type', true);
-    if (data) await this.setData({data, isPrimary, type});
+    if (data) await this.setData({data, isReply, isActive, type});
   }
 
   render() {
@@ -373,6 +387,7 @@ export class ScomPost extends Module {
           templateColumns={['2.75rem', 'auto']}
           templateRows={['auto']}
           gap={{column: '0.75rem', row: '1.313rem'}}
+          padding={{left: '1.25rem', right: '1.25rem', top: '1rem', bottom: '1rem'}}
           position='relative'
         >
           <i-panel
@@ -404,9 +419,19 @@ export class ScomPost extends Module {
           <i-hstack horizontalAlignment="space-between" gap="0.5rem" width="100%" grid={{area: 'user'}} position='relative'>
             <i-grid-layout
               id="pnlInfo"
+              templateRows={['max-content']}
+              templateColumns={['auto']}
               gap={{column: '0.25rem', row: '0.5rem'}}
             >
-              <i-label id="lblOwner" textOverflow="ellipsis" font={{ size: '0.875rem', weight: 500 }} grid={{area: 'name'}}></i-label>
+              <i-hstack verticalAlignment='center' gap="0.25rem" grid={{area: 'name'}}>
+                <i-label id="lblOwner" textOverflow="ellipsis" font={{ size: '0.875rem', weight: 500 }}></i-label>
+                <i-image
+                  id="imgVerified"
+                  url={assets.fullPath('img/verified.svg')}
+                  width={'0.875rem'} height={'0.875rem'}
+                  visible={false}
+                ></i-image>
+              </i-hstack>
               <i-hstack gap={'0.25rem'} grid={{area: 'date'}}>
                 <i-panel border={{left: {width: '1px', style: 'solid', color: Theme.text.secondary}}}></i-panel>
                 <i-label id="lblDate" font={{ size: '0.875rem', color: Theme.text.secondary }} />
