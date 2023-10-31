@@ -10,7 +10,8 @@ import {
   Panel,
   GridLayout,
   HStack,
-  Control
+  Control,
+  VStack
 } from '@ijstech/components';
 import {
   getDuration,
@@ -30,6 +31,8 @@ interface ScomPostElement extends ControlElement {
   type?: PostType;
   isReply?: boolean;
   isActive?: boolean;
+  onReplyClicked?: callbackType;
+  onProfileClicked?: callbackType;
 }
 
 declare global {
@@ -61,23 +64,24 @@ export class ScomPost extends Module {
 
   private pnlWrapper: Panel;
   private pnlMore: GridLayout;
+  private pnlReply: VStack;
+  private pnlReplies: VStack;
   private gridPost: GridLayout;
   private btnViewMore: HStack;
   private pnlDetail: Panel;
   private pnlOverlay: Panel;
   private groupAnalysis: HStack;
-  private pnlBd: Panel;
   private pnlActiveBd: Panel;
   private pnlContent: Panel;
 
   private _data: IPostConfig;
   private _replies: IPost[];
   public onReplyClicked: callbackType;
-  public onShareClicked: callbackType;
   public onProfileClicked: callbackType;
 
   constructor(parent?: Container, options?: any) {
     super(parent, options);
+    this.onShowMore = this.onShowMore.bind(this);
   }
 
   static async create(options?: ScomPostElement, parent?: Container) {
@@ -99,7 +103,6 @@ export class ScomPost extends Module {
   set isActive(value: boolean) {
     this._data.isActive = value ?? false;
   }
-
 
   get type() {
     return this._data.type ?? 'standard';
@@ -140,7 +143,6 @@ export class ScomPost extends Module {
     this.pnlOverlay.visible = false;
     this.btnViewMore.visible = false;
     this.pnlContent.clearInnerHTML();
-    this.pnlBd.visible = false;
     this.pnlContent.minHeight = '12rem';
     if (this.pnlMore) {
       this.pnlMore.remove();
@@ -168,13 +170,8 @@ export class ScomPost extends Module {
     if (replyTo && this.isReply) {  
       this.renderReplyTo(replyTo);
     }
-    if (this.isActive) {
-      this.pnlWrapper.border.radius = '0 0.25rem 0.25rem 0';
-      this.pnlActiveBd.visible = true;
-    } else {
-      this.pnlWrapper.border.radius = '0.5rem';
-      this.pnlActiveBd.visible = false;
-    }
+    this.pnlActiveBd.visible = this.isActive;
+    this.gridPost.border.radius = this.isActive ? '0.25rem' : '0.5rem';
   
     this.renderAnalytics(stat);
 
@@ -229,7 +226,6 @@ export class ScomPost extends Module {
     if (replyTo) {
       const postEl = <i-scom-post margin={{bottom: '0.5rem'}} display='block'></i-scom-post> as ScomPost;
       postEl.onReplyClicked = this.onReplyClicked;
-      postEl.onShareClicked = this.onShareClicked;
       postEl.onProfileClicked = this.onProfileClicked;
       this.insertAdjacentElement('afterbegin', postEl);
       postEl.setData({ data: replyTo, isReply: true });
@@ -300,34 +296,42 @@ export class ScomPost extends Module {
 
   addReply(parentPostId: string, post: IPost) {
     if (parentPostId !== this.postData.id) return;
-    if (!this.pnlMore) this.appendShowMorePanel();
-    // this.pnlBd.visible = true;
+    if (!this.pnlReply) this.appendReplyPanel();
     this._replies.push(post);
+    return this.renderReply(post);
   };
+
   appendReplyPanel(){
-    this.pnlMore.clearInnerHTML();
-    this.pnlMore.templateColumns = ['auto'];
-    this.pnlMore.padding = {top: '0px', left: '0px', right: '0px'};
+    this.pnlReply = <i-vstack id="pnlReply" visible={!this.pnlMore}>
+      <i-vstack id="pnlReplies" gap={'0.5rem'}></i-vstack>
+    </i-vstack>
+    this.pnlWrapper.appendChild(this.pnlReply);
+    return this.pnlReply;
+  };
+
+  private renderReplies() {
+    if (this.pnlReplies) this.pnlReplies.clearInnerHTML();
     const length = this._replies?.length;
     if (length) {
       for (let i = 0; i < length; i++) {
         const reply = this._replies[i];
-        const childElm = <i-scom-post></i-scom-post> as ScomPost;
-        childElm.onReplyClicked = this.onReplyClicked;
-        childElm.onShareClicked = this.onShareClicked;
-        childElm.onProfileClicked = this.onProfileClicked;
-        childElm.parent = this.pnlMore;
-        childElm.setAttribute('isChild', 'true');
-        if (i === length - 1) {
-          childElm.setAttribute('isLastChild', 'true');
-        }
-        this.pnlMore.appendChild(childElm);
-        childElm.setData({data: reply});
+        this.renderReply(reply);
       }
     }
-  };
+  }
+
+  private renderReply(reply: IPost) {
+    const childElm = <i-scom-post></i-scom-post> as ScomPost;
+    childElm.onReplyClicked = this.onReplyClicked;
+    childElm.onProfileClicked = this.onProfileClicked;
+    childElm.parent = this.pnlReplies;
+    this.pnlReplies.appendChild(childElm);
+    childElm.setData({data: reply});
+    return childElm;
+  }
+
   appendShowMorePanel(){
-    const morePnl = (
+    this.pnlMore = (
       <i-grid-layout
         id="pnlMore"
         templateColumns={['2.75rem', 'auto']}
@@ -343,11 +347,19 @@ export class ScomPost extends Module {
         <i-label caption='Show replies' font={{color: Theme.colors.primary.main, size: '0.9rem'}}></i-label>
       </i-grid-layout>
     );
-    this.pnlWrapper.appendChild(morePnl);
+    if (this.pnlReply) this.pnlReply.visible = false;
+    this.pnlWrapper.appendChild(this.pnlMore);
   };
 
   private onShowMore() {
-    this.appendReplyPanel();
+    this.pnlMore.visible = false;
+    if (!this.pnlReply) this.appendReplyPanel();
+    this.pnlReply.visible = true;
+    this.renderReplies();
+  }
+
+  private onProfileShown(target: Control) {
+    if (this.onProfileClicked) this.onProfileClicked(target, this.postData);
   }
 
   private onViewMore() {
@@ -357,14 +369,9 @@ export class ScomPost extends Module {
     this.btnViewMore.visible = false;
   }
 
-  private onProfileShown(target: Control) {
-    if (this.onProfileClicked) this.onProfileClicked(target, this.postData);
-  }
-
   async init() {
     super.init();
     this.onReplyClicked = this.getAttribute('onReplyClicked', true) || this.onReplyClicked;
-    this.onShareClicked = this.getAttribute('onShareClicked', true) || this.onShareClicked;
     this.onProfileClicked = this.getAttribute('onProfileClicked', true) || this.onProfileClicked;
     const data = this.getAttribute('data', true);
     const isReply = this.getAttribute('isReply', true, false);
@@ -378,9 +385,7 @@ export class ScomPost extends Module {
       <i-vstack
         id="pnlWrapper"
         width="100%" cursor="pointer"
-        margin={{top: '0.5rem'}}
-        border={{radius: '0.5rem'}}
-        background={{color: Theme.background.paper}}
+        border={{radius: 'inherit'}}
       >
         <i-grid-layout
           id="gridPost"
@@ -389,6 +394,8 @@ export class ScomPost extends Module {
           gap={{column: '0.75rem', row: '1.313rem'}}
           padding={{left: '1.25rem', right: '1.25rem', top: '1rem', bottom: '1rem'}}
           position='relative'
+          border={{radius: '0.5rem'}}
+          background={{color: Theme.background.paper}}
         >
           <i-panel
             id="pnlActiveBd"
@@ -408,13 +415,6 @@ export class ScomPost extends Module {
               overflow={'hidden'}
               objectFit='cover'
             ></i-image>
-            <i-panel
-              id="pnlBd"
-              visible={false}
-              width={2} height={'calc(100% - 2.5rem)'}
-              left="calc(50% - 1px)" top="2.75rem"
-              background={{color: Theme.colors.secondary.light}}
-            ></i-panel>
           </i-panel>
           <i-hstack horizontalAlignment="space-between" gap="0.5rem" width="100%" grid={{area: 'user'}} position='relative'>
             <i-grid-layout
@@ -450,7 +450,7 @@ export class ScomPost extends Module {
                 padding={{left: '1rem', right: '1rem'}}
                 background={{color: Theme.colors.primary.main}}
                 font={{color: Theme.colors.primary.contrastText}}
-                border={{radius: '30px'}}
+                border={{radius: '1.875rem'}}
                 visible={false}
                 caption='Subscribe'
               ></i-button>

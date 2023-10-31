@@ -67,7 +67,7 @@ declare module "@scom/scom-post/assets.ts" {
 }
 /// <amd-module name="@scom/scom-post" />
 declare module "@scom/scom-post" {
-    import { ControlElement, Module, Container, Control } from '@ijstech/components';
+    import { ControlElement, Module, Container, Control, VStack } from '@ijstech/components';
     import { IPost, IPostData, IPostStat, IAuthor } from "@scom/scom-post/global/index.ts";
     export { IPost, IPostData, IPostStat, IAuthor };
     interface ScomPostElement extends ControlElement {
@@ -75,6 +75,8 @@ declare module "@scom/scom-post" {
         type?: PostType;
         isReply?: boolean;
         isActive?: boolean;
+        onReplyClicked?: callbackType;
+        onProfileClicked?: callbackType;
     }
     global {
         namespace JSX {
@@ -100,18 +102,18 @@ declare module "@scom/scom-post" {
         private imgVerified;
         private pnlWrapper;
         private pnlMore;
+        private pnlReply;
+        private pnlReplies;
         private gridPost;
         private btnViewMore;
         private pnlDetail;
         private pnlOverlay;
         private groupAnalysis;
-        private pnlBd;
         private pnlActiveBd;
         private pnlContent;
         private _data;
         private _replies;
         onReplyClicked: callbackType;
-        onShareClicked: callbackType;
         onProfileClicked: callbackType;
         constructor(parent?: Container, options?: any);
         static create(options?: ScomPostElement, parent?: Container): Promise<ScomPost>;
@@ -132,12 +134,14 @@ declare module "@scom/scom-post" {
         private renderPostType;
         private renderReplyTo;
         private renderAnalytics;
-        addReply(parentPostId: string, post: IPost): void;
-        appendReplyPanel(): void;
+        addReply(parentPostId: string, post: IPost): ScomPost;
+        appendReplyPanel(): VStack;
+        private renderReplies;
+        private renderReply;
         appendShowMorePanel(): void;
         private onShowMore;
-        private onViewMore;
         private onProfileShown;
+        private onViewMore;
         init(): Promise<void>;
         render(): any;
     }
