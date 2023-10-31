@@ -118,6 +118,7 @@ export default class Module1 extends Module {
 
   init() {
     super.init();
+    this.postElm.appendShowMorePanel();
     this.postElm.addReply('post',  {
       id: 'post_3',
       publishDate: '10/02/2023 09:15:00',
