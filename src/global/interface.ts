@@ -7,11 +7,12 @@ export interface IAuthor {
 };
 export interface IPost {
   id: string;
-  author: IAuthor; // authorId: string;
-  replyTo?: IPost; // replyToId?: string;
-  publishDate: Date|string;
-  stat?: IPostStat;
-  data: IPostData[];
+	author: IAuthor;
+	replyTo?: IPost;
+	quotedPosts?: IPost[];
+	publishDate: Date | string;
+	stat?: IPostStat;
+	data: IPostData[];
 };
 export interface IPostStat{
   reply?: number;
