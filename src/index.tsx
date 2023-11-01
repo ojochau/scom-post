@@ -161,13 +161,13 @@ export class ScomPost extends Module {
     this.imgVerified.visible = true;
     this.imgVerified.display = 'flex';
 
-    this.renderQuotedPosts(quotedPosts);
+    // this.renderQuotedPosts(quotedPosts);
 
     if (replyTo && !this.isActive) {
       this.pnlReplyPath.visible = true;
       this.lblUsername.visible = false;
       this.lbReplyTo.caption = replyTo?.author?.username;
-      this.lbReplyTo.link.href = `#/e/${replyTo?.author?.pubKey || ''}`;
+      this.lbReplyTo.link.href = `#/p/${replyTo?.author?.pubKey || ''}`;
     }
 
     this.pnlActiveBd.visible = this.isActive;
@@ -222,16 +222,16 @@ export class ScomPost extends Module {
     }
   }
 
-  private renderQuotedPosts(posts: IPost[]) {
-    if (!posts?.length) return;
-    for (let post of posts) {
-      const postEl = <i-scom-post margin={{bottom: '0.5rem'}} display='block'></i-scom-post> as ScomPost;
-      postEl.onReplyClicked = this.onReplyClicked;
-      postEl.onProfileClicked = this.onProfileClicked;
-      this.insertAdjacentElement('afterbegin', postEl);
-      postEl.setData({ data: post });
-    }
-  }
+  // private renderQuotedPosts(posts: IPost[]) {
+  //   if (!posts?.length) return;
+  //   for (let post of posts) {
+  //     const postEl = <i-scom-post margin={{bottom: '0.5rem'}} display='block'></i-scom-post> as ScomPost;
+  //     postEl.onReplyClicked = this.onReplyClicked;
+  //     postEl.onProfileClicked = this.onProfileClicked;
+  //     this.insertAdjacentElement('afterbegin', postEl);
+  //     postEl.setData({ data: post });
+  //   }
+  // }
 
   private renderAnalytics(analytics: any) {
     const dataList = [
@@ -417,6 +417,7 @@ export class ScomPost extends Module {
               border={{radius: '50%'}}
               overflow={'hidden'}
               objectFit='cover'
+              fallbackUrl={assets.fullPath('img/default_avatar.svg')}
             ></i-image>
           </i-panel>
           <i-hstack horizontalAlignment="space-between" gap="0.5rem" width="100%" grid={{area: 'user'}} position='relative'>

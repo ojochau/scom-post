@@ -131,7 +131,6 @@ declare module "@scom/scom-post" {
         clear(): void;
         private renderUI;
         private renderPostType;
-        private renderQuotedPosts;
         private renderAnalytics;
         addReply(parentPostId: string, post: IPost): ScomPost;
         appendReplyPanel(): VStack;

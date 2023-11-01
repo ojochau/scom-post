@@ -246,12 +246,12 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             this.lblDate.caption = `${(0, global_1.getDuration)(publishDate)}`;
             this.imgVerified.visible = true;
             this.imgVerified.display = 'flex';
-            this.renderQuotedPosts(quotedPosts);
+            // this.renderQuotedPosts(quotedPosts);
             if (replyTo && !this.isActive) {
                 this.pnlReplyPath.visible = true;
                 this.lblUsername.visible = false;
                 this.lbReplyTo.caption = replyTo?.author?.username;
-                this.lbReplyTo.link.href = `#/e/${replyTo?.author?.pubKey || ''}`;
+                this.lbReplyTo.link.href = `#/p/${replyTo?.author?.pubKey || ''}`;
             }
             this.pnlActiveBd.visible = this.isActive;
             this.gridPost.border.radius = this.isActive ? '0.25rem' : '0.5rem';
@@ -303,17 +303,16 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                 ];
             }
         }
-        renderQuotedPosts(posts) {
-            if (!posts?.length)
-                return;
-            for (let post of posts) {
-                const postEl = this.$render("i-scom-post", { margin: { bottom: '0.5rem' }, display: 'block' });
-                postEl.onReplyClicked = this.onReplyClicked;
-                postEl.onProfileClicked = this.onProfileClicked;
-                this.insertAdjacentElement('afterbegin', postEl);
-                postEl.setData({ data: post });
-            }
-        }
+        // private renderQuotedPosts(posts: IPost[]) {
+        //   if (!posts?.length) return;
+        //   for (let post of posts) {
+        //     const postEl = <i-scom-post margin={{bottom: '0.5rem'}} display='block'></i-scom-post> as ScomPost;
+        //     postEl.onReplyClicked = this.onReplyClicked;
+        //     postEl.onProfileClicked = this.onProfileClicked;
+        //     this.insertAdjacentElement('afterbegin', postEl);
+        //     postEl.setData({ data: post });
+        //   }
+        // }
         renderAnalytics(analytics) {
             const dataList = [
                 {
@@ -446,7 +445,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                 this.$render("i-grid-layout", { id: "gridPost", templateColumns: ['2.75rem', 'auto'], templateRows: ['auto'], gap: { column: '0.75rem' }, padding: { left: '1.25rem', right: '1.25rem', top: '1rem', bottom: '1rem' }, position: 'relative', border: { radius: '0.5rem' }, background: { color: Theme.background.paper } },
                     this.$render("i-panel", { id: "pnlActiveBd", visible: false, width: '0.25rem', height: '100%', left: "0px", top: "0px", border: { radius: '0.25rem 0 0 0.25rem' }, background: { color: Theme.background.gradient } }),
                     this.$render("i-panel", { id: "pnlAvatar", grid: { area: 'avatar' } },
-                        this.$render("i-image", { id: "imgAvatar", width: '2.75rem', height: '2.75rem', display: "block", background: { color: Theme.background.gradient }, border: { radius: '50%' }, overflow: 'hidden', objectFit: 'cover' })),
+                        this.$render("i-image", { id: "imgAvatar", width: '2.75rem', height: '2.75rem', display: "block", background: { color: Theme.background.gradient }, border: { radius: '50%' }, overflow: 'hidden', objectFit: 'cover', fallbackUrl: assets_1.default.fullPath('img/default_avatar.svg') })),
                     this.$render("i-hstack", { horizontalAlignment: "space-between", gap: "0.5rem", width: "100%", grid: { area: 'user' }, position: 'relative' },
                         this.$render("i-grid-layout", { id: "pnlInfo", templateRows: ['max-content'], templateColumns: ['auto'], gap: { column: '0.25rem', row: '0.5rem' } },
                             this.$render("i-hstack", { verticalAlignment: 'center', gap: "0.25rem", grid: { area: 'name' } },
