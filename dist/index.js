@@ -218,40 +218,33 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             return this.type === 'full';
         }
         clear() {
-            this.imgAvatar.url = "";
-            this.lblOwner.caption = "";
-            this.lblUsername.caption = "";
-            this.lblDate.caption = "";
+            // this.imgAvatar.url = "";
+            // this.lblOwner.caption = "";
+            // this.lblUsername.caption = "";
+            // this.lblDate.caption = "";
+            // this.imgVerified.visible = false;
             this.pnlOverlay.visible = false;
             this.btnViewMore.visible = false;
             this.pnlContent.clearInnerHTML();
-            this.pnlContent.minHeight = '12rem';
+            this.pnlContent.minHeight = '5rem';
             if (this.pnlMore) {
                 this.pnlMore.remove();
                 this.pnlMore = undefined;
             }
             this._replies = [];
             this.pnlActiveBd.visible = false;
-            this.imgVerified.visible = false;
             this.pnlReplyPath.visible = false;
+            this.pnlInfo.clearInnerHTML();
         }
         async renderUI() {
             this.clear();
-            const { stat, publishDate, author, replyTo, data } = this._data?.data || {};
+            const { stat, replyTo, data } = this._data?.data || {};
             this.renderPostType();
-            this.lblOwner.caption = author?.displayName || '';
-            this.lblUsername.caption = `${author?.internetIdentifier || ''}`;
-            this.imgAvatar.url = author?.avatar ?? '';
-            this.lblDate.caption = `${(0, global_1.getDuration)(publishDate)}`;
-            this.imgVerified.visible = true;
-            this.imgVerified.display = 'flex';
             // this.renderQuotedPosts(quotedPosts);
             if (replyTo && !this.isActive) {
                 this.pnlReplyPath.visible = true;
                 this.lblUsername.visible = false;
                 this.lbReplyTo.caption = replyTo?.author?.displayName || '';
-                if (replyTo?.author?.pubKey)
-                    this.lbReplyTo.link.href = `#/p/${replyTo.author.pubKey}`;
             }
             this.pnlActiveBd.visible = this.isActive;
             this.gridPost.border.radius = this.isActive ? '0.25rem' : '0.5rem';
@@ -270,36 +263,53 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                 }
             }
         }
+        renderInfo(oneLine) {
+            const { publishDate, author } = this.postData;
+            this.imgAvatar.url = author?.avatar ?? '';
+            const userEl = (this.$render("i-hstack", { verticalAlignment: 'center', gap: "0.25rem" },
+                this.$render("i-label", { id: "lblOwner", caption: author?.displayName || '', textOverflow: "ellipsis", font: { size: '0.875rem', weight: 500 } }),
+                this.$render("i-image", { id: "imgVerified", url: assets_1.default.fullPath('img/verified.svg'), width: '0.875rem', height: '0.875rem', display: 'flex' })));
+            const dateEl = (this.$render("i-hstack", { gap: '0.25rem' },
+                this.$render("i-panel", { border: { left: { width: '1px', style: 'solid', color: Theme.text.secondary } } }),
+                this.$render("i-label", { id: "lblDate", font: { size: '0.875rem', color: Theme.text.secondary }, caption: `${(0, global_1.getDuration)(publishDate)}` })));
+            const usernameEl = (this.$render("i-label", { id: "lblUsername", caption: `${author?.internetIdentifier || ''}`, textOverflow: "ellipsis", font: { color: Theme.text.secondary } }));
+            if (oneLine) {
+                this.pnlInfo.append(this.$render("i-hstack", { gap: "0.25rem" },
+                    userEl,
+                    usernameEl,
+                    dateEl));
+            }
+            else {
+                this.pnlInfo.append(this.$render("i-vstack", { gap: "0.5rem" },
+                    this.$render("i-hstack", { gap: "0.25rem", verticalAlignment: "center" },
+                        userEl,
+                        dateEl),
+                    usernameEl));
+            }
+        }
         renderPostType() {
             if (this.isFullType) {
+                this.renderInfo(true);
                 this.gridPost.templateAreas = [
                     ['avatar', 'user'],
                     ['avatar', 'path'],
                     ['content', 'content']
                 ];
-                this.pnlInfo.templateAreas = [
-                    ['name', 'username', 'date']
-                ];
             }
             else if (this.type === 'short') {
+                this.renderInfo();
                 this.gridPost.templateAreas = [
                     ['avatar', 'user'],
                     ['avatar', 'path'],
                     ['avatar', 'content']
-                ];
-                this.pnlInfo.templateAreas = [
-                    ['name', 'date'],
-                    ['username', 'username']
                 ];
             }
             else {
+                this.renderInfo(true);
                 this.gridPost.templateAreas = [
                     ['avatar', 'user'],
                     ['avatar', 'path'],
                     ['avatar', 'content']
-                ];
-                this.pnlInfo.templateAreas = [
-                    ['name', 'username', 'date']
                 ];
             }
         }
@@ -452,21 +462,14 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     this.$render("i-panel", { id: "pnlAvatar", grid: { area: 'avatar' } },
                         this.$render("i-image", { id: "imgAvatar", width: '2.75rem', height: '2.75rem', display: "block", background: { color: Theme.background.gradient }, border: { radius: '50%' }, overflow: 'hidden', objectFit: 'cover', fallbackUrl: assets_1.default.fullPath('img/default_avatar.svg'), onClick: () => this.onGoProfile() })),
                     this.$render("i-hstack", { horizontalAlignment: "space-between", gap: "0.5rem", width: "100%", grid: { area: 'user' }, position: 'relative' },
-                        this.$render("i-grid-layout", { id: "pnlInfo", templateRows: ['max-content'], templateColumns: ['auto'], gap: { column: '0.25rem', row: '0.5rem' } },
-                            this.$render("i-hstack", { verticalAlignment: 'center', gap: "0.25rem", grid: { area: 'name' } },
-                                this.$render("i-label", { id: "lblOwner", textOverflow: "ellipsis", font: { size: '0.875rem', weight: 500 } }),
-                                this.$render("i-image", { id: "imgVerified", url: assets_1.default.fullPath('img/verified.svg'), width: '0.875rem', height: '0.875rem', visible: false })),
-                            this.$render("i-hstack", { gap: '0.25rem', grid: { area: 'date' } },
-                                this.$render("i-panel", { border: { left: { width: '1px', style: 'solid', color: Theme.text.secondary } } }),
-                                this.$render("i-label", { id: "lblDate", font: { size: '0.875rem', color: Theme.text.secondary } })),
-                            this.$render("i-label", { id: "lblUsername", textOverflow: "ellipsis", font: { color: Theme.text.secondary } })),
+                        this.$render("i-panel", { id: "pnlInfo" }),
                         this.$render("i-hstack", { id: "pnlSubscribe", stack: { basis: '30%' }, horizontalAlignment: "end", gap: "0.5rem", position: "absolute", top: '-0.25rem', right: '0px' },
                             this.$render("i-button", { id: "btnSubscribe", minHeight: 32, padding: { left: '1rem', right: '1rem' }, background: { color: Theme.colors.primary.main }, font: { color: Theme.colors.primary.contrastText }, border: { radius: '1.875rem' }, visible: false, caption: 'Subscribe' }),
                             this.$render("i-panel", { onClick: this.onProfileShown },
                                 this.$render("i-icon", { name: "ellipsis-h", width: '1rem', height: '1rem', fill: Theme.text.secondary, class: index_css_1.hoverStyle })))),
                     this.$render("i-hstack", { id: "pnlReplyPath", verticalAlignment: "center", gap: "0.25rem", visible: false, grid: { area: 'path' }, margin: { top: '0.5rem' } },
                         this.$render("i-label", { caption: 'replying to', font: { size: '0.875rem', color: Theme.colors.secondary.light } }),
-                        this.$render("i-label", { id: "lbReplyTo", caption: '', font: { size: '0.875rem', color: Theme.colors.primary.main }, link: { href: '#' } })),
+                        this.$render("i-label", { id: "lbReplyTo", font: { size: '0.875rem', color: Theme.colors.primary.main }, cursor: "pointer", onClick: () => this.onGoProfile() })),
                     this.$render("i-vstack", { width: '100%', grid: { area: 'content' }, margin: { top: '1rem' } },
                         this.$render("i-panel", { id: "pnlDetail" },
                             this.$render("i-vstack", { id: "pnlContent", gap: "0.75rem" }),

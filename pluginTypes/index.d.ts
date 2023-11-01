@@ -132,6 +132,7 @@ declare module "@scom/scom-post" {
         get isFullType(): boolean;
         clear(): void;
         private renderUI;
+        private renderInfo;
         private renderPostType;
         private renderAnalytics;
         addReply(parentPostId: string, post: IPost): ScomPost;
