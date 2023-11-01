@@ -6,6 +6,8 @@ declare module "@scom/scom-post/global/interface.ts" {
         description: string;
         avatar: string;
         pubKey?: string;
+        displayName?: string;
+        internetIdentifier: string;
     }
     export interface IPost {
         id: string;
@@ -140,6 +142,7 @@ declare module "@scom/scom-post" {
         private onShowMore;
         private onProfileShown;
         private onViewMore;
+        private onGoProfile;
         init(): Promise<void>;
         render(): any;
     }

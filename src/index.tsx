@@ -149,13 +149,12 @@ export class ScomPost extends Module {
 
   private async renderUI() {
     this.clear();
-    const { stat, publishDate, author, replyTo, data, quotedPosts = [] } = this._data?.data || {};
+    const { stat, publishDate, author, replyTo, data } = this._data?.data || {};
 
     this.renderPostType();
 
-    this.lblOwner.caption = author?.id || '';
-    this.lblUsername.caption = `${author?.username || ''}`;
-    this.lblUsername.link.href = '';
+    this.lblOwner.caption = author?.displayName || '';
+    this.lblUsername.caption = `${author?.internetIdentifier || ''}`;
     this.imgAvatar.url = author?.avatar ?? '';
     this.lblDate.caption = `${getDuration(publishDate)}`;
     this.imgVerified.visible = true;
@@ -166,8 +165,9 @@ export class ScomPost extends Module {
     if (replyTo && !this.isActive) {
       this.pnlReplyPath.visible = true;
       this.lblUsername.visible = false;
-      this.lbReplyTo.caption = replyTo?.author?.username;
-      this.lbReplyTo.link.href = `#/p/${replyTo?.author?.pubKey || ''}`;
+      this.lbReplyTo.caption = replyTo?.author?.displayName || '';
+      if (replyTo?.author?.pubKey)
+        this.lbReplyTo.link.href = `#/p/${replyTo.author.pubKey}`;
     }
 
     this.pnlActiveBd.visible = this.isActive;
@@ -373,6 +373,12 @@ export class ScomPost extends Module {
     this.btnViewMore.visible = false;
   }
 
+  private onGoProfile() {
+    if (this.postData?.author?.pubKey) {
+      window.open(`#/p/${this.postData.author.pubKey}`, '_self');
+    }
+  }
+
   async init() {
     super.init();
     this.onReplyClicked = this.getAttribute('onReplyClicked', true) || this.onReplyClicked;
@@ -418,6 +424,7 @@ export class ScomPost extends Module {
               overflow={'hidden'}
               objectFit='cover'
               fallbackUrl={assets.fullPath('img/default_avatar.svg')}
+              onClick={() => this.onGoProfile()}
             ></i-image>
           </i-panel>
           <i-hstack horizontalAlignment="space-between" gap="0.5rem" width="100%" grid={{area: 'user'}} position='relative'>
