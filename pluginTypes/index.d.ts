@@ -11,6 +11,7 @@ declare module "@scom/scom-post/global/interface.ts" {
         id: string;
         author: IAuthor;
         replyTo?: IPost;
+        quotedPosts?: IPost[];
         publishDate: Date | string;
         stat?: IPostStat;
         data: IPostData[];
@@ -73,7 +74,6 @@ declare module "@scom/scom-post" {
     interface ScomPostElement extends ControlElement {
         data?: IPost;
         type?: PostType;
-        isReply?: boolean;
         isActive?: boolean;
         onReplyClicked?: callbackType;
         onProfileClicked?: callbackType;
@@ -88,7 +88,6 @@ declare module "@scom/scom-post" {
     interface IPostConfig {
         data?: IPost;
         type?: PostType;
-        isReply?: boolean;
         isActive?: boolean;
     }
     type PostType = 'full' | 'standard' | 'short';
@@ -111,14 +110,14 @@ declare module "@scom/scom-post" {
         private groupAnalysis;
         private pnlActiveBd;
         private pnlContent;
+        private pnlReplyPath;
+        private lbReplyTo;
         private _data;
         private _replies;
         onReplyClicked: callbackType;
         onProfileClicked: callbackType;
         constructor(parent?: Container, options?: any);
         static create(options?: ScomPostElement, parent?: Container): Promise<ScomPost>;
-        get isReply(): boolean;
-        set isReply(value: boolean);
         get isActive(): boolean;
         set isActive(value: boolean);
         get type(): PostType;
@@ -132,7 +131,7 @@ declare module "@scom/scom-post" {
         clear(): void;
         private renderUI;
         private renderPostType;
-        private renderReplyTo;
+        private renderQuotedPosts;
         private renderAnalytics;
         addReply(parentPostId: string, post: IPost): ScomPost;
         appendReplyPanel(): VStack;

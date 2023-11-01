@@ -29,7 +29,6 @@ export { IPost, IPostData, IPostStat, IAuthor }
 interface ScomPostElement extends ControlElement {
   data?: IPost;
   type?: PostType;
-  isReply?: boolean;
   isActive?: boolean;
   onReplyClicked?: callbackType;
   onProfileClicked?: callbackType;
@@ -46,7 +45,6 @@ declare global {
 interface IPostConfig {
   data?: IPost;
   type?: PostType;
-  isReply?: boolean;
   isActive?: boolean;
 }
 
@@ -73,6 +71,8 @@ export class ScomPost extends Module {
   private groupAnalysis: HStack;
   private pnlActiveBd: Panel;
   private pnlContent: Panel;
+  private pnlReplyPath: Panel;
+  private lbReplyTo: Label;
 
   private _data: IPostConfig;
   private _replies: IPost[];
@@ -88,13 +88,6 @@ export class ScomPost extends Module {
     let self = new this(parent, options);
     await self.ready();
     return self;
-  }
-
-  get isReply() {
-    return this._data.isReply ?? false;
-  }
-  set isReply(value: boolean) {
-    this._data.isReply = value ?? false;
   }
 
   get isActive() {
@@ -151,11 +144,12 @@ export class ScomPost extends Module {
     this._replies = [];
     this.pnlActiveBd.visible = false;
     this.imgVerified.visible = false;
+    this.pnlReplyPath.visible = false;
   }
 
   private async renderUI() {
     this.clear();
-    const { stat, publishDate, author, replyTo, data } = this._data?.data || {};
+    const { stat, publishDate, author, replyTo, data, quotedPosts = [] } = this._data?.data || {};
 
     this.renderPostType();
 
@@ -167,9 +161,15 @@ export class ScomPost extends Module {
     this.imgVerified.visible = true;
     this.imgVerified.display = 'flex';
 
-    if (replyTo && this.isReply) {  
-      this.renderReplyTo(replyTo);
+    this.renderQuotedPosts(quotedPosts);
+
+    if (replyTo && !this.isActive) {
+      this.pnlReplyPath.visible = true;
+      this.lblUsername.visible = false;
+      this.lbReplyTo.caption = replyTo?.author?.username;
+      this.lbReplyTo.link.href = `#/e/${replyTo?.author?.pubKey || ''}`;
     }
+
     this.pnlActiveBd.visible = this.isActive;
     this.gridPost.border.radius = this.isActive ? '0.25rem' : '0.5rem';
   
@@ -194,41 +194,42 @@ export class ScomPost extends Module {
     if (this.isFullType) {
       this.gridPost.templateAreas = [
         ['avatar', 'user'],
+        ['avatar', 'path'],
         ['content', 'content']
       ]
-      this.gridPost.gap = {column: '0.75rem', row: '0px'};
       this.pnlInfo.templateAreas = [
         ['name', 'username', 'date']
       ]
     } else if (this.type === 'short') {
       this.gridPost.templateAreas = [
         ['avatar', 'user'],
+        ['avatar', 'path'],
         ['avatar', 'content']
       ]
       this.pnlInfo.templateAreas = [
         ['name', 'date'],
         ['username', 'username']
       ]
-      this.gridPost.gap = {column: '0.75rem', row: '1.313rem'};
     } else {
       this.gridPost.templateAreas = [
         ['avatar', 'user'],
+        ['avatar', 'path'],
         ['avatar', 'content']
       ]
-      this.gridPost.gap = {column: '0.75rem', row: '1.313rem'};
       this.pnlInfo.templateAreas = [
         ['name', 'username', 'date']
       ]
     }
   }
 
-  private renderReplyTo(replyTo: IPost) {
-    if (replyTo) {
+  private renderQuotedPosts(posts: IPost[]) {
+    if (!posts?.length) return;
+    for (let post of posts) {
       const postEl = <i-scom-post margin={{bottom: '0.5rem'}} display='block'></i-scom-post> as ScomPost;
       postEl.onReplyClicked = this.onReplyClicked;
       postEl.onProfileClicked = this.onProfileClicked;
       this.insertAdjacentElement('afterbegin', postEl);
-      postEl.setData({ data: replyTo, isReply: true });
+      postEl.setData({ data: post });
     }
   }
 
@@ -296,9 +297,10 @@ export class ScomPost extends Module {
 
   addReply(parentPostId: string, post: IPost) {
     if (parentPostId !== this.postData.id) return;
+    post.replyTo = {...this.postData};
     if (!this.pnlReply) this.appendReplyPanel();
     this._replies.push(post);
-    return this.renderReply(post);
+    return this.renderReply(post, true);
   };
 
   appendReplyPanel(){
@@ -320,12 +322,14 @@ export class ScomPost extends Module {
     }
   }
 
-  private renderReply(reply: IPost) {
+  private renderReply(reply: IPost, isPrepend?: boolean) {
     const childElm = <i-scom-post></i-scom-post> as ScomPost;
     childElm.onReplyClicked = this.onReplyClicked;
     childElm.onProfileClicked = this.onProfileClicked;
     childElm.parent = this.pnlReplies;
-    this.pnlReplies.appendChild(childElm);
+    if (isPrepend)
+      this.pnlReplies.prepend(childElm);
+    else this.pnlReplies.append(childElm);
     childElm.setData({data: reply});
     return childElm;
   }
@@ -374,10 +378,9 @@ export class ScomPost extends Module {
     this.onReplyClicked = this.getAttribute('onReplyClicked', true) || this.onReplyClicked;
     this.onProfileClicked = this.getAttribute('onProfileClicked', true) || this.onProfileClicked;
     const data = this.getAttribute('data', true);
-    const isReply = this.getAttribute('isReply', true, false);
     const isActive = this.getAttribute('isActive', true, false);
     const type = this.getAttribute('type', true);
-    if (data) await this.setData({data, isReply, isActive, type});
+    if (data) await this.setData({data, isActive, type});
   }
 
   render() {
@@ -391,7 +394,7 @@ export class ScomPost extends Module {
           id="gridPost"
           templateColumns={['2.75rem', 'auto']}
           templateRows={['auto']}
-          gap={{column: '0.75rem', row: '1.313rem'}}
+          gap={{column: '0.75rem'}}
           padding={{left: '1.25rem', right: '1.25rem', top: '1rem', bottom: '1rem'}}
           position='relative'
           border={{radius: '0.5rem'}}
@@ -436,7 +439,7 @@ export class ScomPost extends Module {
                 <i-panel border={{left: {width: '1px', style: 'solid', color: Theme.text.secondary}}}></i-panel>
                 <i-label id="lblDate" font={{ size: '0.875rem', color: Theme.text.secondary }} />
               </i-hstack>
-              <i-label id="lblUsername" textOverflow="ellipsis" font={{color: Theme.text.secondary}} grid={{area: 'username'}}></i-label>
+              <i-label id="lblUsername" textOverflow="ellipsis" font={{color: Theme.text.secondary}}></i-label>
             </i-grid-layout>
             <i-hstack
               id="pnlSubscribe" stack={{basis: '30%'}}
@@ -465,7 +468,17 @@ export class ScomPost extends Module {
               </i-panel>
             </i-hstack>
           </i-hstack>
-          <i-vstack width={'100%'} grid={{area: 'content'}}>
+          <i-hstack
+            id="pnlReplyPath"
+            verticalAlignment="center"
+            gap="0.25rem" visible={false}
+            grid={{area: 'path'}}
+            margin={{top: '0.5rem'}}
+          >
+            <i-label caption='replying to' font={{ size: '0.875rem', color: Theme.colors.secondary.light }} />
+            <i-label id="lbReplyTo" caption='' font={{ size: '0.875rem', color: Theme.colors.primary.main }} link={{href: '#'}} />
+          </i-hstack>
+          <i-vstack width={'100%'} grid={{area: 'content'}} margin={{top: '1rem'}}>
             <i-panel
               id="pnlDetail"
               // maxHeight={MAX_HEIGHT}

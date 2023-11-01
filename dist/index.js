@@ -186,12 +186,6 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             await self.ready();
             return self;
         }
-        get isReply() {
-            return this._data.isReply ?? false;
-        }
-        set isReply(value) {
-            this._data.isReply = value ?? false;
-        }
         get isActive() {
             return this._data.isActive ?? false;
         }
@@ -239,10 +233,11 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             this._replies = [];
             this.pnlActiveBd.visible = false;
             this.imgVerified.visible = false;
+            this.pnlReplyPath.visible = false;
         }
         async renderUI() {
             this.clear();
-            const { stat, publishDate, author, replyTo, data } = this._data?.data || {};
+            const { stat, publishDate, author, replyTo, data, quotedPosts = [] } = this._data?.data || {};
             this.renderPostType();
             this.lblOwner.caption = author?.id || '';
             this.lblUsername.caption = `${author?.username || ''}`;
@@ -251,8 +246,12 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             this.lblDate.caption = `${(0, global_1.getDuration)(publishDate)}`;
             this.imgVerified.visible = true;
             this.imgVerified.display = 'flex';
-            if (replyTo && this.isReply) {
-                this.renderReplyTo(replyTo);
+            this.renderQuotedPosts(quotedPosts);
+            if (replyTo && !this.isActive) {
+                this.pnlReplyPath.visible = true;
+                this.lblUsername.visible = false;
+                this.lbReplyTo.caption = replyTo?.author?.username;
+                this.lbReplyTo.link.href = `#/e/${replyTo?.author?.pubKey || ''}`;
             }
             this.pnlActiveBd.visible = this.isActive;
             this.gridPost.border.radius = this.isActive ? '0.25rem' : '0.5rem';
@@ -275,9 +274,9 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             if (this.isFullType) {
                 this.gridPost.templateAreas = [
                     ['avatar', 'user'],
+                    ['avatar', 'path'],
                     ['content', 'content']
                 ];
-                this.gridPost.gap = { column: '0.75rem', row: '0px' };
                 this.pnlInfo.templateAreas = [
                     ['name', 'username', 'date']
                 ];
@@ -285,32 +284,34 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             else if (this.type === 'short') {
                 this.gridPost.templateAreas = [
                     ['avatar', 'user'],
+                    ['avatar', 'path'],
                     ['avatar', 'content']
                 ];
                 this.pnlInfo.templateAreas = [
                     ['name', 'date'],
                     ['username', 'username']
                 ];
-                this.gridPost.gap = { column: '0.75rem', row: '1.313rem' };
             }
             else {
                 this.gridPost.templateAreas = [
                     ['avatar', 'user'],
+                    ['avatar', 'path'],
                     ['avatar', 'content']
                 ];
-                this.gridPost.gap = { column: '0.75rem', row: '1.313rem' };
                 this.pnlInfo.templateAreas = [
                     ['name', 'username', 'date']
                 ];
             }
         }
-        renderReplyTo(replyTo) {
-            if (replyTo) {
+        renderQuotedPosts(posts) {
+            if (!posts?.length)
+                return;
+            for (let post of posts) {
                 const postEl = this.$render("i-scom-post", { margin: { bottom: '0.5rem' }, display: 'block' });
                 postEl.onReplyClicked = this.onReplyClicked;
                 postEl.onProfileClicked = this.onProfileClicked;
                 this.insertAdjacentElement('afterbegin', postEl);
-                postEl.setData({ data: replyTo, isReply: true });
+                postEl.setData({ data: post });
             }
         }
         renderAnalytics(analytics) {
@@ -364,10 +365,11 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         addReply(parentPostId, post) {
             if (parentPostId !== this.postData.id)
                 return;
+            post.replyTo = { ...this.postData };
             if (!this.pnlReply)
                 this.appendReplyPanel();
             this._replies.push(post);
-            return this.renderReply(post);
+            return this.renderReply(post, true);
         }
         ;
         appendReplyPanel() {
@@ -388,12 +390,15 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                 }
             }
         }
-        renderReply(reply) {
+        renderReply(reply, isPrepend) {
             const childElm = this.$render("i-scom-post", null);
             childElm.onReplyClicked = this.onReplyClicked;
             childElm.onProfileClicked = this.onProfileClicked;
             childElm.parent = this.pnlReplies;
-            this.pnlReplies.appendChild(childElm);
+            if (isPrepend)
+                this.pnlReplies.prepend(childElm);
+            else
+                this.pnlReplies.append(childElm);
             childElm.setData({ data: reply });
             return childElm;
         }
@@ -431,15 +436,14 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             this.onReplyClicked = this.getAttribute('onReplyClicked', true) || this.onReplyClicked;
             this.onProfileClicked = this.getAttribute('onProfileClicked', true) || this.onProfileClicked;
             const data = this.getAttribute('data', true);
-            const isReply = this.getAttribute('isReply', true, false);
             const isActive = this.getAttribute('isActive', true, false);
             const type = this.getAttribute('type', true);
             if (data)
-                await this.setData({ data, isReply, isActive, type });
+                await this.setData({ data, isActive, type });
         }
         render() {
             return (this.$render("i-vstack", { id: "pnlWrapper", width: "100%", cursor: "pointer", border: { radius: 'inherit' } },
-                this.$render("i-grid-layout", { id: "gridPost", templateColumns: ['2.75rem', 'auto'], templateRows: ['auto'], gap: { column: '0.75rem', row: '1.313rem' }, padding: { left: '1.25rem', right: '1.25rem', top: '1rem', bottom: '1rem' }, position: 'relative', border: { radius: '0.5rem' }, background: { color: Theme.background.paper } },
+                this.$render("i-grid-layout", { id: "gridPost", templateColumns: ['2.75rem', 'auto'], templateRows: ['auto'], gap: { column: '0.75rem' }, padding: { left: '1.25rem', right: '1.25rem', top: '1rem', bottom: '1rem' }, position: 'relative', border: { radius: '0.5rem' }, background: { color: Theme.background.paper } },
                     this.$render("i-panel", { id: "pnlActiveBd", visible: false, width: '0.25rem', height: '100%', left: "0px", top: "0px", border: { radius: '0.25rem 0 0 0.25rem' }, background: { color: Theme.background.gradient } }),
                     this.$render("i-panel", { id: "pnlAvatar", grid: { area: 'avatar' } },
                         this.$render("i-image", { id: "imgAvatar", width: '2.75rem', height: '2.75rem', display: "block", background: { color: Theme.background.gradient }, border: { radius: '50%' }, overflow: 'hidden', objectFit: 'cover' })),
@@ -451,12 +455,15 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                             this.$render("i-hstack", { gap: '0.25rem', grid: { area: 'date' } },
                                 this.$render("i-panel", { border: { left: { width: '1px', style: 'solid', color: Theme.text.secondary } } }),
                                 this.$render("i-label", { id: "lblDate", font: { size: '0.875rem', color: Theme.text.secondary } })),
-                            this.$render("i-label", { id: "lblUsername", textOverflow: "ellipsis", font: { color: Theme.text.secondary }, grid: { area: 'username' } })),
+                            this.$render("i-label", { id: "lblUsername", textOverflow: "ellipsis", font: { color: Theme.text.secondary } })),
                         this.$render("i-hstack", { id: "pnlSubscribe", stack: { basis: '30%' }, horizontalAlignment: "end", gap: "0.5rem", position: "absolute", top: '-0.25rem', right: '0px' },
                             this.$render("i-button", { id: "btnSubscribe", minHeight: 32, padding: { left: '1rem', right: '1rem' }, background: { color: Theme.colors.primary.main }, font: { color: Theme.colors.primary.contrastText }, border: { radius: '1.875rem' }, visible: false, caption: 'Subscribe' }),
                             this.$render("i-panel", { onClick: this.onProfileShown },
                                 this.$render("i-icon", { name: "ellipsis-h", width: '1rem', height: '1rem', fill: Theme.text.secondary, class: index_css_1.hoverStyle })))),
-                    this.$render("i-vstack", { width: '100%', grid: { area: 'content' } },
+                    this.$render("i-hstack", { id: "pnlReplyPath", verticalAlignment: "center", gap: "0.25rem", visible: false, grid: { area: 'path' }, margin: { top: '0.5rem' } },
+                        this.$render("i-label", { caption: 'replying to', font: { size: '0.875rem', color: Theme.colors.secondary.light } }),
+                        this.$render("i-label", { id: "lbReplyTo", caption: '', font: { size: '0.875rem', color: Theme.colors.primary.main }, link: { href: '#' } })),
+                    this.$render("i-vstack", { width: '100%', grid: { area: 'content' }, margin: { top: '1rem' } },
                         this.$render("i-panel", { id: "pnlDetail" },
                             this.$render("i-vstack", { id: "pnlContent", gap: "0.75rem" }),
                             this.$render("i-panel", { id: "pnlOverlay", visible: false, height: '5rem', width: '100%', position: 'absolute', bottom: "0px", background: { color: `linear-gradient(0, var(--card-bg-color) 0%, transparent 100%)` } })),
