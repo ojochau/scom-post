@@ -4,6 +4,8 @@ export interface IAuthor {
   description: string;
   avatar: string;
   pubKey?: string;
+  displayName?: string;
+  internetIdentifier: string;
 };
 export interface IPost {
   id: string;

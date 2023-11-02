@@ -53,7 +53,7 @@ type callbackType = (target: Control, data: IPost) => void;
 
 @customElements('i-scom-post')
 export class ScomPost extends Module {
-  private pnlInfo: GridLayout;
+  private pnlInfo: Panel;
   private imgAvatar: Image;
   private lblOwner: Label;
   private lblUsername: Label;
@@ -129,45 +129,36 @@ export class ScomPost extends Module {
   }
 
   clear() {
-    this.imgAvatar.url = "";
-    this.lblOwner.caption = "";
-    this.lblUsername.caption = "";
-    this.lblDate.caption = "";
+    // this.imgAvatar.url = "";
+    // this.lblOwner.caption = "";
+    // this.lblUsername.caption = "";
+    // this.lblDate.caption = "";
+    // this.imgVerified.visible = false;
     this.pnlOverlay.visible = false;
     this.btnViewMore.visible = false;
     this.pnlContent.clearInnerHTML();
-    this.pnlContent.minHeight = '12rem';
+    this.pnlContent.minHeight = '5rem';
     if (this.pnlMore) {
       this.pnlMore.remove();
       this.pnlMore = undefined;
     }
     this._replies = [];
     this.pnlActiveBd.visible = false;
-    this.imgVerified.visible = false;
     this.pnlReplyPath.visible = false;
+    this.pnlInfo.clearInnerHTML();
   }
 
   private async renderUI() {
     this.clear();
-    const { stat, publishDate, author, replyTo, data, quotedPosts = [] } = this._data?.data || {};
-
+    const { stat, replyTo, data } = this._data?.data || {};
     this.renderPostType();
 
-    this.lblOwner.caption = author?.id || '';
-    this.lblUsername.caption = `${author?.username || ''}`;
-    this.lblUsername.link.href = '';
-    this.imgAvatar.url = author?.avatar ?? '';
-    this.lblDate.caption = `${getDuration(publishDate)}`;
-    this.imgVerified.visible = true;
-    this.imgVerified.display = 'flex';
-
-    this.renderQuotedPosts(quotedPosts);
+    // this.renderQuotedPosts(quotedPosts);
 
     if (replyTo && !this.isActive) {
       this.pnlReplyPath.visible = true;
       this.lblUsername.visible = false;
-      this.lbReplyTo.caption = replyTo?.author?.username;
-      this.lbReplyTo.link.href = `#/e/${replyTo?.author?.pubKey || ''}`;
+      this.lbReplyTo.caption = replyTo?.author?.displayName || '';
     }
 
     this.pnlActiveBd.visible = this.isActive;
@@ -190,48 +181,96 @@ export class ScomPost extends Module {
     }
   }
 
+  
+  private renderInfo(oneLine?: boolean) {
+    const { publishDate, author } = this.postData;
+    this.imgAvatar.url = author?.avatar ?? '';
+    const userEl = (
+      <i-hstack verticalAlignment='center' gap="0.25rem">
+        <i-label
+          id="lblOwner"
+          caption={author?.displayName || ''}
+          textOverflow="ellipsis"
+          font={{ size: '0.875rem', weight: 500 }}
+        ></i-label>
+        <i-image
+          id="imgVerified"
+          url={assets.fullPath('img/verified.svg')}
+          width={'0.875rem'} height={'0.875rem'}
+          display='flex'
+          // visible={false}
+        ></i-image>
+      </i-hstack>
+    );
+    const dateEl = (
+      <i-hstack gap={'0.25rem'}>
+        <i-panel border={{left: {width: '1px', style: 'solid', color: Theme.text.secondary}}}></i-panel>
+        <i-label id="lblDate" font={{ size: '0.875rem', color: Theme.text.secondary }} caption={`${getDuration(publishDate)}`} />
+      </i-hstack>
+    );
+    const usernameEl = (
+      <i-label
+        id="lblUsername"
+        caption={`${author?.internetIdentifier || ''}`}
+        textOverflow="ellipsis" font={{color: Theme.text.secondary}}
+      ></i-label>
+    );
+    if (oneLine) {
+      this.pnlInfo.append(
+        <i-hstack gap="0.25rem">
+          {userEl}
+          {usernameEl}
+          {dateEl}
+        </i-hstack>
+      )
+    } else {
+      this.pnlInfo.append(
+        <i-vstack gap="0.5rem">
+          <i-hstack gap="0.25rem" verticalAlignment="center">
+            {userEl}
+            {dateEl}
+          </i-hstack>
+          {usernameEl}
+        </i-vstack>
+      )
+    }
+  }
+
   private renderPostType() {
     if (this.isFullType) {
+      this.renderInfo(true);
       this.gridPost.templateAreas = [
         ['avatar', 'user'],
         ['avatar', 'path'],
         ['content', 'content']
       ]
-      this.pnlInfo.templateAreas = [
-        ['name', 'username', 'date']
-      ]
     } else if (this.type === 'short') {
+      this.renderInfo();
       this.gridPost.templateAreas = [
         ['avatar', 'user'],
         ['avatar', 'path'],
         ['avatar', 'content']
-      ]
-      this.pnlInfo.templateAreas = [
-        ['name', 'date'],
-        ['username', 'username']
       ]
     } else {
+      this.renderInfo(true);
       this.gridPost.templateAreas = [
         ['avatar', 'user'],
         ['avatar', 'path'],
         ['avatar', 'content']
-      ]
-      this.pnlInfo.templateAreas = [
-        ['name', 'username', 'date']
       ]
     }
   }
 
-  private renderQuotedPosts(posts: IPost[]) {
-    if (!posts?.length) return;
-    for (let post of posts) {
-      const postEl = <i-scom-post margin={{bottom: '0.5rem'}} display='block'></i-scom-post> as ScomPost;
-      postEl.onReplyClicked = this.onReplyClicked;
-      postEl.onProfileClicked = this.onProfileClicked;
-      this.insertAdjacentElement('afterbegin', postEl);
-      postEl.setData({ data: post });
-    }
-  }
+  // private renderQuotedPosts(posts: IPost[]) {
+  //   if (!posts?.length) return;
+  //   for (let post of posts) {
+  //     const postEl = <i-scom-post margin={{bottom: '0.5rem'}} display='block'></i-scom-post> as ScomPost;
+  //     postEl.onReplyClicked = this.onReplyClicked;
+  //     postEl.onProfileClicked = this.onProfileClicked;
+  //     this.insertAdjacentElement('afterbegin', postEl);
+  //     postEl.setData({ data: post });
+  //   }
+  // }
 
   private renderAnalytics(analytics: any) {
     const dataList = [
@@ -373,6 +412,12 @@ export class ScomPost extends Module {
     this.btnViewMore.visible = false;
   }
 
+  private onGoProfile() {
+    if (this.postData?.author?.pubKey) {
+      window.open(`#/p/${this.postData.author.pubKey}`, '_self');
+    }
+  }
+
   async init() {
     super.init();
     this.onReplyClicked = this.getAttribute('onReplyClicked', true) || this.onReplyClicked;
@@ -417,10 +462,12 @@ export class ScomPost extends Module {
               border={{radius: '50%'}}
               overflow={'hidden'}
               objectFit='cover'
+              fallbackUrl={assets.fullPath('img/default_avatar.svg')}
+              onClick={() => this.onGoProfile()}
             ></i-image>
           </i-panel>
           <i-hstack horizontalAlignment="space-between" gap="0.5rem" width="100%" grid={{area: 'user'}} position='relative'>
-            <i-grid-layout
+            {/* <i-grid-layout
               id="pnlInfo"
               templateRows={['max-content']}
               templateColumns={['auto']}
@@ -440,7 +487,8 @@ export class ScomPost extends Module {
                 <i-label id="lblDate" font={{ size: '0.875rem', color: Theme.text.secondary }} />
               </i-hstack>
               <i-label id="lblUsername" textOverflow="ellipsis" font={{color: Theme.text.secondary}}></i-label>
-            </i-grid-layout>
+            </i-grid-layout> */}
+            <i-panel id="pnlInfo"></i-panel>
             <i-hstack
               id="pnlSubscribe" stack={{basis: '30%'}}
               horizontalAlignment="end"
@@ -476,7 +524,12 @@ export class ScomPost extends Module {
             margin={{top: '0.5rem'}}
           >
             <i-label caption='replying to' font={{ size: '0.875rem', color: Theme.colors.secondary.light }} />
-            <i-label id="lbReplyTo" caption='' font={{ size: '0.875rem', color: Theme.colors.primary.main }} link={{href: '#'}} />
+            <i-label
+              id="lbReplyTo"
+              font={{ size: '0.875rem', color: Theme.colors.primary.main }}
+              cursor="pointer"
+              onClick={() => this.onGoProfile()}
+            />
           </i-hstack>
           <i-vstack width={'100%'} grid={{area: 'content'}} margin={{top: '1rem'}}>
             <i-panel
