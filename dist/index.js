@@ -267,7 +267,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             const { publishDate, author } = this.postData;
             this.imgAvatar.url = author?.avatar ?? '';
             const userEl = (this.$render("i-hstack", { verticalAlignment: 'center', gap: "0.25rem" },
-                this.$render("i-label", { id: "lblOwner", caption: author?.displayName || '', textOverflow: "ellipsis", font: { size: '0.875rem', weight: 500 } }),
+                this.$render("i-label", { id: "lblOwner", caption: author?.displayName || '', textOverflow: "ellipsis", maxWidth: '6.25rem', font: { size: '0.875rem', weight: 500 } }),
                 this.$render("i-image", { id: "imgVerified", url: assets_1.default.fullPath('img/verified.svg'), width: '0.875rem', height: '0.875rem', display: 'flex' })));
             const dateEl = (this.$render("i-hstack", { gap: '0.25rem' },
                 this.$render("i-panel", { border: { left: { width: '1px', style: 'solid', color: Theme.text.secondary } } }),
@@ -412,7 +412,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             return childElm;
         }
         appendShowMorePanel() {
-            this.pnlMore = (this.$render("i-grid-layout", { id: "pnlMore", templateColumns: ['2.75rem', 'auto'], gap: { column: 12 }, padding: { top: '0.5rem', bottom: '0.5rem', left: '1rem', right: '1rem' }, onClick: this.onShowMore },
+            this.pnlMore = (this.$render("i-grid-layout", { id: "pnlMore", templateColumns: ['2.75rem', 'minmax(auto, calc(100% - 3.5rem))'], gap: { column: 12 }, padding: { top: '0.5rem', bottom: '0.5rem', left: '1rem', right: '1rem' }, onClick: this.onShowMore },
                 this.$render("i-vstack", { height: '1rem', justifyContent: "space-between", alignItems: "center" },
                     this.$render("i-panel", { width: 2, height: 2, background: { color: Theme.colors.secondary.light } }),
                     this.$render("i-panel", { width: 2, height: 2, background: { color: Theme.colors.secondary.light } }),
@@ -457,7 +457,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         }
         render() {
             return (this.$render("i-vstack", { id: "pnlWrapper", width: "100%", cursor: "pointer", border: { radius: 'inherit' } },
-                this.$render("i-grid-layout", { id: "gridPost", templateColumns: ['2.75rem', 'auto'], templateRows: ['auto'], gap: { column: '0.75rem' }, padding: { left: '1.25rem', right: '1.25rem', top: '1rem', bottom: '1rem' }, position: 'relative', border: { radius: '0.5rem' }, background: { color: Theme.background.paper } },
+                this.$render("i-grid-layout", { id: "gridPost", templateColumns: ['2.75rem', 'minmax(auto, calc(100% - 3.5rem))'], templateRows: ['auto'], gap: { column: '0.75rem' }, padding: { left: '1.25rem', right: '1.25rem', top: '1rem', bottom: '1rem' }, position: 'relative', border: { radius: '0.5rem' }, background: { color: Theme.background.paper } },
                     this.$render("i-panel", { id: "pnlActiveBd", visible: false, width: '0.25rem', height: '100%', left: "0px", top: "0px", border: { radius: '0.25rem 0 0 0.25rem' }, background: { color: Theme.background.gradient } }),
                     this.$render("i-panel", { id: "pnlAvatar", grid: { area: 'avatar' } },
                         this.$render("i-image", { id: "imgAvatar", width: '2.75rem', height: '2.75rem', display: "block", background: { color: Theme.background.gradient }, border: { radius: '50%' }, overflow: 'hidden', objectFit: 'cover', fallbackUrl: assets_1.default.fullPath('img/default_avatar.svg'), onClick: () => this.onGoProfile() })),

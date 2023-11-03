@@ -191,6 +191,7 @@ export class ScomPost extends Module {
           id="lblOwner"
           caption={author?.displayName || ''}
           textOverflow="ellipsis"
+          maxWidth={'6.25rem'}
           font={{ size: '0.875rem', weight: 500 }}
         ></i-label>
         <i-image
@@ -377,7 +378,7 @@ export class ScomPost extends Module {
     this.pnlMore = (
       <i-grid-layout
         id="pnlMore"
-        templateColumns={['2.75rem', 'auto']}
+        templateColumns={['2.75rem', 'minmax(auto, calc(100% - 3.5rem))']}
         gap={{column: 12}}
         padding={{top: '0.5rem', bottom: '0.5rem', left: '1rem', right: '1rem'}}
         onClick={this.onShowMore}
@@ -437,7 +438,7 @@ export class ScomPost extends Module {
       >
         <i-grid-layout
           id="gridPost"
-          templateColumns={['2.75rem', 'auto']}
+          templateColumns={['2.75rem', 'minmax(auto, calc(100% - 3.5rem))']}
           templateRows={['auto']}
           gap={{column: '0.75rem'}}
           padding={{left: '1.25rem', right: '1.25rem', top: '1rem', bottom: '1rem'}}
