@@ -48,7 +48,7 @@ interface IPostConfig {
   isActive?: boolean;
 }
 
-type PostType = 'full' | 'standard' | 'short';
+type PostType = 'full' | 'standard' | 'short' | 'quoted';
 type callbackType = (target: Control, data: IPost) => void;
 
 @customElements('i-scom-post')
@@ -59,6 +59,7 @@ export class ScomPost extends Module {
   private lblUsername: Label;
   private lblDate: Label;
   private imgVerified: Image;
+  private pnlQuoted: Panel;
 
   private pnlWrapper: Panel;
   private pnlMore: GridLayout;
@@ -73,6 +74,7 @@ export class ScomPost extends Module {
   private pnlContent: Panel;
   private pnlReplyPath: Panel;
   private lbReplyTo: Label;
+  private pnlSubscribe: Panel;
 
   private _data: IPostConfig;
   private _replies: IPost[];
@@ -128,6 +130,10 @@ export class ScomPost extends Module {
     return this.type === 'full';
   }
 
+  get isQuotedPost() {
+    return this.type === 'quoted';
+  }
+
   clear() {
     // this.imgAvatar.url = "";
     // this.lblOwner.caption = "";
@@ -150,10 +156,8 @@ export class ScomPost extends Module {
 
   private async renderUI() {
     this.clear();
-    const { stat, replyTo, data } = this._data?.data || {};
+    const { stat, replyTo, contentElements } = this._data?.data || {};
     this.renderPostType();
-
-    // this.renderQuotedPosts(quotedPosts);
 
     if (replyTo && !this.isActive) {
       this.pnlReplyPath.visible = true;
@@ -163,28 +167,47 @@ export class ScomPost extends Module {
 
     this.pnlActiveBd.visible = this.isActive;
     this.gridPost.border.radius = this.isActive ? '0.25rem' : '0.5rem';
-  
-    this.renderAnalytics(stat);
+
+    if (!this.isQuotedPost) this.renderAnalytics(stat);
+    this.groupAnalysis.visible = !this.isQuotedPost;
+    this.pnlSubscribe.visible = !this.isQuotedPost;
 
     // let _height = 0;
-    if (data?.length) {
-      for (let item of data) {
-        getEmbedElement(item, this.pnlContent, (elm: any) => {
-          // _height += Number(elm.height || 0);
-          // if (_height > MAX_HEIGHT && !this.btnViewMore.visible) {
-          //   this.pnlOverlay.visible = true;
-          //   this.btnViewMore.visible = true;
-          // }
-          this.pnlContent.minHeight = 'auto';
-        });
+    if (contentElements?.length) {
+      for (let item of contentElements) {
+        if (item.category === 'quotedPost') {
+          this.addQuotedPost(item?.data?.properties);
+        } else {
+          getEmbedElement(item, this.pnlContent, (elm: any) => {
+            // _height += Number(elm.height || 0);
+            // if (_height > MAX_HEIGHT && !this.btnViewMore.visible) {
+            //   this.pnlOverlay.visible = true;
+            //   this.btnViewMore.visible = true;
+            // }
+            this.pnlContent.minHeight = 'auto';
+          });
+        }
       }
     }
   }
 
-  
+  private addQuotedPost(post: IPost) {
+    const postEl = (
+      <i-scom-post
+        type="quoted"
+        data={post}
+      ></i-scom-post>
+    )
+    this.pnlQuoted.append(postEl);
+    this.pnlQuoted.visible = true;
+  }
+
   private renderInfo(oneLine?: boolean) {
     const { publishDate, author } = this.postData;
     this.imgAvatar.url = author?.avatar ?? '';
+    this.imgAvatar.objectFit = 'cover';
+    const imgWidth = this.isQuotedPost || this.isFullType ? '1.75rem' : '2.75rem';
+    this.imgAvatar.width = this.imgAvatar.height = imgWidth;
     const userEl = (
       <i-hstack verticalAlignment='center' gap="0.25rem">
         <i-label
@@ -238,13 +261,15 @@ export class ScomPost extends Module {
   }
 
   private renderPostType() {
-    if (this.isFullType) {
+    this.gridPost.templateColumns = ['2.75rem', 'minmax(auto, calc(100% - 3.5rem))'];
+    if (this.isFullType || this.isQuotedPost) {
       this.renderInfo(true);
       this.gridPost.templateAreas = [
         ['avatar', 'user'],
         ['avatar', 'path'],
         ['content', 'content']
       ]
+      this.gridPost.templateColumns = ['1.75rem', 'minmax(auto, calc(100% - 4.5rem))'];
     } else if (this.type === 'short') {
       this.renderInfo();
       this.gridPost.templateAreas = [
@@ -261,17 +286,6 @@ export class ScomPost extends Module {
       ]
     }
   }
-
-  // private renderQuotedPosts(posts: IPost[]) {
-  //   if (!posts?.length) return;
-  //   for (let post of posts) {
-  //     const postEl = <i-scom-post margin={{bottom: '0.5rem'}} display='block'></i-scom-post> as ScomPost;
-  //     postEl.onReplyClicked = this.onReplyClicked;
-  //     postEl.onProfileClicked = this.onProfileClicked;
-  //     this.insertAdjacentElement('afterbegin', postEl);
-  //     postEl.setData({ data: post });
-  //   }
-  // }
 
   private renderAnalytics(analytics: any) {
     const dataList = [
@@ -539,6 +553,7 @@ export class ScomPost extends Module {
               // overflow={'hidden'}
             >
               <i-vstack id="pnlContent" gap="0.75rem"></i-vstack>
+              <i-panel id="pnlQuoted" visible={false}></i-panel>
               <i-panel
                 id="pnlOverlay"
                 visible={false}

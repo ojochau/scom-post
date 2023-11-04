@@ -13,10 +13,9 @@ declare module "@scom/scom-post/global/interface.ts" {
         id: string;
         author: IAuthor;
         replyTo?: IPost;
-        quotedPosts?: IPost[];
         publishDate: Date | string;
         stat?: IPostStat;
-        data: IPostData[];
+        contentElements: IPostData[];
     }
     export interface IPostStat {
         reply?: number;
@@ -27,6 +26,7 @@ declare module "@scom/scom-post/global/interface.ts" {
     }
     export interface IPostData {
         module: string;
+        category?: "widget" | "quotedPost";
         data: any;
     }
 }
@@ -92,7 +92,7 @@ declare module "@scom/scom-post" {
         type?: PostType;
         isActive?: boolean;
     }
-    type PostType = 'full' | 'standard' | 'short';
+    type PostType = 'full' | 'standard' | 'short' | 'quoted';
     type callbackType = (target: Control, data: IPost) => void;
     export class ScomPost extends Module {
         private pnlInfo;
@@ -101,6 +101,7 @@ declare module "@scom/scom-post" {
         private lblUsername;
         private lblDate;
         private imgVerified;
+        private pnlQuoted;
         private pnlWrapper;
         private pnlMore;
         private pnlReply;
@@ -114,6 +115,7 @@ declare module "@scom/scom-post" {
         private pnlContent;
         private pnlReplyPath;
         private lbReplyTo;
+        private pnlSubscribe;
         private _data;
         private _replies;
         onReplyClicked: callbackType;
@@ -130,8 +132,10 @@ declare module "@scom/scom-post" {
         getData(): IPostConfig;
         get replies(): IPost[];
         get isFullType(): boolean;
+        get isQuotedPost(): boolean;
         clear(): void;
         private renderUI;
+        private addQuotedPost;
         private renderInfo;
         private renderPostType;
         private renderAnalytics;

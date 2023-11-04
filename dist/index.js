@@ -217,6 +217,9 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         get isFullType() {
             return this.type === 'full';
         }
+        get isQuotedPost() {
+            return this.type === 'quoted';
+        }
         clear() {
             // this.imgAvatar.url = "";
             // this.lblOwner.caption = "";
@@ -238,9 +241,8 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         }
         async renderUI() {
             this.clear();
-            const { stat, replyTo, data } = this._data?.data || {};
+            const { stat, replyTo, contentElements } = this._data?.data || {};
             this.renderPostType();
-            // this.renderQuotedPosts(quotedPosts);
             if (replyTo && !this.isActive) {
                 this.pnlReplyPath.visible = true;
                 this.lblUsername.visible = false;
@@ -248,24 +250,40 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             }
             this.pnlActiveBd.visible = this.isActive;
             this.gridPost.border.radius = this.isActive ? '0.25rem' : '0.5rem';
-            this.renderAnalytics(stat);
+            if (!this.isQuotedPost)
+                this.renderAnalytics(stat);
+            this.groupAnalysis.visible = !this.isQuotedPost;
+            this.pnlSubscribe.visible = !this.isQuotedPost;
             // let _height = 0;
-            if (data?.length) {
-                for (let item of data) {
-                    (0, global_1.getEmbedElement)(item, this.pnlContent, (elm) => {
-                        // _height += Number(elm.height || 0);
-                        // if (_height > MAX_HEIGHT && !this.btnViewMore.visible) {
-                        //   this.pnlOverlay.visible = true;
-                        //   this.btnViewMore.visible = true;
-                        // }
-                        this.pnlContent.minHeight = 'auto';
-                    });
+            if (contentElements?.length) {
+                for (let item of contentElements) {
+                    if (item.category === 'quotedPost') {
+                        this.addQuotedPost(item?.data?.properties);
+                    }
+                    else {
+                        (0, global_1.getEmbedElement)(item, this.pnlContent, (elm) => {
+                            // _height += Number(elm.height || 0);
+                            // if (_height > MAX_HEIGHT && !this.btnViewMore.visible) {
+                            //   this.pnlOverlay.visible = true;
+                            //   this.btnViewMore.visible = true;
+                            // }
+                            this.pnlContent.minHeight = 'auto';
+                        });
+                    }
                 }
             }
+        }
+        addQuotedPost(post) {
+            const postEl = (this.$render("i-scom-post", { type: "quoted", data: post }));
+            this.pnlQuoted.append(postEl);
+            this.pnlQuoted.visible = true;
         }
         renderInfo(oneLine) {
             const { publishDate, author } = this.postData;
             this.imgAvatar.url = author?.avatar ?? '';
+            this.imgAvatar.objectFit = 'cover';
+            const imgWidth = this.isQuotedPost || this.isFullType ? '1.75rem' : '2.75rem';
+            this.imgAvatar.width = this.imgAvatar.height = imgWidth;
             const userEl = (this.$render("i-hstack", { verticalAlignment: 'center', gap: "0.25rem" },
                 this.$render("i-label", { id: "lblOwner", caption: author?.displayName || '', textOverflow: "ellipsis", maxWidth: '6.25rem', font: { size: '0.875rem', weight: 500 } }),
                 this.$render("i-image", { id: "imgVerified", url: assets_1.default.fullPath('img/verified.svg'), width: '0.875rem', height: '0.875rem', display: 'flex' })));
@@ -288,13 +306,15 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             }
         }
         renderPostType() {
-            if (this.isFullType) {
+            this.gridPost.templateColumns = ['2.75rem', 'minmax(auto, calc(100% - 3.5rem))'];
+            if (this.isFullType || this.isQuotedPost) {
                 this.renderInfo(true);
                 this.gridPost.templateAreas = [
                     ['avatar', 'user'],
                     ['avatar', 'path'],
                     ['content', 'content']
                 ];
+                this.gridPost.templateColumns = ['1.75rem', 'minmax(auto, calc(100% - 4.5rem))'];
             }
             else if (this.type === 'short') {
                 this.renderInfo();
@@ -313,16 +333,6 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                 ];
             }
         }
-        // private renderQuotedPosts(posts: IPost[]) {
-        //   if (!posts?.length) return;
-        //   for (let post of posts) {
-        //     const postEl = <i-scom-post margin={{bottom: '0.5rem'}} display='block'></i-scom-post> as ScomPost;
-        //     postEl.onReplyClicked = this.onReplyClicked;
-        //     postEl.onProfileClicked = this.onProfileClicked;
-        //     this.insertAdjacentElement('afterbegin', postEl);
-        //     postEl.setData({ data: post });
-        //   }
-        // }
         renderAnalytics(analytics) {
             const dataList = [
                 {
@@ -473,6 +483,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     this.$render("i-vstack", { width: '100%', grid: { area: 'content' }, margin: { top: '1rem' } },
                         this.$render("i-panel", { id: "pnlDetail" },
                             this.$render("i-vstack", { id: "pnlContent", gap: "0.75rem" }),
+                            this.$render("i-panel", { id: "pnlQuoted", visible: false }),
                             this.$render("i-panel", { id: "pnlOverlay", visible: false, height: '5rem', width: '100%', position: 'absolute', bottom: "0px", background: { color: `linear-gradient(0, var(--card-bg-color) 0%, transparent 100%)` } })),
                         this.$render("i-hstack", { id: "btnViewMore", verticalAlignment: "center", padding: { top: '1rem' }, gap: '0.25rem', visible: false, onClick: this.onViewMore },
                             this.$render("i-label", { caption: 'Read more', font: { size: '0.9rem', color: Theme.colors.primary.main } }),

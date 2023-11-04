@@ -11,10 +11,9 @@ export interface IPost {
   id: string;
 	author: IAuthor;
 	replyTo?: IPost;
-	quotedPosts?: IPost[];
 	publishDate: Date | string;
 	stat?: IPostStat;
-	data: IPostData[];
+	contentElements: IPostData[];
 };
 export interface IPostStat{
   reply?: number;
@@ -25,5 +24,6 @@ export interface IPostStat{
 };
 export interface IPostData {
   module: string; //e.g. @scom/scom-markdown, @scom/scom-image, @scom/scom-video
+  category?: "widget" | "quotedPost";
   data: any;
 };
