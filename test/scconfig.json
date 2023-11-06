@@ -16,7 +16,6 @@
     "@scom/scom-post": "*",
     "@ijstech/eth-contract": "*",
     "@ijstech/eth-wallet": "*",
-    "@scom/scom-page-viewer": "*",
     "@scom/scom-markdown-editor": "*",
     "@scom/scom-image": "*",
     "@scom/scom-blog": "*"

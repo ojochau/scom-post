@@ -126,20 +126,11 @@ export class ScomPost extends Module {
     return this._replies ?? [];
   }
 
-  get isFullType() {
-    return this.type === 'full';
-  }
-
   get isQuotedPost() {
     return this.type === 'quoted';
   }
 
   clear() {
-    // this.imgAvatar.url = "";
-    // this.lblOwner.caption = "";
-    // this.lblUsername.caption = "";
-    // this.lblDate.caption = "";
-    // this.imgVerified.visible = false;
     this.pnlOverlay.visible = false;
     this.btnViewMore.visible = false;
     this.pnlContent.clearInnerHTML();
@@ -161,7 +152,6 @@ export class ScomPost extends Module {
 
     if (replyTo && !this.isActive) {
       this.pnlReplyPath.visible = true;
-      this.lblUsername.visible = false;
       this.lbReplyTo.caption = replyTo?.author?.displayName || '';
     }
 
@@ -196,6 +186,9 @@ export class ScomPost extends Module {
       <i-scom-post
         type="quoted"
         data={post}
+        display="block"
+        border={{radius: '0.5rem', width: '1px', style: 'solid', color: Theme.colors.secondary.dark}}
+        onClick={() => window.location.assign(`#/e/${post.id}`)}
       ></i-scom-post>
     )
     this.pnlQuoted.append(postEl);
@@ -206,7 +199,7 @@ export class ScomPost extends Module {
     const { publishDate, author } = this.postData;
     this.imgAvatar.url = author?.avatar ?? '';
     this.imgAvatar.objectFit = 'cover';
-    const imgWidth = this.isQuotedPost || this.isFullType ? '1.75rem' : '2.75rem';
+    const imgWidth = this.isQuotedPost ? '1.75rem' : '2.75rem';
     this.imgAvatar.width = this.imgAvatar.height = imgWidth;
     const userEl = (
       <i-hstack verticalAlignment='center' gap="0.25rem">
@@ -214,15 +207,14 @@ export class ScomPost extends Module {
           id="lblOwner"
           caption={author?.displayName || ''}
           textOverflow="ellipsis"
-          maxWidth={'6.25rem'}
-          font={{ size: '0.875rem', weight: 500 }}
+          maxWidth={this.isQuotedPost ? '9.375rem' : '6.25rem'}
+          font={{ size: this.isQuotedPost ? '1rem' : '0.875rem', weight: 500 }}
         ></i-label>
         <i-image
           id="imgVerified"
           url={assets.fullPath('img/verified.svg')}
           width={'0.875rem'} height={'0.875rem'}
           display='flex'
-          // visible={false}
         ></i-image>
       </i-hstack>
     );
@@ -236,12 +228,14 @@ export class ScomPost extends Module {
       <i-label
         id="lblUsername"
         caption={`${author?.internetIdentifier || ''}`}
-        textOverflow="ellipsis" font={{color: Theme.text.secondary}}
+        maxWidth={this.isQuotedPost ? '13.75rem' : '29.375rem'}
+        textOverflow="ellipsis"
+        font={{size: this.isQuotedPost ? '1rem' : '0.875rem', color: Theme.text.secondary}}
       ></i-label>
     );
     if (oneLine) {
       this.pnlInfo.append(
-        <i-hstack gap="0.25rem">
+        <i-hstack height="100%" gap="0.25rem" verticalAlignment="center">
           {userEl}
           {usernameEl}
           {dateEl}
@@ -262,7 +256,9 @@ export class ScomPost extends Module {
 
   private renderPostType() {
     this.gridPost.templateColumns = ['2.75rem', 'minmax(auto, calc(100% - 3.5rem))'];
-    if (this.isFullType || this.isQuotedPost) {
+    this.gridPost.templateRows = ['auto'];
+    this.gridPost.background.color = Theme.background.paper;
+    if (this.isQuotedPost) {
       this.renderInfo(true);
       this.gridPost.templateAreas = [
         ['avatar', 'user'],
@@ -270,6 +266,8 @@ export class ScomPost extends Module {
         ['content', 'content']
       ]
       this.gridPost.templateColumns = ['1.75rem', 'minmax(auto, calc(100% - 4.5rem))'];
+      this.gridPost.templateRows = ['1.75rem', 'auto'];
+      this.gridPost.background.color = Theme.background.default;
     } else if (this.type === 'short') {
       this.renderInfo();
       this.gridPost.templateAreas = [
@@ -458,7 +456,6 @@ export class ScomPost extends Module {
           padding={{left: '1.25rem', right: '1.25rem', top: '1rem', bottom: '1rem'}}
           position='relative'
           border={{radius: '0.5rem'}}
-          background={{color: Theme.background.paper}}
         >
           <i-panel
             id="pnlActiveBd"
@@ -482,27 +479,6 @@ export class ScomPost extends Module {
             ></i-image>
           </i-panel>
           <i-hstack horizontalAlignment="space-between" gap="0.5rem" width="100%" grid={{area: 'user'}} position='relative'>
-            {/* <i-grid-layout
-              id="pnlInfo"
-              templateRows={['max-content']}
-              templateColumns={['auto']}
-              gap={{column: '0.25rem', row: '0.5rem'}}
-            >
-              <i-hstack verticalAlignment='center' gap="0.25rem" grid={{area: 'name'}}>
-                <i-label id="lblOwner" textOverflow="ellipsis" font={{ size: '0.875rem', weight: 500 }}></i-label>
-                <i-image
-                  id="imgVerified"
-                  url={assets.fullPath('img/verified.svg')}
-                  width={'0.875rem'} height={'0.875rem'}
-                  visible={false}
-                ></i-image>
-              </i-hstack>
-              <i-hstack gap={'0.25rem'} grid={{area: 'date'}}>
-                <i-panel border={{left: {width: '1px', style: 'solid', color: Theme.text.secondary}}}></i-panel>
-                <i-label id="lblDate" font={{ size: '0.875rem', color: Theme.text.secondary }} />
-              </i-hstack>
-              <i-label id="lblUsername" textOverflow="ellipsis" font={{color: Theme.text.secondary}}></i-label>
-            </i-grid-layout> */}
             <i-panel id="pnlInfo"></i-panel>
             <i-hstack
               id="pnlSubscribe" stack={{basis: '30%'}}

@@ -16,6 +16,7 @@ export default class Module1 extends Module {
         description: `Elon Musk`,
         avatar: 'https://pbs.twimg.com/profile_images/1683325380441128960/yRsRRjGO_400x400.jpg',
         pubKey: '',
+        internetIdentifier: 'elonmusk'
       },
       stat: {
         reply: 10,
@@ -24,7 +25,7 @@ export default class Module1 extends Module {
         downvote: 0,
         view: 20,
       },
-      data: [
+      contentElements: [
         {
           module: '@scom/scom-markdown-editor',
           data: {
@@ -127,7 +128,8 @@ export default class Module1 extends Module {
         "username": "PinballReed",
         "description": "Reed-Pinball is fun",
         "avatar": "https://placehold.co/50",
-        "pubKey": ""
+        "pubKey": "",
+        internetIdentifier: "PinballReed"
       },
       stat: {
         reply: 17,
@@ -136,7 +138,7 @@ export default class Module1 extends Module {
         downvote: 0,
         view: 11000
       },
-      data: [{
+      contentElements: [{
         module: '@scom/scom-image',
         data: {
           "properties": {
@@ -157,7 +159,7 @@ export default class Module1 extends Module {
   render() {
     return (
       <i-vstack margin={{ left: 'auto', right: 'auto' }} maxWidth={960}>
-        <i-scom-post id="postElm" data={this._data} type="full" display='block' isReply={true} isActive={true} />
+        <i-scom-post id="postElm" data={this._data} type="full" display='block' isActive={true} />
       </i-vstack>
     );
   }
