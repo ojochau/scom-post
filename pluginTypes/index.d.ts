@@ -57,7 +57,7 @@ declare module "@scom/scom-post/global/index.ts" {
 }
 /// <amd-module name="@scom/scom-post/index.css.ts" />
 declare module "@scom/scom-post/index.css.ts" {
-    export const getIconStyleClass: (img: string, color: string) => string;
+    export const getIconStyleClass: (color: string) => string;
     export const hoverStyle: string;
 }
 /// <amd-module name="@scom/scom-post/assets.ts" />

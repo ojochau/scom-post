@@ -125,21 +125,16 @@ define("@scom/scom-post/index.css.ts", ["require", "exports", "@ijstech/componen
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.hoverStyle = exports.getIconStyleClass = void 0;
     const Theme = components_3.Styles.Theme.ThemeVars;
-    const getIconStyleClass = (img, color) => {
+    const getIconStyleClass = (color) => {
         const styleObj = {
             $nest: {
-                'i-panel': {
-                    transition: 'background 0.3s ease-in',
-                    backgroundSize: 'contain'
-                },
                 'i-label': {
                     transition: 'color 0.3s ease-in'
                 },
                 '&:hover': {
                     $nest: {
-                        'i-panel': {
-                            background: `url(${img})`,
-                            backgroundSize: 'contain'
+                        'i-icon svg': {
+                            fill: `${color}!important`
                         },
                         'i-label': {
                             color: `${color}!important`
@@ -241,6 +236,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             // }
             this.pnlActiveBd.visible = this.isActive;
             this.gridPost.border.radius = this.isActive ? '0.25rem' : '0.5rem';
+            this.gridPost.cursor = this.isActive ? 'default' : 'pointer';
             if (!this.isQuotedPost)
                 this.renderAnalytics(stat);
             this.groupAnalysis.visible = !this.isQuotedPost;
@@ -277,7 +273,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             this.imgAvatar.width = this.imgAvatar.height = imgWidth;
             const userEl = (this.$render("i-hstack", { verticalAlignment: 'center', gap: "0.25rem" },
                 this.$render("i-label", { id: "lblOwner", caption: author?.displayName || '', textOverflow: "ellipsis", maxWidth: this.isQuotedPost ? '9.375rem' : '6.25rem', font: { size: this.isQuotedPost ? '1rem' : '0.875rem', weight: 500 } }),
-                this.$render("i-image", { id: "imgVerified", url: assets_1.default.fullPath('img/verified.svg'), width: '0.875rem', height: '0.875rem', display: 'flex' })));
+                this.$render("i-icon", { id: "imgVerified", width: '0.875rem', height: '0.875rem', name: "certificate", fill: Theme.text.secondary, display: "inline-flex" })));
             const dateEl = (this.$render("i-hstack", { gap: '0.25rem' },
                 this.$render("i-panel", { border: { left: { width: '1px', style: 'solid', color: Theme.text.secondary } } }),
                 this.$render("i-label", { id: "lblDate", font: { size: '0.875rem', color: Theme.text.secondary }, caption: `${(0, global_1.getDuration)(publishDate)}` })));
@@ -333,41 +329,38 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                 {
                     value: analytics?.reply || 0,
                     name: 'Reply',
-                    icon: assets_1.default.fullPath('img/reply.svg'),
-                    hoveredIcon: assets_1.default.fullPath('img/reply_fill.svg'),
+                    icon: { name: "comment-alt" },
                     hoveredColor: Theme.text.secondary,
                     onClick: (target) => {
                         if (this.onReplyClicked)
                             this.onReplyClicked(target, this.postData);
                     }
                 },
-                {
-                    value: analytics?.bookmark || 0,
-                    name: 'Zap',
-                    icon: assets_1.default.fullPath('img/zap.svg'),
-                    hoveredIcon: assets_1.default.fullPath('img/zap_fill.svg'),
-                    hoveredColor: Theme.colors.warning.main
-                },
+                // {
+                //   value: analytics?.bookmark || 0,
+                //   name: 'Zap',
+                //   icon: assets.fullPath('img/zap.svg'),
+                //   hoveredIcon: assets.fullPath('img/zap_fill.svg'),
+                //   hoveredColor: Theme.colors.warning.main
+                // },
                 {
                     value: analytics?.upvote || 0,
                     name: 'Like',
-                    icon: assets_1.default.fullPath('img/like.svg'),
-                    hoveredIcon: assets_1.default.fullPath('img/like_fill.svg'),
+                    icon: { name: "heart" },
                     hoveredColor: Theme.colors.error.main
                 },
                 {
                     value: analytics?.repost || 0,
                     name: 'Repost',
-                    icon: assets_1.default.fullPath('img/repost.svg'),
-                    hoveredIcon: assets_1.default.fullPath('img/repost_fill.svg'),
+                    icon: { name: "retweet" },
                     hoveredColor: Theme.colors.success.main
                 }
             ];
             this.groupAnalysis.clearInnerHTML();
             for (let item of dataList) {
                 const value = components_5.FormatUtils.formatNumber(item.value, { shortScale: true, decimalFigures: 0 });
-                let itemEl = (this.$render("i-hstack", { verticalAlignment: "center", gap: '0.5rem', tooltip: { content: value, placement: 'bottomLeft' }, class: (0, index_css_1.getIconStyleClass)(item.hoveredIcon, item.hoveredColor) },
-                    this.$render("i-panel", { width: '1rem', height: '1rem', background: { image: item.icon }, display: "inline-flex" }),
+                let itemEl = (this.$render("i-hstack", { verticalAlignment: "center", gap: '0.5rem', tooltip: { content: value, placement: 'bottomLeft' }, cursor: 'pointer', class: (0, index_css_1.getIconStyleClass)(item.hoveredColor) },
+                    this.$render("i-icon", { width: '1rem', height: '1rem', fill: Theme.text.secondary, name: item.icon.name }),
                     this.$render("i-label", { caption: value, font: { color: Theme.colors.secondary.light, size: '1.125rem' } })));
                 this.groupAnalysis.appendChild(itemEl);
                 itemEl.onClick = () => {
@@ -461,17 +454,17 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                 await this.setData({ data, isActive, type });
         }
         render() {
-            return (this.$render("i-vstack", { id: "pnlWrapper", width: "100%", cursor: "pointer", border: { radius: 'inherit' } },
+            return (this.$render("i-vstack", { id: "pnlWrapper", width: "100%", border: { radius: 'inherit' } },
                 this.$render("i-grid-layout", { id: "gridPost", templateColumns: ['2.75rem', 'minmax(auto, calc(100% - 3.5rem))'], templateRows: ['auto'], gap: { column: '0.75rem' }, padding: { left: '1.25rem', right: '1.25rem', top: '1rem', bottom: '1rem' }, position: 'relative', border: { radius: '0.5rem' } },
                     this.$render("i-panel", { id: "pnlActiveBd", visible: false, width: '0.25rem', height: '100%', left: "0px", top: "0px", border: { radius: '0.25rem 0 0 0.25rem' }, background: { color: Theme.background.gradient } }),
                     this.$render("i-panel", { id: "pnlAvatar", grid: { area: 'avatar' } },
-                        this.$render("i-image", { id: "imgAvatar", width: '2.75rem', height: '2.75rem', display: "block", background: { color: Theme.background.gradient }, border: { radius: '50%' }, overflow: 'hidden', objectFit: 'cover', fallbackUrl: assets_1.default.fullPath('img/default_avatar.svg'), onClick: () => this.onGoProfile() })),
+                        this.$render("i-image", { id: "imgAvatar", width: '2.75rem', height: '2.75rem', display: "block", background: { color: Theme.background.main }, border: { radius: '50%' }, overflow: 'hidden', objectFit: 'cover', fallbackUrl: assets_1.default.fullPath('img/default_avatar.png'), onClick: () => this.onGoProfile() })),
                     this.$render("i-hstack", { horizontalAlignment: "space-between", gap: "0.5rem", width: "100%", grid: { area: 'user' }, position: 'relative' },
                         this.$render("i-panel", { id: "pnlInfo" }),
                         this.$render("i-hstack", { id: "pnlSubscribe", stack: { basis: '30%' }, horizontalAlignment: "end", gap: "0.5rem", position: "absolute", top: '-0.25rem', right: '0px' },
                             this.$render("i-button", { id: "btnSubscribe", minHeight: 32, padding: { left: '1rem', right: '1rem' }, background: { color: Theme.colors.primary.main }, font: { color: Theme.colors.primary.contrastText }, border: { radius: '1.875rem' }, visible: false, caption: 'Subscribe' }),
-                            this.$render("i-panel", { onClick: this.onProfileShown },
-                                this.$render("i-icon", { name: "ellipsis-h", width: '1rem', height: '1rem', fill: Theme.text.secondary, class: index_css_1.hoverStyle })))),
+                            this.$render("i-panel", { onClick: this.onProfileShown, cursor: "pointer", class: index_css_1.hoverStyle },
+                                this.$render("i-icon", { name: "ellipsis-h", width: '1rem', height: '1rem', fill: Theme.text.secondary })))),
                     this.$render("i-hstack", { id: "pnlReplyPath", verticalAlignment: "center", gap: "0.25rem", visible: false, grid: { area: 'path' }, margin: { top: '0.5rem' } },
                         this.$render("i-label", { caption: 'replying to', font: { size: '0.875rem', color: Theme.colors.secondary.light } }),
                         this.$render("i-label", { id: "lbReplyTo", font: { size: '0.875rem', color: Theme.colors.primary.main }, cursor: "pointer", onClick: () => this.onGoProfile() })),
