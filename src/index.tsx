@@ -150,10 +150,10 @@ export class ScomPost extends Module {
     const { stat, replyTo, contentElements } = this._data?.data || {};
     this.renderPostType();
 
-    if (replyTo && !this.isActive) {
-      this.pnlReplyPath.visible = true;
-      this.lbReplyTo.caption = replyTo?.author?.displayName || '';
-    }
+    // if (replyTo && !this.isActive) {
+    //   this.pnlReplyPath.visible = true;
+    //   this.lbReplyTo.caption = replyTo?.author?.displayName || '';
+    // }
 
     this.pnlActiveBd.visible = this.isActive;
     this.gridPost.border.radius = this.isActive ? '0.25rem' : '0.5rem';
