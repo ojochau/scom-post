@@ -131,7 +131,6 @@ declare module "@scom/scom-post" {
         setData(data: IPostConfig): Promise<void>;
         getData(): IPostConfig;
         get replies(): IPost[];
-        get isFullType(): boolean;
         get isQuotedPost(): boolean;
         clear(): void;
         private renderUI;

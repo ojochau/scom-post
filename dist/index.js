@@ -214,18 +214,10 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         get replies() {
             return this._replies ?? [];
         }
-        get isFullType() {
-            return this.type === 'full';
-        }
         get isQuotedPost() {
             return this.type === 'quoted';
         }
         clear() {
-            // this.imgAvatar.url = "";
-            // this.lblOwner.caption = "";
-            // this.lblUsername.caption = "";
-            // this.lblDate.caption = "";
-            // this.imgVerified.visible = false;
             this.pnlOverlay.visible = false;
             this.btnViewMore.visible = false;
             this.pnlContent.clearInnerHTML();
@@ -245,7 +237,6 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             this.renderPostType();
             if (replyTo && !this.isActive) {
                 this.pnlReplyPath.visible = true;
-                this.lblUsername.visible = false;
                 this.lbReplyTo.caption = replyTo?.author?.displayName || '';
             }
             this.pnlActiveBd.visible = this.isActive;
@@ -274,7 +265,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             }
         }
         addQuotedPost(post) {
-            const postEl = (this.$render("i-scom-post", { type: "quoted", data: post }));
+            const postEl = (this.$render("i-scom-post", { type: "quoted", data: post, display: "block", border: { radius: '0.5rem', width: '1px', style: 'solid', color: Theme.colors.secondary.dark }, onClick: () => window.location.assign(`#/e/${post.id}`) }));
             this.pnlQuoted.append(postEl);
             this.pnlQuoted.visible = true;
         }
@@ -282,17 +273,17 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             const { publishDate, author } = this.postData;
             this.imgAvatar.url = author?.avatar ?? '';
             this.imgAvatar.objectFit = 'cover';
-            const imgWidth = this.isQuotedPost || this.isFullType ? '1.75rem' : '2.75rem';
+            const imgWidth = this.isQuotedPost ? '1.75rem' : '2.75rem';
             this.imgAvatar.width = this.imgAvatar.height = imgWidth;
             const userEl = (this.$render("i-hstack", { verticalAlignment: 'center', gap: "0.25rem" },
-                this.$render("i-label", { id: "lblOwner", caption: author?.displayName || '', textOverflow: "ellipsis", maxWidth: '6.25rem', font: { size: '0.875rem', weight: 500 } }),
+                this.$render("i-label", { id: "lblOwner", caption: author?.displayName || '', textOverflow: "ellipsis", maxWidth: this.isQuotedPost ? '9.375rem' : '6.25rem', font: { size: this.isQuotedPost ? '1rem' : '0.875rem', weight: 500 } }),
                 this.$render("i-image", { id: "imgVerified", url: assets_1.default.fullPath('img/verified.svg'), width: '0.875rem', height: '0.875rem', display: 'flex' })));
             const dateEl = (this.$render("i-hstack", { gap: '0.25rem' },
                 this.$render("i-panel", { border: { left: { width: '1px', style: 'solid', color: Theme.text.secondary } } }),
                 this.$render("i-label", { id: "lblDate", font: { size: '0.875rem', color: Theme.text.secondary }, caption: `${(0, global_1.getDuration)(publishDate)}` })));
-            const usernameEl = (this.$render("i-label", { id: "lblUsername", caption: `${author?.internetIdentifier || ''}`, textOverflow: "ellipsis", font: { color: Theme.text.secondary } }));
+            const usernameEl = (this.$render("i-label", { id: "lblUsername", caption: `${author?.internetIdentifier || ''}`, maxWidth: this.isQuotedPost ? '13.75rem' : '29.375rem', textOverflow: "ellipsis", font: { size: this.isQuotedPost ? '1rem' : '0.875rem', color: Theme.text.secondary } }));
             if (oneLine) {
-                this.pnlInfo.append(this.$render("i-hstack", { gap: "0.25rem" },
+                this.pnlInfo.append(this.$render("i-hstack", { height: "100%", gap: "0.25rem", verticalAlignment: "center" },
                     userEl,
                     usernameEl,
                     dateEl));
@@ -307,7 +298,9 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         }
         renderPostType() {
             this.gridPost.templateColumns = ['2.75rem', 'minmax(auto, calc(100% - 3.5rem))'];
-            if (this.isFullType || this.isQuotedPost) {
+            this.gridPost.templateRows = ['auto'];
+            this.gridPost.background.color = Theme.background.paper;
+            if (this.isQuotedPost) {
                 this.renderInfo(true);
                 this.gridPost.templateAreas = [
                     ['avatar', 'user'],
@@ -315,6 +308,8 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     ['content', 'content']
                 ];
                 this.gridPost.templateColumns = ['1.75rem', 'minmax(auto, calc(100% - 4.5rem))'];
+                this.gridPost.templateRows = ['1.75rem', 'auto'];
+                this.gridPost.background.color = Theme.background.default;
             }
             else if (this.type === 'short') {
                 this.renderInfo();
@@ -467,7 +462,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         }
         render() {
             return (this.$render("i-vstack", { id: "pnlWrapper", width: "100%", cursor: "pointer", border: { radius: 'inherit' } },
-                this.$render("i-grid-layout", { id: "gridPost", templateColumns: ['2.75rem', 'minmax(auto, calc(100% - 3.5rem))'], templateRows: ['auto'], gap: { column: '0.75rem' }, padding: { left: '1.25rem', right: '1.25rem', top: '1rem', bottom: '1rem' }, position: 'relative', border: { radius: '0.5rem' }, background: { color: Theme.background.paper } },
+                this.$render("i-grid-layout", { id: "gridPost", templateColumns: ['2.75rem', 'minmax(auto, calc(100% - 3.5rem))'], templateRows: ['auto'], gap: { column: '0.75rem' }, padding: { left: '1.25rem', right: '1.25rem', top: '1rem', bottom: '1rem' }, position: 'relative', border: { radius: '0.5rem' } },
                     this.$render("i-panel", { id: "pnlActiveBd", visible: false, width: '0.25rem', height: '100%', left: "0px", top: "0px", border: { radius: '0.25rem 0 0 0.25rem' }, background: { color: Theme.background.gradient } }),
                     this.$render("i-panel", { id: "pnlAvatar", grid: { area: 'avatar' } },
                         this.$render("i-image", { id: "imgAvatar", width: '2.75rem', height: '2.75rem', display: "block", background: { color: Theme.background.gradient }, border: { radius: '50%' }, overflow: 'hidden', objectFit: 'cover', fallbackUrl: assets_1.default.fullPath('img/default_avatar.svg'), onClick: () => this.onGoProfile() })),
