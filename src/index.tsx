@@ -11,7 +11,8 @@ import {
   GridLayout,
   HStack,
   Control,
-  VStack
+  VStack,
+  IconName
 } from '@ijstech/components';
 import {
   getDuration,
@@ -157,6 +158,7 @@ export class ScomPost extends Module {
 
     this.pnlActiveBd.visible = this.isActive;
     this.gridPost.border.radius = this.isActive ? '0.25rem' : '0.5rem';
+    this.gridPost.cursor = this.isActive ? 'default' : 'pointer';
 
     if (!this.isQuotedPost) this.renderAnalytics(stat);
     this.groupAnalysis.visible = !this.isQuotedPost;
@@ -210,12 +212,13 @@ export class ScomPost extends Module {
           maxWidth={this.isQuotedPost ? '9.375rem' : '6.25rem'}
           font={{ size: this.isQuotedPost ? '1rem' : '0.875rem', weight: 500 }}
         ></i-label>
-        <i-image
+        <i-icon
           id="imgVerified"
-          url={assets.fullPath('img/verified.svg')}
           width={'0.875rem'} height={'0.875rem'}
-          display='flex'
-        ></i-image>
+          name="certificate"
+          fill={Theme.text.secondary}
+          display="inline-flex"
+        ></i-icon>
       </i-hstack>
     );
     const dateEl = (
@@ -290,32 +293,29 @@ export class ScomPost extends Module {
       {
         value: analytics?.reply || 0,
         name: 'Reply',
-        icon: assets.fullPath('img/reply.svg'),
-        hoveredIcon: assets.fullPath('img/reply_fill.svg'),
+        icon: { name: "comment-alt" },
         hoveredColor: Theme.text.secondary,
         onClick: (target: Control) => {
           if (this.onReplyClicked) this.onReplyClicked(target, this.postData)
         }
       },
-      {
-        value: analytics?.bookmark || 0,
-        name: 'Zap',
-        icon: assets.fullPath('img/zap.svg'),
-        hoveredIcon: assets.fullPath('img/zap_fill.svg'),
-        hoveredColor: Theme.colors.warning.main
-      },
+      // {
+      //   value: analytics?.bookmark || 0,
+      //   name: 'Zap',
+      //   icon: assets.fullPath('img/zap.svg'),
+      //   hoveredIcon: assets.fullPath('img/zap_fill.svg'),
+      //   hoveredColor: Theme.colors.warning.main
+      // },
       {
         value: analytics?.upvote || 0,
         name: 'Like',
-        icon: assets.fullPath('img/like.svg'),
-        hoveredIcon: assets.fullPath('img/like_fill.svg'),
+        icon: { name: "heart" },
         hoveredColor: Theme.colors.error.main
       },
       {
         value: analytics?.repost || 0,
         name: 'Repost',
-        icon: assets.fullPath('img/repost.svg'),
-        hoveredIcon: assets.fullPath('img/repost_fill.svg'),
+        icon: { name: "retweet" },
         hoveredColor: Theme.colors.success.main
       }
     ]
@@ -327,13 +327,14 @@ export class ScomPost extends Module {
           verticalAlignment="center"
           gap='0.5rem'
           tooltip={{content: value, placement: 'bottomLeft'}}
-          class={getIconStyleClass(item.hoveredIcon, item.hoveredColor)}
+          cursor='pointer'
+          class={getIconStyleClass(item.hoveredColor)}
         >
-          <i-panel
+          <i-icon
             width={'1rem'} height={'1rem'}
-            background={{image: item.icon}}
-            display="inline-flex"
-          ></i-panel>
+            fill={Theme.text.secondary}
+            name={item.icon.name as IconName}
+          ></i-icon>
           <i-label
             caption={value}
             font={{color: Theme.colors.secondary.light, size: '1.125rem'}}
@@ -445,7 +446,7 @@ export class ScomPost extends Module {
     return (
       <i-vstack
         id="pnlWrapper"
-        width="100%" cursor="pointer"
+        width="100%"
         border={{radius: 'inherit'}}
       >
         <i-grid-layout
@@ -470,11 +471,11 @@ export class ScomPost extends Module {
               id="imgAvatar"
               width={'2.75rem'} height={'2.75rem'}
               display="block"
-              background={{color: Theme.background.gradient}}
+              background={{color: Theme.background.main}}
               border={{radius: '50%'}}
               overflow={'hidden'}
               objectFit='cover'
-              fallbackUrl={assets.fullPath('img/default_avatar.svg')}
+              fallbackUrl={assets.fullPath('img/default_avatar.png')}
               onClick={() => this.onGoProfile()}
             ></i-image>
           </i-panel>
@@ -496,13 +497,16 @@ export class ScomPost extends Module {
                 visible={false}
                 caption='Subscribe'
               ></i-button>
-              <i-panel onClick={this.onProfileShown}>
+              <i-panel
+                onClick={this.onProfileShown}
+                cursor="pointer"
+                class={hoverStyle}
+              >
                 <i-icon
                   name="ellipsis-h"
                   width={'1rem'}
                   height={'1rem'}
                   fill={Theme.text.secondary}
-                  class={hoverStyle}
                 ></i-icon>
               </i-panel>
             </i-hstack>
