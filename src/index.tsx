@@ -211,6 +211,7 @@ export class ScomPost extends Module {
           textOverflow="ellipsis"
           maxWidth={this.isQuotedPost ? '9.375rem' : '6.25rem'}
           font={{ size: this.isQuotedPost ? '1rem' : '0.875rem', weight: 500 }}
+          lineHeight={'0.875rem'}
         ></i-label>
         <i-icon
           id="imgVerified"
@@ -222,23 +223,33 @@ export class ScomPost extends Module {
       </i-hstack>
     );
     const dateEl = (
-      <i-hstack gap={'0.25rem'}>
+      <i-hstack gap={'0.25rem'} stack={{shrink: '0'}}>
         <i-panel border={{left: {width: '1px', style: 'solid', color: Theme.text.secondary}}}></i-panel>
-        <i-label id="lblDate" font={{ size: '0.875rem', color: Theme.text.secondary }} caption={`${getDuration(publishDate)}`} />
+        <i-label
+          id="lblDate"
+          font={{ size: '0.875rem', color: Theme.text.secondary }}
+          caption={`${getDuration(publishDate)}`}
+          lineHeight={'0.875rem'}
+        />
       </i-hstack>
     );
     const usernameEl = (
       <i-label
         id="lblUsername"
         caption={`${author?.internetIdentifier || ''}`}
-        maxWidth={this.isQuotedPost ? '13.75rem' : '29.375rem'}
+        maxWidth={this.isQuotedPost ? '13.75rem' : '100%'}
         textOverflow="ellipsis"
         font={{size: this.isQuotedPost ? '1rem' : '0.875rem', color: Theme.text.secondary}}
+        lineHeight={'0.875rem'}
       ></i-label>
     );
     if (oneLine) {
       this.pnlInfo.append(
-        <i-hstack height="100%" gap="0.25rem" verticalAlignment="center">
+        <i-hstack
+          height="100%"
+          gap="0.25rem"
+          verticalAlignment="center"
+        >
           {userEl}
           {usernameEl}
           {dateEl}
@@ -457,6 +468,14 @@ export class ScomPost extends Module {
           padding={{left: '1.25rem', right: '1.25rem', top: '1rem', bottom: '1rem'}}
           position='relative'
           border={{radius: '0.5rem'}}
+          mediaQueries={[
+            {
+              maxWidth: '767px',
+              properties: {
+                padding: {left: '1rem', right: '1rem', top: '1rem', bottom: '1rem'}
+              }
+            }
+          ]}
         >
           <i-panel
             id="pnlActiveBd"
@@ -480,12 +499,11 @@ export class ScomPost extends Module {
             ></i-image>
           </i-panel>
           <i-hstack horizontalAlignment="space-between" gap="0.5rem" width="100%" grid={{area: 'user'}} position='relative'>
-            <i-panel id="pnlInfo"></i-panel>
+            <i-panel id="pnlInfo" maxWidth={'100%'} overflow={'hidden'}></i-panel>
             <i-hstack
-              id="pnlSubscribe" stack={{basis: '30%'}}
+              id="pnlSubscribe" stack={{shrink: '0'}}
               horizontalAlignment="end"
               gap="0.5rem"
-              position="absolute" top={'-0.25rem'} right={'0px'}
             >
               <i-button
                 id="btnSubscribe"
