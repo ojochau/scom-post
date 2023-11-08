@@ -272,12 +272,12 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             const imgWidth = this.isQuotedPost ? '1.75rem' : '2.75rem';
             this.imgAvatar.width = this.imgAvatar.height = imgWidth;
             const userEl = (this.$render("i-hstack", { verticalAlignment: 'center', gap: "0.25rem" },
-                this.$render("i-label", { id: "lblOwner", caption: author?.displayName || '', textOverflow: "ellipsis", maxWidth: this.isQuotedPost ? '9.375rem' : '6.25rem', font: { size: this.isQuotedPost ? '1rem' : '0.875rem', weight: 500 } }),
+                this.$render("i-label", { id: "lblOwner", caption: author?.displayName || '', textOverflow: "ellipsis", maxWidth: this.isQuotedPost ? '9.375rem' : '6.25rem', font: { size: this.isQuotedPost ? '1rem' : '0.875rem', weight: 500 }, lineHeight: '0.875rem' }),
                 this.$render("i-icon", { id: "imgVerified", width: '0.875rem', height: '0.875rem', name: "certificate", fill: Theme.text.secondary, display: "inline-flex" })));
-            const dateEl = (this.$render("i-hstack", { gap: '0.25rem' },
+            const dateEl = (this.$render("i-hstack", { gap: '0.25rem', stack: { shrink: '0' } },
                 this.$render("i-panel", { border: { left: { width: '1px', style: 'solid', color: Theme.text.secondary } } }),
-                this.$render("i-label", { id: "lblDate", font: { size: '0.875rem', color: Theme.text.secondary }, caption: `${(0, global_1.getDuration)(publishDate)}` })));
-            const usernameEl = (this.$render("i-label", { id: "lblUsername", caption: `${author?.internetIdentifier || ''}`, maxWidth: this.isQuotedPost ? '13.75rem' : '29.375rem', textOverflow: "ellipsis", font: { size: this.isQuotedPost ? '1rem' : '0.875rem', color: Theme.text.secondary } }));
+                this.$render("i-label", { id: "lblDate", font: { size: '0.875rem', color: Theme.text.secondary }, caption: `${(0, global_1.getDuration)(publishDate)}`, lineHeight: '0.875rem' })));
+            const usernameEl = (this.$render("i-label", { id: "lblUsername", caption: `${author?.internetIdentifier || ''}`, maxWidth: this.isQuotedPost ? '13.75rem' : '100%', textOverflow: "ellipsis", font: { size: this.isQuotedPost ? '1rem' : '0.875rem', color: Theme.text.secondary }, lineHeight: '0.875rem' }));
             if (oneLine) {
                 this.pnlInfo.append(this.$render("i-hstack", { height: "100%", gap: "0.25rem", verticalAlignment: "center" },
                     userEl,
@@ -455,13 +455,20 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         }
         render() {
             return (this.$render("i-vstack", { id: "pnlWrapper", width: "100%", border: { radius: 'inherit' } },
-                this.$render("i-grid-layout", { id: "gridPost", templateColumns: ['2.75rem', 'minmax(auto, calc(100% - 3.5rem))'], templateRows: ['auto'], gap: { column: '0.75rem' }, padding: { left: '1.25rem', right: '1.25rem', top: '1rem', bottom: '1rem' }, position: 'relative', border: { radius: '0.5rem' } },
+                this.$render("i-grid-layout", { id: "gridPost", templateColumns: ['2.75rem', 'minmax(auto, calc(100% - 3.5rem))'], templateRows: ['auto'], gap: { column: '0.75rem' }, padding: { left: '1.25rem', right: '1.25rem', top: '1rem', bottom: '1rem' }, position: 'relative', border: { radius: '0.5rem' }, mediaQueries: [
+                        {
+                            maxWidth: '767px',
+                            properties: {
+                                padding: { left: '1rem', right: '1rem', top: '1rem', bottom: '1rem' }
+                            }
+                        }
+                    ] },
                     this.$render("i-panel", { id: "pnlActiveBd", visible: false, width: '0.25rem', height: '100%', left: "0px", top: "0px", border: { radius: '0.25rem 0 0 0.25rem' }, background: { color: Theme.background.gradient } }),
                     this.$render("i-panel", { id: "pnlAvatar", grid: { area: 'avatar' } },
                         this.$render("i-image", { id: "imgAvatar", width: '2.75rem', height: '2.75rem', display: "block", background: { color: Theme.background.main }, border: { radius: '50%' }, overflow: 'hidden', objectFit: 'cover', fallbackUrl: assets_1.default.fullPath('img/default_avatar.png'), onClick: () => this.onGoProfile() })),
                     this.$render("i-hstack", { horizontalAlignment: "space-between", gap: "0.5rem", width: "100%", grid: { area: 'user' }, position: 'relative' },
-                        this.$render("i-panel", { id: "pnlInfo" }),
-                        this.$render("i-hstack", { id: "pnlSubscribe", stack: { basis: '30%' }, horizontalAlignment: "end", gap: "0.5rem", position: "absolute", top: '-0.25rem', right: '0px' },
+                        this.$render("i-panel", { id: "pnlInfo", maxWidth: '100%', overflow: 'hidden' }),
+                        this.$render("i-hstack", { id: "pnlSubscribe", stack: { shrink: '0' }, horizontalAlignment: "end", gap: "0.5rem" },
                             this.$render("i-button", { id: "btnSubscribe", minHeight: 32, padding: { left: '1rem', right: '1rem' }, background: { color: Theme.colors.primary.main }, font: { color: Theme.colors.primary.contrastText }, border: { radius: '1.875rem' }, visible: false, caption: 'Subscribe' }),
                             this.$render("i-panel", { onClick: this.onProfileShown, cursor: "pointer", class: index_css_1.hoverStyle },
                                 this.$render("i-icon", { name: "ellipsis-h", width: '1rem', height: '1rem', fill: Theme.text.secondary })))),
