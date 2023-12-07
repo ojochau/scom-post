@@ -79,6 +79,7 @@ declare module "@scom/scom-post" {
         isActive?: boolean;
         onReplyClicked?: callbackType;
         onProfileClicked?: callbackType;
+        onQuotedPostClicked?: (target: ScomPost, event?: MouseEvent) => void;
     }
     global {
         namespace JSX {
@@ -93,7 +94,7 @@ declare module "@scom/scom-post" {
         isActive?: boolean;
     }
     type PostType = 'full' | 'standard' | 'short' | 'quoted';
-    type callbackType = (target: Control, data: IPost) => void;
+    type callbackType = (target: Control, data: IPost, event?: Event) => void;
     export class ScomPost extends Module {
         private pnlInfo;
         private imgAvatar;
@@ -120,6 +121,7 @@ declare module "@scom/scom-post" {
         private _replies;
         onReplyClicked: callbackType;
         onProfileClicked: callbackType;
+        onQuotedPostClicked: (target: ScomPost, event?: MouseEvent) => void;
         constructor(parent?: Container, options?: any);
         static create(options?: ScomPostElement, parent?: Container): Promise<ScomPost>;
         get isActive(): boolean;
