@@ -33,6 +33,7 @@ interface ScomPostElement extends ControlElement {
   isActive?: boolean;
   onReplyClicked?: callbackType;
   onProfileClicked?: callbackType;
+  onQuotedPostClicked?: (target: ScomPost, event?: MouseEvent) => void;
 }
 
 declare global {
@@ -50,7 +51,7 @@ interface IPostConfig {
 }
 
 type PostType = 'full' | 'standard' | 'short' | 'quoted';
-type callbackType = (target: Control, data: IPost) => void;
+type callbackType = (target: Control, data: IPost, event?: Event) => void;
 
 @customElements('i-scom-post')
 export class ScomPost extends Module {
@@ -81,6 +82,7 @@ export class ScomPost extends Module {
   private _replies: IPost[];
   public onReplyClicked: callbackType;
   public onProfileClicked: callbackType;
+  public onQuotedPostClicked: (target: ScomPost, event?: MouseEvent) => void;
 
   constructor(parent?: Container, options?: any) {
     super(parent, options);
@@ -190,9 +192,10 @@ export class ScomPost extends Module {
         data={post}
         display="block"
         border={{radius: '0.5rem', width: '1px', style: 'solid', color: Theme.colors.secondary.dark}}
-        onClick={() => window.location.assign(`#/e/${post.id}`)}
       ></i-scom-post>
     )
+    postEl.onClick = this.onQuotedPostClicked;
+    postEl.onQuotedPostClicked = this.onQuotedPostClicked;
     this.pnlQuoted.append(postEl);
     this.pnlQuoted.visible = true;
   }
@@ -306,8 +309,8 @@ export class ScomPost extends Module {
         name: 'Reply',
         icon: { name: "comment-alt" },
         hoveredColor: Theme.text.secondary,
-        onClick: (target: Control) => {
-          if (this.onReplyClicked) this.onReplyClicked(target, this.postData)
+        onClick: (target: Control, event: Event) => {
+          if (this.onReplyClicked) this.onReplyClicked(target, this.postData, event)
         }
       },
       // {
@@ -353,8 +356,8 @@ export class ScomPost extends Module {
         </i-hstack>
       )
       this.groupAnalysis.appendChild(itemEl);
-      itemEl.onClick = () => {
-        if (item.onClick) item.onClick(itemEl);
+      itemEl.onClick = (target: Control, event: Event) => {
+        if (item.onClick) item.onClick(itemEl, event);
       }
     }
   }
@@ -390,6 +393,7 @@ export class ScomPost extends Module {
     const childElm = <i-scom-post></i-scom-post> as ScomPost;
     childElm.onReplyClicked = this.onReplyClicked;
     childElm.onProfileClicked = this.onProfileClicked;
+    childElm.onQuotedPostClicked = this.onQuotedPostClicked;
     childElm.parent = this.pnlReplies;
     if (isPrepend)
       this.pnlReplies.prepend(childElm);
@@ -426,8 +430,8 @@ export class ScomPost extends Module {
     this.renderReplies();
   }
 
-  private onProfileShown(target: Control) {
-    if (this.onProfileClicked) this.onProfileClicked(target, this.postData);
+  private onProfileShown(target: Control, event: Event) {
+    if (this.onProfileClicked) this.onProfileClicked(target, this.postData, event);
   }
 
   private onViewMore() {
@@ -447,6 +451,7 @@ export class ScomPost extends Module {
     super.init();
     this.onReplyClicked = this.getAttribute('onReplyClicked', true) || this.onReplyClicked;
     this.onProfileClicked = this.getAttribute('onProfileClicked', true) || this.onProfileClicked;
+    this.onQuotedPostClicked = this.getAttribute('onQuotedPostClicked', true) || this.onQuotedPostClicked;
     const data = this.getAttribute('data', true);
     const isActive = this.getAttribute('isActive', true, false);
     const type = this.getAttribute('type', true);

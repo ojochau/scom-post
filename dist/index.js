@@ -261,7 +261,9 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             }
         }
         addQuotedPost(post) {
-            const postEl = (this.$render("i-scom-post", { type: "quoted", data: post, display: "block", border: { radius: '0.5rem', width: '1px', style: 'solid', color: Theme.colors.secondary.dark }, onClick: () => window.location.assign(`#/e/${post.id}`) }));
+            const postEl = (this.$render("i-scom-post", { type: "quoted", data: post, display: "block", border: { radius: '0.5rem', width: '1px', style: 'solid', color: Theme.colors.secondary.dark } }));
+            postEl.onClick = this.onQuotedPostClicked;
+            postEl.onQuotedPostClicked = this.onQuotedPostClicked;
             this.pnlQuoted.append(postEl);
             this.pnlQuoted.visible = true;
         }
@@ -331,9 +333,9 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     name: 'Reply',
                     icon: { name: "comment-alt" },
                     hoveredColor: Theme.text.secondary,
-                    onClick: (target) => {
+                    onClick: (target, event) => {
                         if (this.onReplyClicked)
-                            this.onReplyClicked(target, this.postData);
+                            this.onReplyClicked(target, this.postData, event);
                     }
                 },
                 // {
@@ -363,9 +365,9 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     this.$render("i-icon", { width: '1rem', height: '1rem', fill: Theme.text.secondary, name: item.icon.name }),
                     this.$render("i-label", { caption: value, font: { color: Theme.colors.secondary.light, size: '1.125rem' } })));
                 this.groupAnalysis.appendChild(itemEl);
-                itemEl.onClick = () => {
+                itemEl.onClick = (target, event) => {
                     if (item.onClick)
-                        item.onClick(itemEl);
+                        item.onClick(itemEl, event);
                 };
             }
         }
@@ -401,6 +403,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             const childElm = this.$render("i-scom-post", null);
             childElm.onReplyClicked = this.onReplyClicked;
             childElm.onProfileClicked = this.onProfileClicked;
+            childElm.onQuotedPostClicked = this.onQuotedPostClicked;
             childElm.parent = this.pnlReplies;
             if (isPrepend)
                 this.pnlReplies.prepend(childElm);
@@ -428,9 +431,9 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             this.pnlReply.visible = true;
             this.renderReplies();
         }
-        onProfileShown(target) {
+        onProfileShown(target, event) {
             if (this.onProfileClicked)
-                this.onProfileClicked(target, this.postData);
+                this.onProfileClicked(target, this.postData, event);
         }
         onViewMore() {
             this.pnlDetail.style.maxHeight = '';
@@ -447,6 +450,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             super.init();
             this.onReplyClicked = this.getAttribute('onReplyClicked', true) || this.onReplyClicked;
             this.onProfileClicked = this.getAttribute('onProfileClicked', true) || this.onProfileClicked;
+            this.onQuotedPostClicked = this.getAttribute('onQuotedPostClicked', true) || this.onQuotedPostClicked;
             const data = this.getAttribute('data', true);
             const isActive = this.getAttribute('isActive', true, false);
             const type = this.getAttribute('type', true);
