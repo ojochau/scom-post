@@ -10,7 +10,7 @@ export interface IAuthor {
 export interface IPost {
   id: string;
 	author: IAuthor;
-	replyTo?: IPost;
+	parentAuthor?: IAuthor; //whom this post is replying to
 	publishDate: Date | string;
 	stat?: IPostStat;
 	contentElements: IPostData[];
