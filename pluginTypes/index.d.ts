@@ -12,7 +12,7 @@ declare module "@scom/scom-post/global/interface.ts" {
     export interface IPost {
         id: string;
         author: IAuthor;
-        replyTo?: IPost;
+        parentAuthor?: IAuthor;
         publishDate: Date | string;
         stat?: IPostStat;
         contentElements: IPostData[];

@@ -317,12 +317,12 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         }
         async renderUI() {
             this.clear();
-            const { stat, contentElements } = this._data?.data || {};
+            const { stat, parentAuthor, contentElements } = this._data?.data || {};
             this.renderPostType();
-            // if (replyTo && !this.isActive) {
-            //   this.pnlReplyPath.visible = true;
-            //   this.lbReplyTo.caption = replyTo?.author?.displayName || '';
-            // }
+            if (parentAuthor) {
+                this.pnlReplyPath.visible = true;
+                this.lbReplyTo.caption = parentAuthor.displayName || '';
+            }
             this.pnlActiveBd.visible = this.isActive;
             this.gridPost.border.radius = this.isActive ? '0.25rem' : '0.5rem';
             this.gridPost.cursor = this.isActive ? 'default' : 'pointer';
@@ -456,7 +456,6 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         addReply(parentPostId, post) {
             if (parentPostId !== this.postData.id)
                 return;
-            post.replyTo = { ...this.postData };
             if (!this.pnlReply)
                 this.appendReplyPanel();
             this._replies.push(post);
