@@ -166,15 +166,104 @@ define("@scom/scom-post/assets.ts", ["require", "exports", "@ijstech/components"
         fullPath
     };
 });
-define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/scom-post/global/index.ts", "@scom/scom-post/index.css.ts", "@scom/scom-post/assets.ts"], function (require, exports, components_5, global_1, index_css_1, assets_1) {
+define("@scom/scom-post/components/index.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_5) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.tooltipStyle = void 0;
+    const Theme = components_5.Styles.Theme.ThemeVars;
+    exports.tooltipStyle = components_5.Styles.style({
+        $nest: {
+            '.caret': {
+                border: '10px solid transparent',
+                borderTop: `10px solid ${Theme.background.modal}`
+            }
+        }
+    });
+});
+define("@scom/scom-post/components/bubbleMenu.tsx", ["require", "exports", "@ijstech/components", "@scom/scom-post/components/index.css.ts", "@scom/scom-post/assets.ts"], function (require, exports, components_6, index_css_1, assets_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.ScomPostBubbleMenu = void 0;
+    const Theme = components_6.Styles.Theme.ThemeVars;
+    const defaultItems = [
+        {
+            icon: { name: 'edit' },
+            onClick: () => {
+            }
+        },
+        {
+            icon: { name: 'comment' },
+            onClick: () => {
+            }
+        },
+        {
+            icon: { image: { url: assets_1.default.fullPath('img/twitter.svg') }, display: 'inline-flex', width: '1.563rem', height: '1.563rem' },
+            onClick: () => {
+                const query = new URLSearchParams();
+                query.set('text', window.getSelection()?.toString() || '');
+                // query.set('url', '');
+                const url = `https://twitter.com/intent/tweet?${query.toString()}`;
+                window.open(url);
+            }
+        }
+    ];
+    let ScomPostBubbleMenu = class ScomPostBubbleMenu extends components_6.Module {
+        get items() {
+            return this._items;
+        }
+        set items(value) {
+            this._items = value;
+        }
+        setData(items) {
+            this.items = items;
+            this.renderUI();
+        }
+        getData() {
+            return this._items;
+        }
+        renderUI() {
+            const items = this.items || defaultItems;
+            this.pnlItems.clearInnerHTML();
+            const iconProps = {
+                width: '1.563rem', height: '1.563rem',
+                padding: { left: '0.2rem', right: '0.2rem', top: '0.2rem', bottom: '0.2rem' },
+                fill: Theme.text.primary
+            };
+            for (let item of items) {
+                const btn = this.$render("i-button", { icon: { ...iconProps, ...item.icon }, background: { color: 'transparent' }, height: 'auto', boxShadow: 'none' });
+                btn.onClick = () => {
+                    if (item.onClick)
+                        item.onClick(btn, null);
+                };
+                this.pnlItems.append(btn);
+            }
+        }
+        init() {
+            super.init();
+            const items = this.getAttribute('items', true) || defaultItems;
+            this.setData(items);
+        }
+        render() {
+            return (this.$render("i-panel", { background: { color: Theme.background.modal }, border: { radius: '3px' }, padding: { top: '0.5rem', bottom: '0.5rem', left: '0.75rem', right: '0.75rem' }, width: '100%', height: '100%', class: index_css_1.tooltipStyle },
+                this.$render("i-hstack", { id: "pnlItems", verticalAlignment: "center", gap: '0.375rem', maxWidth: '100%' }),
+                this.$render("i-panel", { height: 10, width: 10, position: "absolute", left: "50%", bottom: '-0.9rem', zIndex: -1, margin: { left: -5 }, class: "caret" })));
+        }
+    };
+    ScomPostBubbleMenu = __decorate([
+        (0, components_6.customElements)('i-scom-post--bubble-menu')
+    ], ScomPostBubbleMenu);
+    exports.ScomPostBubbleMenu = ScomPostBubbleMenu;
+});
+define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/scom-post/global/index.ts", "@scom/scom-post/index.css.ts", "@scom/scom-post/assets.ts", "@scom/scom-post/components/bubbleMenu.tsx"], function (require, exports, components_7, global_1, index_css_2, assets_2, bubbleMenu_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ScomPost = void 0;
-    const Theme = components_5.Styles.Theme.ThemeVars;
-    let ScomPost = class ScomPost extends components_5.Module {
+    const Theme = components_7.Styles.Theme.ThemeVars;
+    let ScomPost = class ScomPost extends components_7.Module {
         constructor(parent, options) {
             super(parent, options);
             this.onShowMore = this.onShowMore.bind(this);
+            this.showBubbleMenu = this.showBubbleMenu.bind(this);
         }
         static async create(options, parent) {
             let self = new this(parent, options);
@@ -338,13 +427,6 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                             this.onReplyClicked(target, this.postData, event);
                     }
                 },
-                // {
-                //   value: analytics?.bookmark || 0,
-                //   name: 'Zap',
-                //   icon: assets.fullPath('img/zap.svg'),
-                //   hoveredIcon: assets.fullPath('img/zap_fill.svg'),
-                //   hoveredColor: Theme.colors.warning.main
-                // },
                 {
                     value: analytics?.upvote || 0,
                     name: 'Like',
@@ -360,8 +442,8 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             ];
             this.groupAnalysis.clearInnerHTML();
             for (let item of dataList) {
-                const value = components_5.FormatUtils.formatNumber(item.value, { shortScale: true, decimalFigures: 0 });
-                let itemEl = (this.$render("i-hstack", { verticalAlignment: "center", gap: '0.5rem', tooltip: { content: value, placement: 'bottomLeft' }, cursor: 'pointer', class: (0, index_css_1.getIconStyleClass)(item.hoveredColor) },
+                const value = components_7.FormatUtils.formatNumber(item.value, { shortScale: true, decimalFigures: 0 });
+                let itemEl = (this.$render("i-hstack", { verticalAlignment: "center", gap: '0.5rem', tooltip: { content: value, placement: 'bottomLeft' }, cursor: 'pointer', class: (0, index_css_2.getIconStyleClass)(item.hoveredColor) },
                     this.$render("i-icon", { width: '1rem', height: '1rem', fill: Theme.text.secondary, name: item.icon.name }),
                     this.$render("i-label", { caption: value, font: { color: Theme.colors.secondary.light, size: '1.125rem' } })));
                 this.groupAnalysis.appendChild(itemEl);
@@ -455,6 +537,36 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             const type = this.getAttribute('type', true);
             if (data)
                 await this.setData({ data, isActive, type });
+            if (!this.bubbleMenu) {
+                this.bubbleMenu = await bubbleMenu_1.ScomPostBubbleMenu.create();
+            }
+            this.addEventListener("mouseup", this.showBubbleMenu);
+        }
+        async showBubbleMenu(event) {
+            event.preventDefault();
+            const selectedText = window.getSelection()?.toString() || '';
+            if (selectedText?.trim()) {
+                const selection = window.getSelection();
+                const range = selection.getRangeAt(0);
+                this.bubbleMenu.openModal({
+                    showBackdrop: false,
+                    popupPlacement: 'top',
+                    position: 'fixed',
+                    zIndex: 9999,
+                    minWidth: 0,
+                    width: 'max-content',
+                    height: '2.563rem',
+                    padding: { top: 0, left: 0, right: 0, bottom: 0 },
+                    closeOnBackdropClick: false,
+                    linkTo: range
+                });
+            }
+            else {
+                this.bubbleMenu.closeModal();
+            }
+        }
+        onHide() {
+            this.removeEventListener("mouseup", this.showBubbleMenu);
         }
         render() {
             return (this.$render("i-vstack", { id: "pnlWrapper", width: "100%", border: { radius: 'inherit' } },
@@ -468,12 +580,12 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     ] },
                     this.$render("i-panel", { id: "pnlActiveBd", visible: false, width: '0.25rem', height: '100%', left: "0px", top: "0px", border: { radius: '0.25rem 0 0 0.25rem' }, background: { color: Theme.background.gradient } }),
                     this.$render("i-panel", { id: "pnlAvatar", grid: { area: 'avatar' } },
-                        this.$render("i-image", { id: "imgAvatar", width: '2.75rem', height: '2.75rem', display: "block", background: { color: Theme.background.main }, border: { radius: '50%' }, overflow: 'hidden', objectFit: 'cover', fallbackUrl: assets_1.default.fullPath('img/default_avatar.png'), onClick: () => this.onGoProfile() })),
+                        this.$render("i-image", { id: "imgAvatar", width: '2.75rem', height: '2.75rem', display: "block", background: { color: Theme.background.main }, border: { radius: '50%' }, overflow: 'hidden', objectFit: 'cover', fallbackUrl: assets_2.default.fullPath('img/default_avatar.png'), onClick: () => this.onGoProfile() })),
                     this.$render("i-hstack", { horizontalAlignment: "space-between", gap: "0.5rem", width: "100%", grid: { area: 'user' }, position: 'relative' },
                         this.$render("i-panel", { id: "pnlInfo", maxWidth: '100%', overflow: 'hidden' }),
                         this.$render("i-hstack", { id: "pnlSubscribe", stack: { shrink: '0' }, horizontalAlignment: "end", gap: "0.5rem" },
                             this.$render("i-button", { id: "btnSubscribe", minHeight: 32, padding: { left: '1rem', right: '1rem' }, background: { color: Theme.colors.primary.main }, font: { color: Theme.colors.primary.contrastText }, border: { radius: '1.875rem' }, visible: false, caption: 'Subscribe' }),
-                            this.$render("i-panel", { onClick: this.onProfileShown, cursor: "pointer", class: index_css_1.hoverStyle },
+                            this.$render("i-panel", { onClick: this.onProfileShown, cursor: "pointer", class: index_css_2.hoverStyle },
                                 this.$render("i-icon", { name: "ellipsis-h", width: '1rem', height: '1rem', fill: Theme.text.secondary })))),
                     this.$render("i-hstack", { id: "pnlReplyPath", verticalAlignment: "center", gap: "0.25rem", visible: false, grid: { area: 'path' }, margin: { top: '0.5rem' } },
                         this.$render("i-label", { caption: 'replying to', font: { size: '0.875rem', color: Theme.colors.secondary.light } }),
@@ -490,7 +602,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         }
     };
     ScomPost = __decorate([
-        (0, components_5.customElements)('i-scom-post')
+        (0, components_7.customElements)('i-scom-post')
     ], ScomPost);
     exports.ScomPost = ScomPost;
 });

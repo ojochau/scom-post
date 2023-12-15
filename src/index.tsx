@@ -24,6 +24,7 @@ import {
 } from './global';
 import { getIconStyleClass, hoverStyle } from './index.css';
 import assets from './assets';
+import { ScomPostBubbleMenu } from './components/bubbleMenu';
 const Theme = Styles.Theme.ThemeVars;
 
 export { IPost, IPostData, IPostStat, IAuthor }
@@ -77,6 +78,7 @@ export class ScomPost extends Module {
   private pnlReplyPath: Panel;
   private lbReplyTo: Label;
   private pnlSubscribe: Panel;
+  private bubbleMenu: ScomPostBubbleMenu;
 
   private _data: IPostConfig;
   private _replies: IPost[];
@@ -87,6 +89,7 @@ export class ScomPost extends Module {
   constructor(parent?: Container, options?: any) {
     super(parent, options);
     this.onShowMore = this.onShowMore.bind(this);
+    this.showBubbleMenu = this.showBubbleMenu.bind(this);
   }
 
   static async create(options?: ScomPostElement, parent?: Container) {
@@ -312,13 +315,6 @@ export class ScomPost extends Module {
           if (this.onReplyClicked) this.onReplyClicked(target, this.postData, event)
         }
       },
-      // {
-      //   value: analytics?.bookmark || 0,
-      //   name: 'Zap',
-      //   icon: assets.fullPath('img/zap.svg'),
-      //   hoveredIcon: assets.fullPath('img/zap_fill.svg'),
-      //   hoveredColor: Theme.colors.warning.main
-      // },
       {
         value: analytics?.upvote || 0,
         name: 'Like',
@@ -454,6 +450,39 @@ export class ScomPost extends Module {
     const isActive = this.getAttribute('isActive', true, false);
     const type = this.getAttribute('type', true);
     if (data) await this.setData({data, isActive, type});
+    if (!this.bubbleMenu) {
+      this.bubbleMenu = await ScomPostBubbleMenu.create() as ScomPostBubbleMenu;
+    }
+    this.addEventListener("mouseup", this.showBubbleMenu);
+  }
+
+  private async showBubbleMenu(event: MouseEvent) {
+    event.preventDefault();
+    const selectedText = window.getSelection()?.toString() || '';
+
+    if (selectedText?.trim()) {
+      const selection = window.getSelection();
+      const range = selection.getRangeAt(0);
+
+      this.bubbleMenu.openModal({
+        showBackdrop: false,
+        popupPlacement: 'top',
+        position: 'fixed',
+        zIndex: 9999,
+        minWidth: 0,
+        width: 'max-content',
+        height: '2.563rem',
+        padding: {top: 0, left: 0, right: 0, bottom: 0},
+        closeOnBackdropClick: false,
+        linkTo: range as unknown as Control
+      })
+    } else {
+      this.bubbleMenu.closeModal();
+    }
+  }
+
+  onHide(): void {
+    this.removeEventListener("mouseup", this.showBubbleMenu);
   }
 
   render() {
