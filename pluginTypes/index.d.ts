@@ -68,6 +68,39 @@ declare module "@scom/scom-post/assets.ts" {
     };
     export default _default;
 }
+/// <amd-module name="@scom/scom-post/components/index.css.ts" />
+declare module "@scom/scom-post/components/index.css.ts" {
+    export const tooltipStyle: string;
+}
+/// <amd-module name="@scom/scom-post/components/bubbleMenu.tsx" />
+declare module "@scom/scom-post/components/bubbleMenu.tsx" {
+    import { Control, ControlElement, Module } from '@ijstech/components';
+    interface ScomPostBubbleMenuElement extends ControlElement {
+        items?: IItem[];
+    }
+    interface IItem {
+        icon: any;
+        onClick?: (target: Control, event: Event) => void;
+    }
+    global {
+        namespace JSX {
+            interface IntrinsicElements {
+                ['i-scom-post--bubble-menu']: ScomPostBubbleMenuElement;
+            }
+        }
+    }
+    export class ScomPostBubbleMenu extends Module {
+        private pnlItems;
+        private _items;
+        get items(): IItem[];
+        set items(value: IItem[]);
+        setData(items: IItem[]): void;
+        getData(): IItem[];
+        renderUI(): void;
+        init(): void;
+        render(): void;
+    }
+}
 /// <amd-module name="@scom/scom-post" />
 declare module "@scom/scom-post" {
     import { ControlElement, Module, Container, Control, VStack } from '@ijstech/components';
@@ -117,6 +150,7 @@ declare module "@scom/scom-post" {
         private pnlReplyPath;
         private lbReplyTo;
         private pnlSubscribe;
+        private bubbleMenu;
         private _data;
         private _replies;
         onReplyClicked: callbackType;
@@ -150,6 +184,8 @@ declare module "@scom/scom-post" {
         private onViewMore;
         private onGoProfile;
         init(): Promise<void>;
+        private showBubbleMenu;
+        onHide(): void;
         render(): any;
     }
 }

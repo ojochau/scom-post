@@ -30,7 +30,7 @@ export default class Module1 extends Module {
           module: '@scom/scom-markdown-editor',
           data: {
             properties: {
-              content: 'New post',
+              content: `This article aims to inform readers about the latest developments and improvements in Solidity, which are based on the community's input and ongoing debates. While the information provided is not conclusive, it sheds light on the potential technological advancements.`,
             },
             tag: {
               width: '100%',
