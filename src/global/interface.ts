@@ -12,15 +12,15 @@ export interface IPost {
 	author: IAuthor;
 	parentAuthor?: IAuthor; //whom this post is replying to
 	publishDate: Date | string;
-	stat?: IPostStat;
+	stats?: IPostStats;
 	contentElements: IPostData[];
 };
-export interface IPostStat{
-  reply?: number;
-  repost?: number;
-  upvote?: number; //like
-  downvote?: number;
-  view?: number;
+export interface IPostStats {
+	replies?: number;
+	reposts?: number;
+  upvotes?: number; //likes
+  downvotes?: number;
+  views?: number;
 };
 export interface IPostData {
   module: string; //e.g. @scom/scom-markdown, @scom/scom-image, @scom/scom-video

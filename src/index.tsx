@@ -19,7 +19,7 @@ import {
   getEmbedElement,
   IPost,
   IPostData,
-  IPostStat,
+  IPostStats,
   IAuthor
 } from './global';
 import { getIconStyleClass, hoverStyle } from './index.css';
@@ -27,7 +27,7 @@ import assets from './assets';
 import { ScomPostBubbleMenu } from './components/bubbleMenu';
 const Theme = Styles.Theme.ThemeVars;
 
-export { IPost, IPostData, IPostStat, IAuthor }
+export { IPost, IPostData, IPostStats, IAuthor }
 interface ScomPostElement extends ControlElement {
   data?: IPost;
   type?: PostType;
@@ -153,7 +153,7 @@ export class ScomPost extends Module {
 
   private async renderUI() {
     this.clear();
-    const { stat, parentAuthor, contentElements } = this._data?.data || {};
+    const { stats, parentAuthor, contentElements } = this._data?.data || {};
     this.renderPostType();
 
     if (parentAuthor) {
@@ -164,7 +164,7 @@ export class ScomPost extends Module {
     this.gridPost.border.radius = this.isActive ? '0.25rem' : '0.5rem';
     this.gridPost.cursor = this.isActive ? 'default' : 'pointer';
 
-    if (!this.isQuotedPost) this.renderAnalytics(stat);
+    if (!this.isQuotedPost) this.renderAnalytics(stats);
     this.groupAnalysis.visible = !this.isQuotedPost;
     this.pnlSubscribe.visible = !this.isQuotedPost;
 
@@ -304,10 +304,10 @@ export class ScomPost extends Module {
     }
   }
 
-  private renderAnalytics(analytics: any) {
+  private renderAnalytics(analytics: IPostStats) {
     const dataList = [
       {
-        value: analytics?.reply || 0,
+        value: analytics?.replies || 0,
         name: 'Reply',
         icon: { name: "comment-alt" },
         hoveredColor: Theme.text.secondary,
@@ -316,13 +316,13 @@ export class ScomPost extends Module {
         }
       },
       {
-        value: analytics?.upvote || 0,
+        value: analytics?.upvotes || 0,
         name: 'Like',
         icon: { name: "heart" },
         hoveredColor: Theme.colors.error.main
       },
       {
-        value: analytics?.repost || 0,
+        value: analytics?.reposts || 0,
         name: 'Repost',
         icon: { name: "retweet" },
         hoveredColor: Theme.colors.success.main
