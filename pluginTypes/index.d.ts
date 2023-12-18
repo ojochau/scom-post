@@ -14,15 +14,15 @@ declare module "@scom/scom-post/global/interface.ts" {
         author: IAuthor;
         parentAuthor?: IAuthor;
         publishDate: Date | string;
-        stat?: IPostStat;
+        stats?: IPostStats;
         contentElements: IPostData[];
     }
-    export interface IPostStat {
-        reply?: number;
-        repost?: number;
-        upvote?: number;
-        downvote?: number;
-        view?: number;
+    export interface IPostStats {
+        replies?: number;
+        reposts?: number;
+        upvotes?: number;
+        downvotes?: number;
+        views?: number;
     }
     export interface IPostData {
         module: string;
@@ -104,8 +104,8 @@ declare module "@scom/scom-post/components/bubbleMenu.tsx" {
 /// <amd-module name="@scom/scom-post" />
 declare module "@scom/scom-post" {
     import { ControlElement, Module, Container, Control, VStack } from '@ijstech/components';
-    import { IPost, IPostData, IPostStat, IAuthor } from "@scom/scom-post/global/index.ts";
-    export { IPost, IPostData, IPostStat, IAuthor };
+    import { IPost, IPostData, IPostStats, IAuthor } from "@scom/scom-post/global/index.ts";
+    export { IPost, IPostData, IPostStats, IAuthor };
     interface ScomPostElement extends ControlElement {
         data?: IPost;
         type?: PostType;

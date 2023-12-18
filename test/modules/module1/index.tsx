@@ -18,12 +18,12 @@ export default class Module1 extends Module {
         pubKey: '',
         internetIdentifier: 'elonmusk'
       },
-      stat: {
-        reply: 10,
-        repost: 3,
-        upvote: 48,
-        downvote: 0,
-        view: 20,
+      stats: {
+        replies: 10,
+        reposts: 3,
+        upvotes: 48,
+        downvotes: 0,
+        views: 20,
       },
       contentElements: [
         {
@@ -53,12 +53,12 @@ export default class Module1 extends Module {
           avatar: 'https://placehold.co/50',
           pubKey: '',
         },
-        stat: {
-          reply: 17,
-          repost: 54,
-          upvote: 886,
-          downvote: 0,
-          view: 11000,
+        stats: {
+          replies: 17,
+          reposts: 54,
+          upvotes: 886,
+          downvotes: 0,
+          views: 11000,
         },
         data: [
           {
@@ -88,12 +88,12 @@ export default class Module1 extends Module {
             avatar: 'https://placehold.co/50',
             pubKey: '',
           },
-          stat: {
-            reply: 17,
-            repost: 54,
-            upvote: 886,
-            downvote: 0,
-            view: 11000,
+          stats: {
+            replies: 17,
+            reposts: 54,
+            upvotes: 886,
+            downvotes: 0,
+            views: 11000,
           },
           data: [
             {
@@ -131,12 +131,12 @@ export default class Module1 extends Module {
         "pubKey": "",
         internetIdentifier: "PinballReed"
       },
-      stat: {
-        reply: 17,
-        repost: 54,
-        upvote: 886,
-        downvote: 0,
-        view: 11000
+      stats: {
+        replies: 17,
+        reposts: 54,
+        upvotes: 886,
+        downvotes: 0,
+        views: 11000
       },
       contentElements: [{
         module: '@scom/scom-image',

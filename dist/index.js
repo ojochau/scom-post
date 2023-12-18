@@ -317,7 +317,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         }
         async renderUI() {
             this.clear();
-            const { stat, parentAuthor, contentElements } = this._data?.data || {};
+            const { stats, parentAuthor, contentElements } = this._data?.data || {};
             this.renderPostType();
             if (parentAuthor) {
                 this.pnlReplyPath.visible = true;
@@ -327,7 +327,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             this.gridPost.border.radius = this.isActive ? '0.25rem' : '0.5rem';
             this.gridPost.cursor = this.isActive ? 'default' : 'pointer';
             if (!this.isQuotedPost)
-                this.renderAnalytics(stat);
+                this.renderAnalytics(stats);
             this.groupAnalysis.visible = !this.isQuotedPost;
             this.pnlSubscribe.visible = !this.isQuotedPost;
             // let _height = 0;
@@ -418,7 +418,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         renderAnalytics(analytics) {
             const dataList = [
                 {
-                    value: analytics?.reply || 0,
+                    value: analytics?.replies || 0,
                     name: 'Reply',
                     icon: { name: "comment-alt" },
                     hoveredColor: Theme.text.secondary,
@@ -428,13 +428,13 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     }
                 },
                 {
-                    value: analytics?.upvote || 0,
+                    value: analytics?.upvotes || 0,
                     name: 'Like',
                     icon: { name: "heart" },
                     hoveredColor: Theme.colors.error.main
                 },
                 {
-                    value: analytics?.repost || 0,
+                    value: analytics?.reposts || 0,
                     name: 'Repost',
                     icon: { name: "retweet" },
                     hoveredColor: Theme.colors.success.main
