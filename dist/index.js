@@ -384,8 +384,8 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             }
         }
         renderPostType() {
-            this.gridPost.templateColumns = ['2.75rem', 'minmax(auto, calc(100% - 3.5rem))'];
-            this.gridPost.templateRows = ['auto'];
+            // this.gridPost.templateColumns = ['2.75rem', 'minmax(auto, calc(100% - 3.5rem))'];
+            // this.gridPost.templateRows = ['auto'];
             this.gridPost.background.color = Theme.background.paper;
             if (this.isQuotedPost) {
                 this.renderInfo(true);
@@ -394,8 +394,8 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     ['avatar', 'path'],
                     ['content', 'content']
                 ];
-                this.gridPost.templateColumns = ['1.75rem', 'minmax(auto, calc(100% - 4.5rem))'];
-                this.gridPost.templateRows = ['1.75rem', 'auto'];
+                // this.gridPost.templateColumns = ['1.75rem', 'minmax(auto, calc(100% - 4.5rem))'];
+                // this.gridPost.templateRows = ['1.75rem', 'auto'];
                 this.gridPost.background.color = Theme.background.default;
             }
             else if (this.type === 'short') {
@@ -570,7 +570,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         }
         render() {
             return (this.$render("i-vstack", { id: "pnlWrapper", width: "100%", border: { radius: 'inherit' } },
-                this.$render("i-grid-layout", { id: "gridPost", templateColumns: ['2.75rem', 'minmax(auto, calc(100% - 3.5rem))'], templateRows: ['auto'], gap: { column: '0.75rem' }, padding: { left: '1.25rem', right: '1.25rem', top: '1rem', bottom: '1rem' }, position: 'relative', border: { radius: '0.5rem' }, mediaQueries: [
+                this.$render("i-panel", { id: "gridPost", padding: { left: '1.25rem', right: '1.25rem', top: '1rem', bottom: '1rem' }, position: 'relative', border: { radius: '0.5rem' }, mediaQueries: [
                         {
                             maxWidth: '767px',
                             properties: {
@@ -579,10 +579,11 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                         }
                     ] },
                     this.$render("i-panel", { id: "pnlActiveBd", visible: false, width: '0.25rem', height: '100%', left: "0px", top: "0px", border: { radius: '0.25rem 0 0 0.25rem' }, background: { color: Theme.background.gradient } }),
-                    this.$render("i-panel", { id: "pnlAvatar", grid: { area: 'avatar' } },
-                        this.$render("i-image", { id: "imgAvatar", width: '2.75rem', height: '2.75rem', display: "block", background: { color: Theme.background.main }, border: { radius: '50%' }, overflow: 'hidden', objectFit: 'cover', fallbackUrl: assets_2.default.fullPath('img/default_avatar.png'), onClick: () => this.onGoProfile() })),
                     this.$render("i-hstack", { horizontalAlignment: "space-between", gap: "0.5rem", width: "100%", grid: { area: 'user' }, position: 'relative' },
-                        this.$render("i-panel", { id: "pnlInfo", maxWidth: '100%', overflow: 'hidden' }),
+                        this.$render("i-hstack", { alignItems: 'center', gap: 10 },
+                            this.$render("i-panel", { id: "pnlAvatar", grid: { area: 'avatar' } },
+                                this.$render("i-image", { id: "imgAvatar", width: '2.75rem', height: '2.75rem', display: "block", background: { color: Theme.background.main }, border: { radius: '50%' }, overflow: 'hidden', objectFit: 'cover', fallbackUrl: assets_2.default.fullPath('img/default_avatar.png'), onClick: () => this.onGoProfile() })),
+                            this.$render("i-panel", { id: "pnlInfo", maxWidth: '100%', overflow: 'hidden' })),
                         this.$render("i-hstack", { id: "pnlSubscribe", stack: { shrink: '0' }, horizontalAlignment: "end", gap: "0.5rem" },
                             this.$render("i-button", { id: "btnSubscribe", minHeight: 32, padding: { left: '1rem', right: '1rem' }, background: { color: Theme.colors.primary.main }, font: { color: Theme.colors.primary.contrastText }, border: { radius: '1.875rem' }, visible: false, caption: 'Subscribe' }),
                             this.$render("i-panel", { onClick: this.onProfileShown, cursor: "pointer", class: index_css_2.hoverStyle },
