@@ -189,7 +189,6 @@ declare module "@scom/scom-post" {
         init(): Promise<void>;
         private showBubbleMenu;
         onHide(): void;
-        private renderWithoutGutter;
         render(): any;
     }
 }
