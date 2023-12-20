@@ -37,6 +37,7 @@ interface ScomPostElement extends ControlElement {
     onReplyClicked?: callbackType;
     onProfileClicked?: callbackType;
     onQuotedPostClicked?: (target: ScomPost, event?: MouseEvent) => void;
+    disableGutters?: boolean;
 }
 
 declare global {
@@ -71,6 +72,7 @@ export class ScomPost extends Module {
     private pnlReply: VStack;
     private pnlReplies: VStack;
     private gridPost: GridLayout;
+    private pnlPost: Panel;
     private btnViewMore: HStack;
     private pnlDetail: Panel;
     private pnlOverlay: Panel;
@@ -81,6 +83,7 @@ export class ScomPost extends Module {
     private lbReplyTo: Label;
     private pnlSubscribe: Panel;
     private bubbleMenu: ScomPostBubbleMenu;
+    private disableGutters: boolean;
 
     private _data: IPostConfig;
     private _replies: IPost[];
@@ -279,8 +282,10 @@ export class ScomPost extends Module {
     }
 
     private renderPostType() {
-        // this.gridPost.templateColumns = ['2.75rem', 'minmax(auto, calc(100% - 3.5rem))'];
-        // this.gridPost.templateRows = ['auto'];
+        if(!this.disableGutters) {
+            this.gridPost.templateColumns = ['2.75rem', 'minmax(auto, calc(100% - 3.5rem))'];
+            this.gridPost.templateRows = ['auto'];
+        }
         this.gridPost.background.color = Theme.background.paper;
         if (this.isQuotedPost) {
             this.renderInfo(true);
@@ -289,8 +294,10 @@ export class ScomPost extends Module {
                 ['avatar', 'path'],
                 ['content', 'content']
             ]
-            // this.gridPost.templateColumns = ['1.75rem', 'minmax(auto, calc(100% - 4.5rem))'];
-            // this.gridPost.templateRows = ['1.75rem', 'auto'];
+            if(!this.disableGutters) {
+                this.gridPost.templateColumns = ['1.75rem', 'minmax(auto, calc(100% - 4.5rem))'];
+                this.gridPost.templateRows = ['1.75rem', 'auto'];
+            }
             this.gridPost.background.color = Theme.background.default;
         } else if (this.type === 'short') {
             this.renderInfo();
@@ -451,6 +458,7 @@ export class ScomPost extends Module {
         this.onReplyClicked = this.getAttribute('onReplyClicked', true) || this.onReplyClicked;
         this.onProfileClicked = this.getAttribute('onProfileClicked', true) || this.onProfileClicked;
         this.onQuotedPostClicked = this.getAttribute('onQuotedPostClicked', true) || this.onQuotedPostClicked;
+        this.disableGutters = this.getAttribute('disableGutters', true) || this.disableGutters;
         const data = this.getAttribute('data', true);
         const isActive = this.getAttribute('isActive', true, false);
         const type = this.getAttribute('type', true);
@@ -459,6 +467,121 @@ export class ScomPost extends Module {
             this.bubbleMenu = await ScomPostBubbleMenu.create() as ScomPostBubbleMenu;
         }
         this.addEventListener("mouseup", this.showBubbleMenu);
+        let elm;
+        if (this.disableGutters)
+            elm = this.pnlPost;
+        else
+            elm = this.gridPost;
+        elm.append(<i-panel>
+            <i-panel
+                id="pnlActiveBd"
+                visible={false}
+                width={'0.25rem'} height={'100%'}
+                left="0px" top="0px"
+                border={{radius: '0.25rem 0 0 0.25rem'}}
+                background={{color: Theme.background.gradient}}
+            ></i-panel>
+
+            <i-hstack horizontalAlignment="space-between" gap="0.5rem" width="100%" grid={{area: 'user'}}
+                      position='relative'>
+                <i-hstack alignItems={'center'} gap={10}>
+                    <i-panel id="pnlAvatar" grid={{area: 'avatar'}}>
+                        <i-image
+                            id="imgAvatar"
+                            width={'2.75rem'} height={'2.75rem'}
+                            display="block"
+                            background={{color: Theme.background.main}}
+                            border={{radius: '50%'}}
+                            overflow={'hidden'}
+                            objectFit='cover'
+                            fallbackUrl={assets.fullPath('img/default_avatar.png')}
+                            onClick={() => this.onGoProfile()}
+                        ></i-image>
+                    </i-panel>
+                    <i-panel id="pnlInfo" maxWidth={'100%'} overflow={'hidden'}></i-panel>
+                </i-hstack>
+                <i-hstack
+                    id="pnlSubscribe" stack={{shrink: '0'}}
+                    horizontalAlignment="end"
+                    gap="0.5rem"
+                >
+                    <i-button
+                        id="btnSubscribe"
+                        minHeight={32}
+                        padding={{left: '1rem', right: '1rem'}}
+                        background={{color: Theme.colors.primary.main}}
+                        font={{color: Theme.colors.primary.contrastText}}
+                        border={{radius: '1.875rem'}}
+                        visible={false}
+                        caption='Subscribe'
+                    ></i-button>
+                    <i-panel
+                        onClick={this.onProfileShown}
+                        cursor="pointer"
+                        class={hoverStyle}
+                    >
+                        <i-icon
+                            name="ellipsis-h"
+                            width={'1rem'}
+                            height={'1rem'}
+                            fill={Theme.text.secondary}
+                        ></i-icon>
+                    </i-panel>
+                </i-hstack>
+            </i-hstack>
+            <i-hstack
+                id="pnlReplyPath"
+                verticalAlignment="center"
+                gap="0.25rem" visible={false}
+                grid={{area: 'path'}}
+                margin={{top: '0.5rem'}}
+            >
+                <i-label caption='replying to' font={{size: '0.875rem', color: Theme.colors.secondary.light}}/>
+                <i-label
+                    id="lbReplyTo"
+                    font={{size: '0.875rem', color: Theme.colors.primary.main}}
+                    cursor="pointer"
+                    onClick={() => this.onGoProfile()}
+                />
+            </i-hstack>
+            <i-vstack width={'100%'} grid={{area: 'content'}} margin={{top: '1rem'}}>
+                <i-panel
+                    id="pnlDetail"
+                    // maxHeight={MAX_HEIGHT}
+                    // overflow={'hidden'}
+                >
+                    <i-vstack id="pnlContent" gap="0.75rem"></i-vstack>
+                    <i-panel id="pnlQuoted" visible={false}></i-panel>
+                    <i-panel
+                        id="pnlOverlay"
+                        visible={false}
+                        height='5rem' width='100%'
+                        position='absolute' bottom="0px"
+                        background={{color: `linear-gradient(0, var(--card-bg-color) 0%, transparent 100%)`}}
+                    ></i-panel>
+                </i-panel>
+                <i-hstack
+                    id="btnViewMore"
+                    verticalAlignment="center"
+                    padding={{top: '1rem'}}
+                    gap='0.25rem'
+                    visible={false}
+                    onClick={this.onViewMore}
+                >
+                    <i-label caption={'Read more'}
+                             font={{size: '0.9rem', color: Theme.colors.primary.main}}></i-label>
+                    <i-icon name={"angle-down"} width={16} height={16}
+                            fill={Theme.colors.primary.main}></i-icon>
+                </i-hstack>
+                <i-hstack
+                    id="groupAnalysis"
+                    horizontalAlignment="space-between"
+                    padding={{top: '1.063rem'}}
+                    width={'100%'}
+                />
+            </i-vstack>
+        </i-panel>)
+
     }
 
     private async showBubbleMenu(event: MouseEvent) {
@@ -490,31 +613,38 @@ export class ScomPost extends Module {
         this.removeEventListener("mouseup", this.showBubbleMenu);
     }
 
+    private renderWithoutGutter() {
+
+    }
+
     render() {
         return (
             <i-vstack
                 id="pnlWrapper"
                 width="100%"
                 border={{radius: 'inherit'}}>
-                {/*<i-grid-layout*/}
-                {/*  id="gridPost"*/}
-                {/*  templateColumns={['2.75rem', 'minmax(auto, calc(100% - 3.5rem))']}*/}
-                {/*  templateRows={['auto']}*/}
-                {/*  gap={{column: '0.75rem'}}*/}
-                {/*  padding={{left: '1.25rem', right: '1.25rem', top: '1rem', bottom: '1rem'}}*/}
-                {/*  position='relative'*/}
-                {/*  border={{radius: '0.5rem'}}*/}
-                {/*  mediaQueries={[*/}
-                {/*    {*/}
-                {/*      maxWidth: '767px',*/}
-                {/*      properties: {*/}
-                {/*        padding: {left: '1rem', right: '1rem', top: '1rem', bottom: '1rem'}*/}
-                {/*      }*/}
-                {/*    }*/}
-                {/*  ]}*/}
-                {/*>*/}
+                <i-grid-layout
+                    id="gridPost"
+                    templateColumns={['2.75rem', 'minmax(auto, calc(100% - 3.5rem))']}
+                    templateRows={['auto']}
+                    gap={{column: '0.75rem'}}
+                    padding={{left: '1.25rem', right: '1.25rem', top: '1rem', bottom: '1rem'}}
+                    position='relative'
+                    border={{radius: '0.5rem'}}
+                    visible
+                    mediaQueries={[
+                        {
+                            maxWidth: '767px',
+                            properties: {
+                                padding: {left: '1rem', right: '1rem', top: '1rem', bottom: '1rem'}
+                            }
+                        }
+                    ]}
+                >
+
+                </i-grid-layout>
                 <i-panel
-                    id={"gridPost"}
+                    id={"pnlPost"}
                     padding={{left: '1.25rem', right: '1.25rem', top: '1rem', bottom: '1rem'}}
                     position='relative'
                     border={{radius: '0.5rem'}}
@@ -525,116 +655,11 @@ export class ScomPost extends Module {
                                 padding: {left: '1rem', right: '1rem', top: '1rem', bottom: '1rem'}
                             }
                         }
-                    ]}>
-                    <i-panel
-                        id="pnlActiveBd"
-                        visible={false}
-                        width={'0.25rem'} height={'100%'}
-                        left="0px" top="0px"
-                        border={{radius: '0.25rem 0 0 0.25rem'}}
-                        background={{color: Theme.background.gradient}}
-                    ></i-panel>
+                    ]}
+                    visible={false}
+                >
 
-                    <i-hstack horizontalAlignment="space-between" gap="0.5rem" width="100%" grid={{area: 'user'}}
-                              position='relative'>
-                        <i-hstack alignItems={'center'} gap={10}>
-                            <i-panel id="pnlAvatar" grid={{area: 'avatar'}}>
-                                <i-image
-                                    id="imgAvatar"
-                                    width={'2.75rem'} height={'2.75rem'}
-                                    display="block"
-                                    background={{color: Theme.background.main}}
-                                    border={{radius: '50%'}}
-                                    overflow={'hidden'}
-                                    objectFit='cover'
-                                    fallbackUrl={assets.fullPath('img/default_avatar.png')}
-                                    onClick={() => this.onGoProfile()}
-                                ></i-image>
-                            </i-panel>
-                            <i-panel id="pnlInfo" maxWidth={'100%'} overflow={'hidden'}></i-panel>
-                        </i-hstack>
-                        <i-hstack
-                            id="pnlSubscribe" stack={{shrink: '0'}}
-                            horizontalAlignment="end"
-                            gap="0.5rem"
-                        >
-                            <i-button
-                                id="btnSubscribe"
-                                minHeight={32}
-                                padding={{left: '1rem', right: '1rem'}}
-                                background={{color: Theme.colors.primary.main}}
-                                font={{color: Theme.colors.primary.contrastText}}
-                                border={{radius: '1.875rem'}}
-                                visible={false}
-                                caption='Subscribe'
-                            ></i-button>
-                            <i-panel
-                                onClick={this.onProfileShown}
-                                cursor="pointer"
-                                class={hoverStyle}
-                            >
-                                <i-icon
-                                    name="ellipsis-h"
-                                    width={'1rem'}
-                                    height={'1rem'}
-                                    fill={Theme.text.secondary}
-                                ></i-icon>
-                            </i-panel>
-                        </i-hstack>
-                    </i-hstack>
-                    <i-hstack
-                        id="pnlReplyPath"
-                        verticalAlignment="center"
-                        gap="0.25rem" visible={false}
-                        grid={{area: 'path'}}
-                        margin={{top: '0.5rem'}}
-                    >
-                        <i-label caption='replying to' font={{size: '0.875rem', color: Theme.colors.secondary.light}}/>
-                        <i-label
-                            id="lbReplyTo"
-                            font={{size: '0.875rem', color: Theme.colors.primary.main}}
-                            cursor="pointer"
-                            onClick={() => this.onGoProfile()}
-                        />
-                    </i-hstack>
-                    <i-vstack width={'100%'} grid={{area: 'content'}} margin={{top: '1rem'}}>
-                        <i-panel
-                            id="pnlDetail"
-                            // maxHeight={MAX_HEIGHT}
-                            // overflow={'hidden'}
-                        >
-                            <i-vstack id="pnlContent" gap="0.75rem"></i-vstack>
-                            <i-panel id="pnlQuoted" visible={false}></i-panel>
-                            <i-panel
-                                id="pnlOverlay"
-                                visible={false}
-                                height='5rem' width='100%'
-                                position='absolute' bottom="0px"
-                                background={{color: `linear-gradient(0, var(--card-bg-color) 0%, transparent 100%)`}}
-                            ></i-panel>
-                        </i-panel>
-                        <i-hstack
-                            id="btnViewMore"
-                            verticalAlignment="center"
-                            padding={{top: '1rem'}}
-                            gap='0.25rem'
-                            visible={false}
-                            onClick={this.onViewMore}
-                        >
-                            <i-label caption={'Read more'}
-                                     font={{size: '0.9rem', color: Theme.colors.primary.main}}></i-label>
-                            <i-icon name={"angle-down"} width={16} height={16}
-                                    fill={Theme.colors.primary.main}></i-icon>
-                        </i-hstack>
-                        <i-hstack
-                            id="groupAnalysis"
-                            horizontalAlignment="space-between"
-                            padding={{top: '1.063rem'}}
-                            width={'100%'}
-                        />
-                    </i-vstack>
                 </i-panel>
-                {/*</i-grid-layout>*/}
             </i-vstack>
         );
     }

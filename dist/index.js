@@ -384,8 +384,10 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             }
         }
         renderPostType() {
-            // this.gridPost.templateColumns = ['2.75rem', 'minmax(auto, calc(100% - 3.5rem))'];
-            // this.gridPost.templateRows = ['auto'];
+            if (!this.disableGutters) {
+                this.gridPost.templateColumns = ['2.75rem', 'minmax(auto, calc(100% - 3.5rem))'];
+                this.gridPost.templateRows = ['auto'];
+            }
             this.gridPost.background.color = Theme.background.paper;
             if (this.isQuotedPost) {
                 this.renderInfo(true);
@@ -394,8 +396,10 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     ['avatar', 'path'],
                     ['content', 'content']
                 ];
-                // this.gridPost.templateColumns = ['1.75rem', 'minmax(auto, calc(100% - 4.5rem))'];
-                // this.gridPost.templateRows = ['1.75rem', 'auto'];
+                if (!this.disableGutters) {
+                    this.gridPost.templateColumns = ['1.75rem', 'minmax(auto, calc(100% - 4.5rem))'];
+                    this.gridPost.templateRows = ['1.75rem', 'auto'];
+                }
                 this.gridPost.background.color = Theme.background.default;
             }
             else if (this.type === 'short') {
@@ -532,6 +536,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             this.onReplyClicked = this.getAttribute('onReplyClicked', true) || this.onReplyClicked;
             this.onProfileClicked = this.getAttribute('onProfileClicked', true) || this.onProfileClicked;
             this.onQuotedPostClicked = this.getAttribute('onQuotedPostClicked', true) || this.onQuotedPostClicked;
+            this.disableGutters = this.getAttribute('disableGutters', true) || this.disableGutters;
             const data = this.getAttribute('data', true);
             const isActive = this.getAttribute('isActive', true, false);
             const type = this.getAttribute('type', true);
@@ -541,6 +546,34 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                 this.bubbleMenu = await bubbleMenu_1.ScomPostBubbleMenu.create();
             }
             this.addEventListener("mouseup", this.showBubbleMenu);
+            let elm;
+            if (this.disableGutters)
+                elm = this.pnlPost;
+            else
+                elm = this.gridPost;
+            elm.append(this.$render("i-panel", null,
+                this.$render("i-panel", { id: "pnlActiveBd", visible: false, width: '0.25rem', height: '100%', left: "0px", top: "0px", border: { radius: '0.25rem 0 0 0.25rem' }, background: { color: Theme.background.gradient } }),
+                this.$render("i-hstack", { horizontalAlignment: "space-between", gap: "0.5rem", width: "100%", grid: { area: 'user' }, position: 'relative' },
+                    this.$render("i-hstack", { alignItems: 'center', gap: 10 },
+                        this.$render("i-panel", { id: "pnlAvatar", grid: { area: 'avatar' } },
+                            this.$render("i-image", { id: "imgAvatar", width: '2.75rem', height: '2.75rem', display: "block", background: { color: Theme.background.main }, border: { radius: '50%' }, overflow: 'hidden', objectFit: 'cover', fallbackUrl: assets_2.default.fullPath('img/default_avatar.png'), onClick: () => this.onGoProfile() })),
+                        this.$render("i-panel", { id: "pnlInfo", maxWidth: '100%', overflow: 'hidden' })),
+                    this.$render("i-hstack", { id: "pnlSubscribe", stack: { shrink: '0' }, horizontalAlignment: "end", gap: "0.5rem" },
+                        this.$render("i-button", { id: "btnSubscribe", minHeight: 32, padding: { left: '1rem', right: '1rem' }, background: { color: Theme.colors.primary.main }, font: { color: Theme.colors.primary.contrastText }, border: { radius: '1.875rem' }, visible: false, caption: 'Subscribe' }),
+                        this.$render("i-panel", { onClick: this.onProfileShown, cursor: "pointer", class: index_css_2.hoverStyle },
+                            this.$render("i-icon", { name: "ellipsis-h", width: '1rem', height: '1rem', fill: Theme.text.secondary })))),
+                this.$render("i-hstack", { id: "pnlReplyPath", verticalAlignment: "center", gap: "0.25rem", visible: false, grid: { area: 'path' }, margin: { top: '0.5rem' } },
+                    this.$render("i-label", { caption: 'replying to', font: { size: '0.875rem', color: Theme.colors.secondary.light } }),
+                    this.$render("i-label", { id: "lbReplyTo", font: { size: '0.875rem', color: Theme.colors.primary.main }, cursor: "pointer", onClick: () => this.onGoProfile() })),
+                this.$render("i-vstack", { width: '100%', grid: { area: 'content' }, margin: { top: '1rem' } },
+                    this.$render("i-panel", { id: "pnlDetail" },
+                        this.$render("i-vstack", { id: "pnlContent", gap: "0.75rem" }),
+                        this.$render("i-panel", { id: "pnlQuoted", visible: false }),
+                        this.$render("i-panel", { id: "pnlOverlay", visible: false, height: '5rem', width: '100%', position: 'absolute', bottom: "0px", background: { color: `linear-gradient(0, var(--card-bg-color) 0%, transparent 100%)` } })),
+                    this.$render("i-hstack", { id: "btnViewMore", verticalAlignment: "center", padding: { top: '1rem' }, gap: '0.25rem', visible: false, onClick: this.onViewMore },
+                        this.$render("i-label", { caption: 'Read more', font: { size: '0.9rem', color: Theme.colors.primary.main } }),
+                        this.$render("i-icon", { name: "angle-down", width: 16, height: 16, fill: Theme.colors.primary.main })),
+                    this.$render("i-hstack", { id: "groupAnalysis", horizontalAlignment: "space-between", padding: { top: '1.063rem' }, width: '100%' }))));
         }
         async showBubbleMenu(event) {
             event.preventDefault();
@@ -568,38 +601,26 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         onHide() {
             this.removeEventListener("mouseup", this.showBubbleMenu);
         }
+        renderWithoutGutter() {
+        }
         render() {
             return (this.$render("i-vstack", { id: "pnlWrapper", width: "100%", border: { radius: 'inherit' } },
-                this.$render("i-panel", { id: "gridPost", padding: { left: '1.25rem', right: '1.25rem', top: '1rem', bottom: '1rem' }, position: 'relative', border: { radius: '0.5rem' }, mediaQueries: [
+                this.$render("i-grid-layout", { id: "gridPost", templateColumns: ['2.75rem', 'minmax(auto, calc(100% - 3.5rem))'], templateRows: ['auto'], gap: { column: '0.75rem' }, padding: { left: '1.25rem', right: '1.25rem', top: '1rem', bottom: '1rem' }, position: 'relative', border: { radius: '0.5rem' }, visible: true, mediaQueries: [
                         {
                             maxWidth: '767px',
                             properties: {
                                 padding: { left: '1rem', right: '1rem', top: '1rem', bottom: '1rem' }
                             }
                         }
-                    ] },
-                    this.$render("i-panel", { id: "pnlActiveBd", visible: false, width: '0.25rem', height: '100%', left: "0px", top: "0px", border: { radius: '0.25rem 0 0 0.25rem' }, background: { color: Theme.background.gradient } }),
-                    this.$render("i-hstack", { horizontalAlignment: "space-between", gap: "0.5rem", width: "100%", grid: { area: 'user' }, position: 'relative' },
-                        this.$render("i-hstack", { alignItems: 'center', gap: 10 },
-                            this.$render("i-panel", { id: "pnlAvatar", grid: { area: 'avatar' } },
-                                this.$render("i-image", { id: "imgAvatar", width: '2.75rem', height: '2.75rem', display: "block", background: { color: Theme.background.main }, border: { radius: '50%' }, overflow: 'hidden', objectFit: 'cover', fallbackUrl: assets_2.default.fullPath('img/default_avatar.png'), onClick: () => this.onGoProfile() })),
-                            this.$render("i-panel", { id: "pnlInfo", maxWidth: '100%', overflow: 'hidden' })),
-                        this.$render("i-hstack", { id: "pnlSubscribe", stack: { shrink: '0' }, horizontalAlignment: "end", gap: "0.5rem" },
-                            this.$render("i-button", { id: "btnSubscribe", minHeight: 32, padding: { left: '1rem', right: '1rem' }, background: { color: Theme.colors.primary.main }, font: { color: Theme.colors.primary.contrastText }, border: { radius: '1.875rem' }, visible: false, caption: 'Subscribe' }),
-                            this.$render("i-panel", { onClick: this.onProfileShown, cursor: "pointer", class: index_css_2.hoverStyle },
-                                this.$render("i-icon", { name: "ellipsis-h", width: '1rem', height: '1rem', fill: Theme.text.secondary })))),
-                    this.$render("i-hstack", { id: "pnlReplyPath", verticalAlignment: "center", gap: "0.25rem", visible: false, grid: { area: 'path' }, margin: { top: '0.5rem' } },
-                        this.$render("i-label", { caption: 'replying to', font: { size: '0.875rem', color: Theme.colors.secondary.light } }),
-                        this.$render("i-label", { id: "lbReplyTo", font: { size: '0.875rem', color: Theme.colors.primary.main }, cursor: "pointer", onClick: () => this.onGoProfile() })),
-                    this.$render("i-vstack", { width: '100%', grid: { area: 'content' }, margin: { top: '1rem' } },
-                        this.$render("i-panel", { id: "pnlDetail" },
-                            this.$render("i-vstack", { id: "pnlContent", gap: "0.75rem" }),
-                            this.$render("i-panel", { id: "pnlQuoted", visible: false }),
-                            this.$render("i-panel", { id: "pnlOverlay", visible: false, height: '5rem', width: '100%', position: 'absolute', bottom: "0px", background: { color: `linear-gradient(0, var(--card-bg-color) 0%, transparent 100%)` } })),
-                        this.$render("i-hstack", { id: "btnViewMore", verticalAlignment: "center", padding: { top: '1rem' }, gap: '0.25rem', visible: false, onClick: this.onViewMore },
-                            this.$render("i-label", { caption: 'Read more', font: { size: '0.9rem', color: Theme.colors.primary.main } }),
-                            this.$render("i-icon", { name: "angle-down", width: 16, height: 16, fill: Theme.colors.primary.main })),
-                        this.$render("i-hstack", { id: "groupAnalysis", horizontalAlignment: "space-between", padding: { top: '1.063rem' }, width: '100%' })))));
+                    ] }),
+                this.$render("i-panel", { id: "pnlPost", padding: { left: '1.25rem', right: '1.25rem', top: '1rem', bottom: '1rem' }, position: 'relative', border: { radius: '0.5rem' }, mediaQueries: [
+                        {
+                            maxWidth: '767px',
+                            properties: {
+                                padding: { left: '1rem', right: '1rem', top: '1rem', bottom: '1rem' }
+                            }
+                        }
+                    ], visible: false })));
         }
     };
     ScomPost = __decorate([
