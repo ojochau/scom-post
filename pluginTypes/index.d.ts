@@ -113,6 +113,7 @@ declare module "@scom/scom-post" {
         onReplyClicked?: callbackType;
         onProfileClicked?: callbackType;
         onQuotedPostClicked?: (target: ScomPost, event?: MouseEvent) => void;
+        disableGutters?: boolean;
     }
     global {
         namespace JSX {
@@ -141,6 +142,7 @@ declare module "@scom/scom-post" {
         private pnlReply;
         private pnlReplies;
         private gridPost;
+        private pnlPost;
         private btnViewMore;
         private pnlDetail;
         private pnlOverlay;
@@ -151,6 +153,7 @@ declare module "@scom/scom-post" {
         private lbReplyTo;
         private pnlSubscribe;
         private bubbleMenu;
+        private disableGutters;
         private _data;
         private _replies;
         onReplyClicked: callbackType;
