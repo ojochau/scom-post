@@ -483,7 +483,17 @@ export class ScomPost extends Module {
                     border={{radius: '0.25rem 0 0 0.25rem'}}
                     background={{color: Theme.background.gradient}}
                 ></i-panel>);
-            this.pnlPost.append(<i-panel padding={{left: '1.25rem', right: '1.25rem', top: '1rem', bottom: '1rem'}}>
+            this.pnlPost.append(
+                <i-panel
+                    mediaQueries={[
+                        {
+                            maxWidth: '767px',
+                            properties: {
+                                padding: {left: 0, right: 0, top: 0, bottom: 0}
+                            }
+                        }
+                    ]}
+                    padding={{left: '1.25rem', right: '1.25rem', top: '1rem', bottom: '1rem'}}>
                 <i-hstack horizontalAlignment="space-between" gap="0.5rem" width="100%"
                           grid={{area: 'user'}}
                           position='relative'>
