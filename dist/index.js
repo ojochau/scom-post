@@ -612,7 +612,6 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                 this.bubbleMenu = await bubbleMenu_1.ScomPostBubbleMenu.create();
             }
             this.addEventListener("mouseup", this.showBubbleMenu);
-            console.log('init disableGutters', this.disableGutters);
         }
         async showBubbleMenu(event) {
             event.preventDefault();

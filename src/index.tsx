@@ -711,9 +711,6 @@ export class ScomPost extends Module {
             this.bubbleMenu = await ScomPostBubbleMenu.create() as ScomPostBubbleMenu;
         }
         this.addEventListener("mouseup", this.showBubbleMenu);
-        console.log('init disableGutters', this.disableGutters);
-
-
     }
 
     private async showBubbleMenu(event: MouseEvent) {
@@ -785,7 +782,6 @@ export class ScomPost extends Module {
                     ]}
                     visible={false}
                 >
-
                 </i-panel>
             </i-vstack>
         );
