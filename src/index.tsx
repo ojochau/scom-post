@@ -405,7 +405,7 @@ export class ScomPost extends Module {
     }
 
     private renderReply(reply: IPost, isPrepend?: boolean) {
-        const childElm = <i-scom-post disableGutters={true}></i-scom-post> as ScomPost;
+        const childElm = <i-scom-post/> as ScomPost;
         childElm.onReplyClicked = this.onReplyClicked;
         childElm.onProfileClicked = this.onProfileClicked;
         childElm.onQuotedPostClicked = this.onQuotedPostClicked;
