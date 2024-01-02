@@ -494,7 +494,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             }
         }
         renderReply(reply, isPrepend) {
-            const childElm = this.$render("i-scom-post", { disableGutters: true });
+            const childElm = this.$render("i-scom-post", null);
             childElm.onReplyClicked = this.onReplyClicked;
             childElm.onProfileClicked = this.onProfileClicked;
             childElm.onQuotedPostClicked = this.onQuotedPostClicked;
