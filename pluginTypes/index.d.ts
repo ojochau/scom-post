@@ -59,6 +59,7 @@ declare module "@scom/scom-post/global/index.ts" {
 declare module "@scom/scom-post/index.css.ts" {
     export const getIconStyleClass: (color: string) => string;
     export const hoverStyle: string;
+    export const ellipsisStyle: string;
 }
 /// <amd-module name="@scom/scom-post/assets.ts" />
 declare module "@scom/scom-post/assets.ts" {
@@ -137,6 +138,7 @@ declare module "@scom/scom-post" {
         private lblDate;
         private imgVerified;
         private pnlQuoted;
+        private btnShowMore;
         private pnlWrapper;
         private pnlMore;
         private pnlReply;
@@ -186,6 +188,7 @@ declare module "@scom/scom-post" {
         private onProfileShown;
         private onViewMore;
         private onGoProfile;
+        private handleShowMoreClick;
         init(): Promise<void>;
         private showBubbleMenu;
         onHide(): void;

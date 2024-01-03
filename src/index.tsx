@@ -12,7 +12,8 @@ import {
     HStack,
     Control,
     VStack,
-    IconName
+    IconName,
+    Button
 } from '@ijstech/components';
 import {
     getDuration,
@@ -22,7 +23,7 @@ import {
     IPostStats,
     IAuthor
 } from './global';
-import {getIconStyleClass, hoverStyle} from './index.css';
+import {getIconStyleClass, hoverStyle, ellipsisStyle} from './index.css';
 import assets from './assets';
 import {ScomPostBubbleMenu} from './components/bubbleMenu';
 
@@ -66,6 +67,7 @@ export class ScomPost extends Module {
     private lblDate: Label;
     private imgVerified: Image;
     private pnlQuoted: Panel;
+    private btnShowMore: Button;
 
     private pnlWrapper: Panel;
     private pnlMore: GridLayout;
@@ -189,13 +191,15 @@ export class ScomPost extends Module {
                 if (item.category === 'quotedPost') {
                     this.addQuotedPost(item?.data?.properties);
                 } else {
-                    getEmbedElement(item, this.pnlContent, (elm: any) => {
+                    await getEmbedElement(item, this.pnlContent, (elm: any) => {
                         // _height += Number(elm.height || 0);
                         // if (_height > MAX_HEIGHT && !this.btnViewMore.visible) {
                         //   this.pnlOverlay.visible = true;
                         //   this.btnViewMore.visible = true;
                         // }
                         this.pnlContent.minHeight = 'auto';
+                        const mdEditor = this.pnlContent.querySelector('i-markdown-editor');
+                        this.btnShowMore.visible = mdEditor && mdEditor['offsetHeight'] < mdEditor.scrollHeight;
                     });
                 }
             }
@@ -462,6 +466,11 @@ export class ScomPost extends Module {
         }
     }
 
+    private handleShowMoreClick() {
+        this.pnlContent.classList.remove(ellipsisStyle);
+        this.btnShowMore.visible = false;
+    }
+
     async init() {
         super.init();
         this.onReplyClicked = this.getAttribute('onReplyClicked', true) || this.onReplyClicked;
@@ -563,7 +572,8 @@ export class ScomPost extends Module {
                         // maxHeight={MAX_HEIGHT}
                         // overflow={'hidden'}
                     >
-                        <i-vstack id="pnlContent" gap="0.75rem"></i-vstack>
+                        <i-vstack id="pnlContent" gap="0.75rem" class={ellipsisStyle}></i-vstack>
+                        <i-button id={'btnShowMore'} background={{color: 'transparent'}} onClick={this.handleShowMoreClick.bind(this)} caption={"Show more..."} font={{color: Theme.colors.primary.main}} visible={false}></i-button>
                         <i-panel id="pnlQuoted" visible={false}></i-panel>
                         <i-panel
                             id="pnlOverlay"
@@ -674,7 +684,8 @@ export class ScomPost extends Module {
                     // maxHeight={MAX_HEIGHT}
                     // overflow={'hidden'}
                 >
-                    <i-vstack id="pnlContent" gap="0.75rem"></i-vstack>
+                    <i-vstack id="pnlContent" gap="0.75rem" class={ellipsisStyle}></i-vstack>
+                    <i-button id={'btnShowMore'} background={{color: 'transparent'}} onClick={this.handleShowMoreClick.bind(this)} caption={"Show more..."} font={{color: Theme.colors.primary.main}} visible={false}></i-button>
                     <i-panel id="pnlQuoted" visible={false}></i-panel>
                     <i-panel
                         id="pnlOverlay"
@@ -710,6 +721,7 @@ export class ScomPost extends Module {
         if (!this.bubbleMenu) {
             this.bubbleMenu = await ScomPostBubbleMenu.create() as ScomPostBubbleMenu;
         }
+
         this.addEventListener("mouseup", this.showBubbleMenu);
     }
 

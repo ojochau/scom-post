@@ -123,7 +123,7 @@ define("@scom/scom-post/global/index.ts", ["require", "exports", "@ijstech/compo
 define("@scom/scom-post/index.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.hoverStyle = exports.getIconStyleClass = void 0;
+    exports.ellipsisStyle = exports.hoverStyle = exports.getIconStyleClass = void 0;
     const Theme = components_3.Styles.Theme.ThemeVars;
     const getIconStyleClass = (color) => {
         const styleObj = {
@@ -150,6 +150,16 @@ define("@scom/scom-post/index.css.ts", ["require", "exports", "@ijstech/componen
         $nest: {
             '&:hover svg': {
                 fill: `${Theme.text.primary} !important`
+            }
+        }
+    });
+    exports.ellipsisStyle = components_3.Styles.style({
+        $nest: {
+            'i-markdown-editor': {
+                display: '-webkit-box',
+                '-webkit-line-clamp': 10,
+                // @ts-ignore
+                '-webkit-box-orient': 'vertical'
             }
         }
     });
@@ -344,13 +354,15 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                         this.addQuotedPost(item?.data?.properties);
                     }
                     else {
-                        (0, global_1.getEmbedElement)(item, this.pnlContent, (elm) => {
+                        await (0, global_1.getEmbedElement)(item, this.pnlContent, (elm) => {
                             // _height += Number(elm.height || 0);
                             // if (_height > MAX_HEIGHT && !this.btnViewMore.visible) {
                             //   this.pnlOverlay.visible = true;
                             //   this.btnViewMore.visible = true;
                             // }
                             this.pnlContent.minHeight = 'auto';
+                            const mdEditor = this.pnlContent.querySelector('i-markdown-editor');
+                            this.btnShowMore.visible = mdEditor && mdEditor['offsetHeight'] < mdEditor.scrollHeight;
                         });
                     }
                 }
@@ -540,6 +552,10 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                 window.open(`#/p/${this.postData.author.pubKey}`, '_self');
             }
         }
+        handleShowMoreClick() {
+            this.pnlContent.classList.remove(index_css_2.ellipsisStyle);
+            this.btnShowMore.visible = false;
+        }
         async init() {
             super.init();
             this.onReplyClicked = this.getAttribute('onReplyClicked', true) || this.onReplyClicked;
@@ -574,7 +590,8 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                         this.$render("i-label", { id: "lbReplyTo", font: { size: '0.875rem', color: Theme.colors.primary.main }, cursor: "pointer", onClick: () => this.onGoProfile() })),
                     this.$render("i-vstack", { width: '100%', grid: { area: 'content' }, margin: { top: '1rem' } },
                         this.$render("i-panel", { id: "pnlDetail" },
-                            this.$render("i-vstack", { id: "pnlContent", gap: "0.75rem" }),
+                            this.$render("i-vstack", { id: "pnlContent", gap: "0.75rem", class: index_css_2.ellipsisStyle }),
+                            this.$render("i-button", { id: 'btnShowMore', background: { color: 'transparent' }, onClick: this.handleShowMoreClick.bind(this), caption: "Show more...", font: { color: Theme.colors.primary.main }, visible: false }),
                             this.$render("i-panel", { id: "pnlQuoted", visible: false }),
                             this.$render("i-panel", { id: "pnlOverlay", visible: false, height: '5rem', width: '100%', position: 'absolute', bottom: "0px", background: { color: `linear-gradient(0, var(--card-bg-color) 0%, transparent 100%)` } })),
                         this.$render("i-hstack", { id: "btnViewMore", verticalAlignment: "center", padding: { top: '1rem' }, gap: '0.25rem', visible: false, onClick: this.onViewMore },
@@ -598,7 +615,8 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     this.$render("i-label", { id: "lbReplyTo", font: { size: '0.875rem', color: Theme.colors.primary.main }, cursor: "pointer", onClick: () => this.onGoProfile() })));
                 this.gridPost.append(this.$render("i-vstack", { width: '100%', grid: { area: 'content' }, margin: { top: '1rem' } },
                     this.$render("i-panel", { id: "pnlDetail" },
-                        this.$render("i-vstack", { id: "pnlContent", gap: "0.75rem" }),
+                        this.$render("i-vstack", { id: "pnlContent", gap: "0.75rem", class: index_css_2.ellipsisStyle }),
+                        this.$render("i-button", { id: 'btnShowMore', background: { color: 'transparent' }, onClick: this.handleShowMoreClick.bind(this), caption: "Show more...", font: { color: Theme.colors.primary.main }, visible: false }),
                         this.$render("i-panel", { id: "pnlQuoted", visible: false }),
                         this.$render("i-panel", { id: "pnlOverlay", visible: false, height: '5rem', width: '100%', position: 'absolute', bottom: "0px", background: { color: `linear-gradient(0, var(--card-bg-color) 0%, transparent 100%)` } })),
                     this.$render("i-hstack", { id: "btnViewMore", verticalAlignment: "center", padding: { top: '1rem' }, gap: '0.25rem', visible: false, onClick: this.onViewMore },
