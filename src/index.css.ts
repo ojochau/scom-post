@@ -29,3 +29,14 @@ export const hoverStyle = Styles.style({
    }
  }
 })
+
+export const ellipsisStyle = Styles.style({
+  $nest: {
+    'i-markdown-editor': {
+      display: '-webkit-box',
+      '-webkit-line-clamp': 10,
+      // @ts-ignore
+      '-webkit-box-orient': 'vertical'
+    }
+  }
+})
