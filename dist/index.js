@@ -123,7 +123,7 @@ define("@scom/scom-post/global/index.ts", ["require", "exports", "@ijstech/compo
 define("@scom/scom-post/index.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.ellipsisStyle = exports.hoverStyle = exports.getIconStyleClass = void 0;
+    exports.maxHeightStyle = exports.ellipsisStyle = exports.hoverStyle = exports.getIconStyleClass = void 0;
     const Theme = components_3.Styles.Theme.ThemeVars;
     const getIconStyleClass = (color) => {
         const styleObj = {
@@ -161,6 +161,33 @@ define("@scom/scom-post/index.css.ts", ["require", "exports", "@ijstech/componen
                 // @ts-ignore
                 '-webkit-box-orient': 'vertical'
             }
+        }
+    });
+    exports.maxHeightStyle = components_3.Styles.style({
+        // maxHeight: 500,
+        // overflow: 'hidden',
+        $nest: {
+            '#pnlDetail': {
+                maxHeight: 500,
+                overflow: 'hidden',
+            },
+            // '#pnlDetail:container(height > 500px)': {
+            //   $nest: {
+            //     '#showMoreWrapper': {
+            //       display: 'block',
+            //       background: 'black !important'
+            //     }
+            //   }
+            // },
+            // '#pnlDetail:container(height <= 500px)': {
+            //   $nest: {
+            //     '#showMoreWrapper': {
+            //       display: 'block',
+            //       background: 'white !important'
+            //     }
+            //   }
+            // },
+            '#btnShowMore': {}
         }
     });
 });
@@ -360,9 +387,9 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                             //   this.pnlOverlay.visible = true;
                             //   this.btnViewMore.visible = true;
                             // }
-                            this.pnlContent.minHeight = 'auto';
-                            const mdEditor = this.pnlContent.querySelector('i-markdown-editor');
-                            this.btnShowMore.visible = mdEditor && mdEditor['offsetHeight'] < mdEditor.scrollHeight;
+                            // this.pnlContent.minHeight = 'auto';
+                            // const mdEditor = this.pnlContent.querySelector('i-markdown-editor');
+                            // this.btnShowMore.visible = mdEditor && mdEditor['offsetHeight'] < mdEditor.scrollHeight;
                         });
                     }
                 }
@@ -552,16 +579,19 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                 window.open(`#/p/${this.postData.author.pubKey}`, '_self');
             }
         }
-        handleShowMoreClick() {
-            this.pnlContent.classList.remove(index_css_2.ellipsisStyle);
-            this.btnShowMore.visible = false;
-        }
+        // private handleShowMoreClick() {
+        //     this.pnlContent.classList.remove(ellipsisStyle);
+        //     this.btnShowMore.visible = false;
+        // }
         async init() {
             super.init();
+            console.log('init');
             this.onReplyClicked = this.getAttribute('onReplyClicked', true) || this.onReplyClicked;
             this.onProfileClicked = this.getAttribute('onProfileClicked', true) || this.onProfileClicked;
             this.onQuotedPostClicked = this.getAttribute('onQuotedPostClicked', true) || this.onQuotedPostClicked;
             this.disableGutters = this.getAttribute('disableGutters', true) || this.disableGutters;
+            this.limitHeight = this.getAttribute('limitHeight', true) || this.limitHeight;
+            this.isReply = this.getAttribute('isReply', true) || this.isReply;
             const data = this.getAttribute('data', true);
             const isActive = this.getAttribute('isActive', true, false);
             const type = this.getAttribute('type', true);
@@ -590,8 +620,9 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                         this.$render("i-label", { id: "lbReplyTo", font: { size: '0.875rem', color: Theme.colors.primary.main }, cursor: "pointer", onClick: () => this.onGoProfile() })),
                     this.$render("i-vstack", { width: '100%', grid: { area: 'content' }, margin: { top: '1rem' } },
                         this.$render("i-panel", { id: "pnlDetail" },
+                            this.$render("i-hstack", { id: "showMoreWrapper", visible: false, height: 500, width: '100%', zIndex: 9999, background: { color: 'linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(102,102,102,.5) 90%, rgba(170,170,170,1) 100%)' }, position: 'absolute', justifyContent: 'center', alignItems: 'end' },
+                                this.$render("i-button", { id: "btnShowMore", caption: "Show more", margin: { bottom: 10 }, background: { color: 'transparent' }, font: { color: Theme.colors.primary.main }, boxShadow: 'unset', onClick: this.handleShowMoreClick.bind(this) })),
                             this.$render("i-vstack", { id: "pnlContent", gap: "0.75rem", class: index_css_2.ellipsisStyle }),
-                            this.$render("i-button", { id: 'btnShowMore', background: { color: 'transparent' }, onClick: this.handleShowMoreClick.bind(this), caption: "Show more...", font: { color: Theme.colors.primary.main }, visible: false }),
                             this.$render("i-panel", { id: "pnlQuoted", visible: false }),
                             this.$render("i-panel", { id: "pnlOverlay", visible: false, height: '5rem', width: '100%', position: 'absolute', bottom: "0px", background: { color: `linear-gradient(0, var(--card-bg-color) 0%, transparent 100%)` } })),
                         this.$render("i-hstack", { id: "btnViewMore", verticalAlignment: "center", padding: { top: '1rem' }, gap: '0.25rem', visible: false, onClick: this.onViewMore },
@@ -615,8 +646,9 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     this.$render("i-label", { id: "lbReplyTo", font: { size: '0.875rem', color: Theme.colors.primary.main }, cursor: "pointer", onClick: () => this.onGoProfile() })));
                 this.gridPost.append(this.$render("i-vstack", { width: '100%', grid: { area: 'content' }, margin: { top: '1rem' } },
                     this.$render("i-panel", { id: "pnlDetail" },
+                        this.$render("i-hstack", { id: "showMoreWrapper", visible: false, height: 500, width: '100%', zIndex: 9999, background: { color: 'linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(102,102,102,.5) 90%, rgba(170,170,170,1) 100%)' }, position: 'absolute', justifyContent: 'center', alignItems: 'end' },
+                            this.$render("i-button", { id: "btnShowMore", caption: "Show more", margin: { bottom: 10 }, background: { color: 'transparent' }, font: { color: Theme.colors.primary.main }, boxShadow: 'unset', onClick: this.handleShowMoreClick.bind(this) })),
                         this.$render("i-vstack", { id: "pnlContent", gap: "0.75rem", class: index_css_2.ellipsisStyle }),
-                        this.$render("i-button", { id: 'btnShowMore', background: { color: 'transparent' }, onClick: this.handleShowMoreClick.bind(this), caption: "Show more...", font: { color: Theme.colors.primary.main }, visible: false }),
                         this.$render("i-panel", { id: "pnlQuoted", visible: false }),
                         this.$render("i-panel", { id: "pnlOverlay", visible: false, height: '5rem', width: '100%', position: 'absolute', bottom: "0px", background: { color: `linear-gradient(0, var(--card-bg-color) 0%, transparent 100%)` } })),
                     this.$render("i-hstack", { id: "btnViewMore", verticalAlignment: "center", padding: { top: '1rem' }, gap: '0.25rem', visible: false, onClick: this.onViewMore },
@@ -629,7 +661,37 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             if (!this.bubbleMenu) {
                 this.bubbleMenu = await bubbleMenu_1.ScomPostBubbleMenu.create();
             }
+            setTimeout(() => {
+                if ((this.isReply || this.limitHeight) && this.type !== 'quoted') {
+                    this.classList.add(index_css_2.maxHeightStyle);
+                }
+                if (this.type !== 'quoted' && (this.isReply || this.limitHeight) && (this.pnlDetail.scrollHeight > this.pnlDetail.offsetHeight) || (this.gridPost.scrollHeight > this.gridPost.offsetHeight)) {
+                    this.showMoreWrapper.visible = true;
+                }
+                if (this.isReply) {
+                    this.showMoreWrapper.height = 'calc(100vh - 240px)';
+                }
+            }, 500);
             this.addEventListener("mouseup", this.showBubbleMenu);
+        }
+        renderShowMore() {
+            const maxRetries = 10;
+            let retries = 0;
+            const interval = setInterval(() => {
+                if ((this.isReply || this.limitHeight) && this.type !== 'quoted') {
+                    this.classList.add(index_css_2.maxHeightStyle);
+                }
+                if (this.type !== 'quoted' && (this.isReply || this.limitHeight) && (this.pnlDetail.scrollHeight > this.pnlDetail.offsetHeight) || (this.gridPost.scrollHeight > this.gridPost.offsetHeight)) {
+                    this.showMoreWrapper.visible = true;
+                }
+                if (this.isReply) {
+                    this.showMoreWrapper.height = 'calc(100vh - 240px)';
+                }
+                if (this.pnlDetail.scrollHeight > 0 || this.pnlDetail.offsetHeight > 0 || retries >= maxRetries) {
+                    clearInterval(interval);
+                }
+                retries++;
+            }, 500);
         }
         async showBubbleMenu(event) {
             event.preventDefault();
@@ -654,12 +716,19 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                 this.bubbleMenu.closeModal();
             }
         }
+        handleShowMoreClick() {
+            this.showMoreWrapper.visible = false;
+            this.classList.remove(index_css_2.maxHeightStyle);
+        }
         onHide() {
             this.removeEventListener("mouseup", this.showBubbleMenu);
         }
         render() {
             return (this.$render("i-vstack", { id: "pnlWrapper", width: "100%", border: { radius: 'inherit' } },
-                this.$render("i-grid-layout", { id: "gridPost", templateColumns: ['2.75rem', 'minmax(auto, calc(100% - 3.5rem))'], templateRows: ['auto'], gap: { column: '0.75rem' }, padding: { left: '1.25rem', right: '1.25rem', top: '1rem', bottom: '1rem' }, position: 'relative', border: { radius: '0.5rem' }, visible: false, mediaQueries: [
+                this.$render("i-grid-layout", { id: "gridPost", 
+                    // maxHeight={"calc(100vh - 50px - 94px)"}
+                    // overflow={'hidden'}
+                    templateColumns: ['2.75rem', 'minmax(auto, calc(100% - 3.5rem))'], templateRows: ['auto'], gap: { column: '0.75rem' }, padding: { left: '1.25rem', right: '1.25rem', top: '1rem', bottom: '1rem' }, position: 'relative', border: { radius: '0.5rem' }, visible: false, mediaQueries: [
                         {
                             maxWidth: '767px',
                             properties: {

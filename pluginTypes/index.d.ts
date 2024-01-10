@@ -60,6 +60,7 @@ declare module "@scom/scom-post/index.css.ts" {
     export const getIconStyleClass: (color: string) => string;
     export const hoverStyle: string;
     export const ellipsisStyle: string;
+    export const maxHeightStyle: string;
 }
 /// <amd-module name="@scom/scom-post/assets.ts" />
 declare module "@scom/scom-post/assets.ts" {
@@ -115,6 +116,8 @@ declare module "@scom/scom-post" {
         onProfileClicked?: callbackType;
         onQuotedPostClicked?: (target: ScomPost, event?: MouseEvent) => void;
         disableGutters?: boolean;
+        limitHeight?: boolean;
+        isReply?: boolean;
     }
     global {
         namespace JSX {
@@ -139,6 +142,8 @@ declare module "@scom/scom-post" {
         private imgVerified;
         private pnlQuoted;
         private btnShowMore;
+        private showMoreWrapper;
+        private btnShowMoreInWrapper;
         private pnlWrapper;
         private pnlMore;
         private pnlReply;
@@ -156,6 +161,8 @@ declare module "@scom/scom-post" {
         private pnlSubscribe;
         private bubbleMenu;
         private disableGutters;
+        private limitHeight;
+        private isReply;
         private _data;
         private _replies;
         onReplyClicked: callbackType;
@@ -188,9 +195,10 @@ declare module "@scom/scom-post" {
         private onProfileShown;
         private onViewMore;
         private onGoProfile;
-        private handleShowMoreClick;
         init(): Promise<void>;
+        renderShowMore(): void;
         private showBubbleMenu;
+        private handleShowMoreClick;
         onHide(): void;
         render(): any;
     }
