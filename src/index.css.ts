@@ -40,3 +40,33 @@ export const ellipsisStyle = Styles.style({
     }
   }
 })
+
+export const maxHeightStyle = Styles.style({
+  // maxHeight: 500,
+  // overflow: 'hidden',
+  $nest: {
+    '#pnlDetail': {
+      maxHeight: 500,
+      overflow: 'hidden',
+    },
+    // '#pnlDetail:container(height > 500px)': {
+    //   $nest: {
+    //     '#showMoreWrapper': {
+    //       display: 'block',
+    //       background: 'black !important'
+    //     }
+    //   }
+    // },
+    // '#pnlDetail:container(height <= 500px)': {
+    //   $nest: {
+    //     '#showMoreWrapper': {
+    //       display: 'block',
+    //       background: 'white !important'
+    //     }
+    //   }
+    // },
+    '#btnShowMore': {
+      
+    }
+  }
+})
