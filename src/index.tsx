@@ -58,7 +58,7 @@ interface IPostConfig {
 }
 
 type PostType = 'full' | 'standard' | 'short' | 'quoted';
-type callbackType = (target: Control, data: IPost, event?: Event) => void;
+type callbackType = (target: Control, data: IPost, event?: Event, contentElement?: Control) => void;
 
 @customElements('i-scom-post')
 export class ScomPost extends Module {
@@ -101,6 +101,7 @@ export class ScomPost extends Module {
 
     constructor(parent?: Container, options?: any) {
         super(parent, options);
+        this.onProfileShown = this.onProfileShown.bind(this);
         this.onShowMore = this.onShowMore.bind(this);
         this.showBubbleMenu = this.showBubbleMenu.bind(this);
     }
@@ -457,7 +458,7 @@ export class ScomPost extends Module {
     }
 
     private onProfileShown(target: Control, event: Event) {
-        if (this.onProfileClicked) this.onProfileClicked(target, this.postData, event);
+        if (this.onProfileClicked) this.onProfileClicked(target, this.postData, event, this.pnlContent);
     }
 
     private onViewMore() {
@@ -583,7 +584,7 @@ export class ScomPost extends Module {
                                   visible={false}
                                   height={500}
                                   width={'100%'}
-                                  zIndex={9999}
+                                  zIndex={998}
                                   background={{color: 'linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(102,102,102,.5) 90%, rgba(170,170,170,1) 100%)'}}
                                   position={'absolute'}
                                   justifyContent={'center'}
