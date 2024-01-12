@@ -82,6 +82,7 @@ declare module "@scom/scom-post/components/bubbleMenu.tsx" {
     }
     interface IItem {
         icon: any;
+        tooltipText?: string;
         onClick?: (target: Control, event: Event) => void;
     }
     global {
@@ -132,7 +133,7 @@ declare module "@scom/scom-post" {
         isActive?: boolean;
     }
     type PostType = 'full' | 'standard' | 'short' | 'quoted';
-    type callbackType = (target: Control, data: IPost, event?: Event) => void;
+    type callbackType = (target: Control, data: IPost, event?: Event, contentElement?: Control) => void;
     export class ScomPost extends Module {
         private pnlInfo;
         private imgAvatar;

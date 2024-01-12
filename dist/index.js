@@ -235,6 +235,7 @@ define("@scom/scom-post/components/bubbleMenu.tsx", ["require", "exports", "@ijs
         },
         {
             icon: { image: { url: assets_1.default.fullPath('img/twitter.svg') }, display: 'inline-flex', width: '1.563rem', height: '1.563rem' },
+            tooltipText: 'Post on "X"',
             onClick: () => {
                 const query = new URLSearchParams();
                 query.set('text', window.getSelection()?.toString() || '');
@@ -267,7 +268,7 @@ define("@scom/scom-post/components/bubbleMenu.tsx", ["require", "exports", "@ijs
                 fill: Theme.text.primary
             };
             for (let item of items) {
-                const btn = this.$render("i-button", { icon: { ...iconProps, ...item.icon }, background: { color: 'transparent' }, height: 'auto', boxShadow: 'none' });
+                const btn = this.$render("i-button", { icon: { ...iconProps, ...item.icon }, background: { color: 'transparent' }, height: 'auto', boxShadow: "none", tooltip: { content: item.tooltipText || '' } });
                 btn.onClick = () => {
                     if (item.onClick)
                         item.onClick(btn, null);
@@ -299,6 +300,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
     let ScomPost = class ScomPost extends components_7.Module {
         constructor(parent, options) {
             super(parent, options);
+            this.onProfileShown = this.onProfileShown.bind(this);
             this.onShowMore = this.onShowMore.bind(this);
             this.showBubbleMenu = this.showBubbleMenu.bind(this);
         }
@@ -566,7 +568,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         }
         onProfileShown(target, event) {
             if (this.onProfileClicked)
-                this.onProfileClicked(target, this.postData, event);
+                this.onProfileClicked(target, this.postData, event, this.pnlContent);
         }
         onViewMore() {
             this.pnlDetail.style.maxHeight = '';
@@ -620,7 +622,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                         this.$render("i-label", { id: "lbReplyTo", font: { size: '0.875rem', color: Theme.colors.primary.main }, cursor: "pointer", onClick: () => this.onGoProfile() })),
                     this.$render("i-vstack", { width: '100%', grid: { area: 'content' }, margin: { top: '1rem' } },
                         this.$render("i-panel", { id: "pnlDetail" },
-                            this.$render("i-hstack", { id: "showMoreWrapper", visible: false, height: 500, width: '100%', zIndex: 9999, background: { color: 'linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(102,102,102,.5) 90%, rgba(170,170,170,1) 100%)' }, position: 'absolute', justifyContent: 'center', alignItems: 'end' },
+                            this.$render("i-hstack", { id: "showMoreWrapper", visible: false, height: 500, width: '100%', zIndex: 998, background: { color: 'linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(102,102,102,.5) 90%, rgba(170,170,170,1) 100%)' }, position: 'absolute', justifyContent: 'center', alignItems: 'end' },
                                 this.$render("i-button", { id: "btnShowMore", caption: "Show more", margin: { bottom: 10 }, background: { color: 'transparent' }, font: { color: Theme.colors.primary.main }, boxShadow: 'unset', onClick: this.handleShowMoreClick.bind(this) })),
                             this.$render("i-vstack", { id: "pnlContent", gap: "0.75rem", class: index_css_2.ellipsisStyle }),
                             this.$render("i-panel", { id: "pnlQuoted", visible: false }),

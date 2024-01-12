@@ -16,6 +16,7 @@ interface ScomPostBubbleMenuElement extends ControlElement {
 
 interface IItem {
   icon: any;
+  tooltipText?: string;
   onClick?: (target: Control, event: Event) => void;
 }
 
@@ -32,6 +33,7 @@ const defaultItems = [
   },
   {
     icon: { image: {url: assets.fullPath('img/twitter.svg')}, display: 'inline-flex', width: '1.563rem', height: '1.563rem' },
+    tooltipText: 'Post on "X"',
     onClick: () => {
       const query = new URLSearchParams();
       query.set('text', window.getSelection()?.toString() || '');
@@ -85,7 +87,8 @@ export class ScomPostBubbleMenu extends Module {
         icon={{...iconProps, ...item.icon}}
         background={{color: 'transparent'}}
         height={'auto'}
-        boxShadow='none'
+        boxShadow="none"
+        tooltip={{ content: item.tooltipText || '' }}
       />
       btn.onClick = () => {
         if (item.onClick) item.onClick(btn, null);
