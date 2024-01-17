@@ -21,16 +21,16 @@ interface IItem {
 }
 
 const defaultItems = [
-  {
-    icon: { name: 'edit'},
-    onClick: () => {
-    }
-  },
-  {
-    icon: { name: 'comment'},
-    onClick: () => {
-    }
-  },
+  // {
+  //   icon: { name: 'edit'},
+  //   onClick: () => {
+  //   }
+  // },
+  // {
+  //   icon: { name: 'comment'},
+  //   onClick: () => {
+  //   }
+  // },
   {
     icon: { image: {url: assets.fullPath('img/twitter.svg')}, display: 'inline-flex', width: '1.563rem', height: '1.563rem' },
     tooltipText: 'Post on "X"',
