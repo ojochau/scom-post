@@ -223,16 +223,16 @@ define("@scom/scom-post/components/bubbleMenu.tsx", ["require", "exports", "@ijs
     exports.ScomPostBubbleMenu = void 0;
     const Theme = components_6.Styles.Theme.ThemeVars;
     const defaultItems = [
-        {
-            icon: { name: 'edit' },
-            onClick: () => {
-            }
-        },
-        {
-            icon: { name: 'comment' },
-            onClick: () => {
-            }
-        },
+        // {
+        //   icon: { name: 'edit'},
+        //   onClick: () => {
+        //   }
+        // },
+        // {
+        //   icon: { name: 'comment'},
+        //   onClick: () => {
+        //   }
+        // },
         {
             icon: { image: { url: assets_1.default.fullPath('img/twitter.svg') }, display: 'inline-flex', width: '1.563rem', height: '1.563rem' },
             tooltipText: 'Post on "X"',
