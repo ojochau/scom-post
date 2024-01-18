@@ -114,6 +114,8 @@ declare module "@scom/scom-post" {
         type?: PostType;
         isActive?: boolean;
         onReplyClicked?: callbackType;
+        onLikeClicked?: (target: ScomPost, event?: MouseEvent) => void;
+        onRepostClicked?: (target: ScomPost, event?: MouseEvent) => void;
         onProfileClicked?: callbackType;
         onQuotedPostClicked?: (target: ScomPost, event?: MouseEvent) => void;
         disableGutters?: boolean;
@@ -167,6 +169,8 @@ declare module "@scom/scom-post" {
         private _data;
         private _replies;
         onReplyClicked: callbackType;
+        onLikeClicked: callbackType;
+        onRepostClicked: callbackType;
         onProfileClicked: callbackType;
         onQuotedPostClicked: (target: ScomPost, event?: MouseEvent) => void;
         constructor(parent?: Container, options?: any);
