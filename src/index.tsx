@@ -36,6 +36,8 @@ interface ScomPostElement extends ControlElement {
     type?: PostType;
     isActive?: boolean;
     onReplyClicked?: callbackType;
+    onLikeClicked?: (target: ScomPost, event?: MouseEvent) => void;
+    onRepostClicked?: (target: ScomPost, event?: MouseEvent) => void;
     onProfileClicked?: callbackType;
     onQuotedPostClicked?: (target: ScomPost, event?: MouseEvent) => void;
     disableGutters?: boolean;
@@ -96,6 +98,8 @@ export class ScomPost extends Module {
     private _data: IPostConfig;
     private _replies: IPost[];
     public onReplyClicked: callbackType;
+    public onLikeClicked: callbackType;
+    public onRepostClicked: callbackType;
     public onProfileClicked: callbackType;
     public onQuotedPostClicked: (target: ScomPost, event?: MouseEvent) => void;
 
@@ -338,7 +342,7 @@ export class ScomPost extends Module {
     }
 
     private renderAnalytics(analytics: IPostStats) {
-        const dataList = [
+        const dataList: any[] = [
             {
                 value: analytics?.replies || 0,
                 name: 'Reply',
@@ -352,13 +356,19 @@ export class ScomPost extends Module {
                 value: analytics?.upvotes || 0,
                 name: 'Like',
                 icon: {name: "heart"},
-                hoveredColor: Theme.colors.error.main
+                hoveredColor: Theme.colors.error.main,
+                onClick: (target: Control, event: Event) => {
+                    if (this.onLikeClicked) this.onLikeClicked(target, this.postData, event)
+                }
             },
             {
                 value: analytics?.reposts || 0,
                 name: 'Repost',
                 icon: {name: "retweet"},
-                hoveredColor: Theme.colors.success.main
+                hoveredColor: Theme.colors.success.main,
+                onClick: (target: Control, event: Event) => {
+                    if (this.onRepostClicked) this.onRepostClicked(target, this.postData, event)
+                }
             }
         ]
         this.groupAnalysis.clearInnerHTML();
@@ -419,6 +429,8 @@ export class ScomPost extends Module {
     private renderReply(reply: IPost, isPrepend?: boolean) {
         const childElm = <i-scom-post/> as ScomPost;
         childElm.onReplyClicked = this.onReplyClicked;
+        childElm.onLikeClicked = this.onLikeClicked;
+        childElm.onRepostClicked = this.onRepostClicked;
         childElm.onProfileClicked = this.onProfileClicked;
         childElm.onQuotedPostClicked = this.onQuotedPostClicked;
         childElm.parent = this.pnlReplies;
@@ -483,6 +495,8 @@ export class ScomPost extends Module {
         super.init();
         console.log('init');
         this.onReplyClicked = this.getAttribute('onReplyClicked', true) || this.onReplyClicked;
+        this.onLikeClicked = this.getAttribute('onLikeClicked', true) || this.onLikeClicked;
+        this.onRepostClicked = this.getAttribute('onRepostClicked', true) || this.onRepostClicked;
         this.onProfileClicked = this.getAttribute('onProfileClicked', true) || this.onProfileClicked;
         this.onQuotedPostClicked = this.getAttribute('onQuotedPostClicked', true) || this.onQuotedPostClicked;
         this.disableGutters = this.getAttribute('disableGutters', true) || this.disableGutters;

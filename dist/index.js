@@ -485,13 +485,21 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     value: analytics?.upvotes || 0,
                     name: 'Like',
                     icon: { name: "heart" },
-                    hoveredColor: Theme.colors.error.main
+                    hoveredColor: Theme.colors.error.main,
+                    onClick: (target, event) => {
+                        if (this.onLikeClicked)
+                            this.onLikeClicked(target, this.postData, event);
+                    }
                 },
                 {
                     value: analytics?.reposts || 0,
                     name: 'Repost',
                     icon: { name: "retweet" },
-                    hoveredColor: Theme.colors.success.main
+                    hoveredColor: Theme.colors.success.main,
+                    onClick: (target, event) => {
+                        if (this.onRepostClicked)
+                            this.onRepostClicked(target, this.postData, event);
+                    }
                 }
             ];
             this.groupAnalysis.clearInnerHTML();
@@ -537,6 +545,8 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         renderReply(reply, isPrepend) {
             const childElm = this.$render("i-scom-post", null);
             childElm.onReplyClicked = this.onReplyClicked;
+            childElm.onLikeClicked = this.onLikeClicked;
+            childElm.onRepostClicked = this.onRepostClicked;
             childElm.onProfileClicked = this.onProfileClicked;
             childElm.onQuotedPostClicked = this.onQuotedPostClicked;
             childElm.parent = this.pnlReplies;
@@ -589,6 +599,8 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             super.init();
             console.log('init');
             this.onReplyClicked = this.getAttribute('onReplyClicked', true) || this.onReplyClicked;
+            this.onLikeClicked = this.getAttribute('onLikeClicked', true) || this.onLikeClicked;
+            this.onRepostClicked = this.getAttribute('onRepostClicked', true) || this.onRepostClicked;
             this.onProfileClicked = this.getAttribute('onProfileClicked', true) || this.onProfileClicked;
             this.onQuotedPostClicked = this.getAttribute('onQuotedPostClicked', true) || this.onQuotedPostClicked;
             this.disableGutters = this.getAttribute('disableGutters', true) || this.disableGutters;
