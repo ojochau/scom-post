@@ -411,7 +411,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             const imgWidth = this.isQuotedPost ? '1.75rem' : '2.75rem';
             this.imgAvatar.width = this.imgAvatar.height = imgWidth;
             const userEl = (this.$render("i-hstack", { verticalAlignment: 'center', gap: "0.25rem" },
-                this.$render("i-label", { id: "lblOwner", caption: author?.displayName || '', textOverflow: "ellipsis", maxWidth: this.isQuotedPost ? '9.375rem' : '6.25rem', font: { size: this.isQuotedPost ? '1rem' : '0.875rem', weight: 500 }, lineHeight: '0.875rem' }),
+                this.$render("i-label", { id: "lblOwner", caption: author?.displayName || author?.username || '', textOverflow: "ellipsis", maxWidth: this.isQuotedPost ? '9.375rem' : '6.25rem', font: { size: this.isQuotedPost ? '1rem' : '0.875rem', weight: 500 }, lineHeight: '0.875rem' }),
                 this.$render("i-icon", { id: "imgVerified", width: '0.875rem', height: '0.875rem', name: "certificate", fill: Theme.text.secondary, display: "inline-flex" })));
             const dateEl = (this.$render("i-hstack", { gap: '0.25rem', stack: { shrink: '0' } },
                 this.$render("i-panel", { border: { left: { width: '1px', style: 'solid', color: Theme.text.secondary } } }),
