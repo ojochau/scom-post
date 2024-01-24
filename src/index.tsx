@@ -243,7 +243,7 @@ export class ScomPost extends Module {
             <i-hstack verticalAlignment='center' gap="0.25rem">
                 <i-label
                     id="lblOwner"
-                    caption={author?.displayName || ''}
+                    caption={author?.displayName || author?.username || ''}
                     textOverflow="ellipsis"
                     maxWidth={this.isQuotedPost ? '9.375rem' : '6.25rem'}
                     font={{size: this.isQuotedPost ? '1rem' : '0.875rem', weight: 500}}
