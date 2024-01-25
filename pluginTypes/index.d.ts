@@ -5,7 +5,7 @@ declare module "@scom/scom-post/global/interface.ts" {
         username: string;
         description: string;
         avatar: string;
-        pubKey?: string;
+        npub?: string;
         displayName?: string;
         internetIdentifier: string;
     }

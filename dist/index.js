@@ -587,8 +587,8 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             this.btnViewMore.visible = false;
         }
         onGoProfile() {
-            if (this.postData?.author?.pubKey) {
-                window.open(`#/p/${this.postData.author.pubKey}`, '_self');
+            if (this.postData?.author?.npub) {
+                window.open(`#/p/${this.postData.author.npub}`, '_self');
             }
         }
         // private handleShowMoreClick() {

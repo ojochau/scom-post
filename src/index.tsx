@@ -481,8 +481,8 @@ export class ScomPost extends Module {
     }
 
     private onGoProfile() {
-        if (this.postData?.author?.pubKey) {
-            window.open(`#/p/${this.postData.author.pubKey}`, '_self');
+        if (this.postData?.author?.npub) {
+            window.open(`#/p/${this.postData.author.npub}`, '_self');
         }
     }
 
