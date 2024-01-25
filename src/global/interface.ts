@@ -3,7 +3,7 @@ export interface IAuthor {
   username: string;
   description: string;
   avatar: string;
-  pubKey?: string;
+  npub?: string;
   displayName?: string;
   internetIdentifier: string;
 };
