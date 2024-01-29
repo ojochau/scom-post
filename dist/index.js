@@ -634,7 +634,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                         this.$render("i-label", { id: "lbReplyTo", font: { size: '0.875rem', color: Theme.colors.primary.main }, cursor: "pointer", onClick: () => this.onGoProfile() })),
                     this.$render("i-vstack", { width: '100%', grid: { area: 'content' }, margin: { top: '1rem' } },
                         this.$render("i-panel", { id: "pnlDetail" },
-                            this.$render("i-hstack", { id: "showMoreWrapper", visible: false, height: 500, width: '100%', zIndex: 998, background: { color: 'linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(102,102,102,.5) 90%, rgba(170,170,170,1) 100%)' }, position: 'absolute', justifyContent: 'center', alignItems: 'end' },
+                            this.$render("i-hstack", { id: "showMoreWrapper", visible: false, height: 500, width: '100%', zIndex: 1, background: { color: 'linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(102,102,102,.5) 90%, rgba(170,170,170,1) 100%)' }, position: 'absolute', justifyContent: 'center', alignItems: 'end' },
                                 this.$render("i-button", { id: "btnShowMore", caption: "Show more", margin: { bottom: 10 }, background: { color: 'transparent' }, font: { color: Theme.colors.primary.main }, boxShadow: 'unset', onClick: this.handleShowMoreClick.bind(this) })),
                             this.$render("i-vstack", { id: "pnlContent", gap: "0.75rem", class: index_css_2.ellipsisStyle }),
                             this.$render("i-panel", { id: "pnlQuoted", visible: false }),
@@ -660,7 +660,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     this.$render("i-label", { id: "lbReplyTo", font: { size: '0.875rem', color: Theme.colors.primary.main }, cursor: "pointer", onClick: () => this.onGoProfile() })));
                 this.gridPost.append(this.$render("i-vstack", { width: '100%', grid: { area: 'content' }, margin: { top: '1rem' } },
                     this.$render("i-panel", { id: "pnlDetail" },
-                        this.$render("i-hstack", { id: "showMoreWrapper", visible: false, height: 500, width: '100%', zIndex: 999, background: { color: 'linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(102,102,102,.5) 90%, rgba(170,170,170,1) 100%)' }, position: 'absolute', justifyContent: 'center', alignItems: 'end' },
+                        this.$render("i-hstack", { id: "showMoreWrapper", visible: false, height: 500, width: '100%', zIndex: 1, background: { color: 'linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(102,102,102,.5) 90%, rgba(170,170,170,1) 100%)' }, position: 'absolute', justifyContent: 'center', alignItems: 'end' },
                             this.$render("i-button", { id: "btnShowMore", caption: "Show more", margin: { bottom: 10 }, background: { color: 'transparent' }, font: { color: Theme.colors.primary.main }, boxShadow: 'unset', onClick: this.handleShowMoreClick.bind(this) })),
                         this.$render("i-vstack", { id: "pnlContent", gap: "0.75rem", class: index_css_2.ellipsisStyle }),
                         this.$render("i-panel", { id: "pnlQuoted", visible: false }),

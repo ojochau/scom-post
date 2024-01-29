@@ -598,7 +598,7 @@ export class ScomPost extends Module {
                                   visible={false}
                                   height={500}
                                   width={'100%'}
-                                  zIndex={998}
+                                  zIndex={1}
                                   background={{color: 'linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(102,102,102,.5) 90%, rgba(170,170,170,1) 100%)'}}
                                   position={'absolute'}
                                   justifyContent={'center'}
@@ -717,7 +717,7 @@ export class ScomPost extends Module {
                               visible={false}
                               height={500}
                               width={'100%'}
-                              zIndex={999}
+                              zIndex={1}
                               background={{color: 'linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(102,102,102,.5) 90%, rgba(170,170,170,1) 100%)'}}
                               position={'absolute'}
                               justifyContent={'center'}
