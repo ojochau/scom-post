@@ -505,13 +505,19 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             this.groupAnalysis.clearInnerHTML();
             for (let item of dataList) {
                 const value = components_7.FormatUtils.formatNumber(item.value, { shortScale: true, decimalFigures: 0 });
+                const lblValue = (this.$render("i-label", { caption: value, font: { color: Theme.colors.secondary.light, size: '1.125rem' }, tag: item.value }));
                 let itemEl = (this.$render("i-hstack", { verticalAlignment: "center", gap: '0.5rem', tooltip: { content: value, placement: 'bottomLeft' }, cursor: 'pointer', class: (0, index_css_2.getIconStyleClass)(item.hoveredColor) },
                     this.$render("i-icon", { width: '1rem', height: '1rem', fill: Theme.text.secondary, name: item.icon.name }),
-                    this.$render("i-label", { caption: value, font: { color: Theme.colors.secondary.light, size: '1.125rem' } })));
+                    lblValue));
                 this.groupAnalysis.appendChild(itemEl);
                 itemEl.onClick = (target, event) => {
                     if (item.onClick)
                         item.onClick(itemEl, event);
+                    if (item.name === 'Like' || item.name === 'Repost') {
+                        const newValue = (lblValue.tag ?? 0) + 1;
+                        lblValue.caption = components_7.FormatUtils.formatNumber(newValue, { shortScale: true, decimalFigures: 0 });
+                        lblValue.tag = newValue;
+                    }
                 };
             }
         }
