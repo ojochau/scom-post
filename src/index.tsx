@@ -374,6 +374,13 @@ export class ScomPost extends Module {
         this.groupAnalysis.clearInnerHTML();
         for (let item of dataList) {
             const value = FormatUtils.formatNumber(item.value, {shortScale: true, decimalFigures: 0});
+            const lblValue = (
+                <i-label
+                    caption={value}
+                    font={{color: Theme.colors.secondary.light, size: '1.125rem'}}
+                    tag={item.value}
+                ></i-label>
+            )
             let itemEl = (
                 <i-hstack
                     verticalAlignment="center"
@@ -387,15 +394,17 @@ export class ScomPost extends Module {
                         fill={Theme.text.secondary}
                         name={item.icon.name as IconName}
                     ></i-icon>
-                    <i-label
-                        caption={value}
-                        font={{color: Theme.colors.secondary.light, size: '1.125rem'}}
-                    ></i-label>
+                    {lblValue}
                 </i-hstack>
             )
             this.groupAnalysis.appendChild(itemEl);
             itemEl.onClick = (target: Control, event: Event) => {
                 if (item.onClick) item.onClick(itemEl, event);
+                if (item.name === 'Like' || item.name === 'Repost') {
+                    const newValue = (lblValue.tag??0) + 1;
+                    lblValue.caption = FormatUtils.formatNumber(newValue, {shortScale: true, decimalFigures: 0});
+                    lblValue.tag = newValue;
+                }
             }
         }
     }
