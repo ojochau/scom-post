@@ -498,7 +498,7 @@ export class ScomPost extends Module {
 
     appendReplyPanel() {
         this.pnlReply = <i-vstack id="pnlReply" visible={!this.pnlMore}>
-            <i-vstack id="pnlReplies" gap={'0.5rem'}></i-vstack>
+            <i-vstack id="pnlReplies" gap={'0.5rem'} padding={{bottom: 50}}></i-vstack>
         </i-vstack>
         this.pnlWrapper.appendChild(this.pnlReply);
         return this.pnlReply;
