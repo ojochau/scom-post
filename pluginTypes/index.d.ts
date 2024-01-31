@@ -121,6 +121,7 @@ declare module "@scom/scom-post" {
         disableGutters?: boolean;
         limitHeight?: boolean;
         isReply?: boolean;
+        overflowEllipse?: boolean;
     }
     global {
         namespace JSX {
@@ -166,6 +167,7 @@ declare module "@scom/scom-post" {
         private disableGutters;
         private limitHeight;
         private isReply;
+        private overflowEllipse;
         private _data;
         private _replies;
         onReplyClicked: callbackType;
@@ -201,7 +203,6 @@ declare module "@scom/scom-post" {
         private onViewMore;
         private onGoProfile;
         init(): Promise<void>;
-        renderShowMore(): void;
         private showBubbleMenu;
         private handleShowMoreClick;
         onHide(): void;
