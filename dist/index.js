@@ -588,7 +588,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         ;
         appendReplyPanel() {
             this.pnlReply = this.$render("i-vstack", { id: "pnlReply", visible: !this.pnlMore },
-                this.$render("i-vstack", { id: "pnlReplies", gap: '0.5rem' }));
+                this.$render("i-vstack", { id: "pnlReplies", gap: '0.5rem', padding: { bottom: 50 } }));
             this.pnlWrapper.appendChild(this.pnlReply);
             return this.pnlReply;
         }
