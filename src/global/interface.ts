@@ -14,6 +14,7 @@ export interface IPost {
 	publishDate: Date | string;
 	stats?: IPostStats;
 	contentElements: IPostData[];
+  repost?: IAuthor;
 };
 export interface IPostStats {
 	replies?: number;
