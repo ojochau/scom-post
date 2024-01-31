@@ -49,3 +49,15 @@ export const maxHeightStyle = Styles.style({
     },
   }
 })
+
+export const customLinkStyle = Styles.style({
+  $nest: {
+    'a': {
+      color: `${Theme.colors.primary.main}!important`,
+      display: `inline !important`,
+    },
+    'img': {
+      maxWidth: '100%'
+    }
+  }
+})

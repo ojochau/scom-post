@@ -14,7 +14,7 @@ import {
     VStack,
     IconName,
     Button,
-    Observe
+    Markdown
 } from '@ijstech/components';
 import {
     getDuration,
@@ -24,7 +24,7 @@ import {
     IPostStats,
     IAuthor
 } from './global';
-import {getIconStyleClass, hoverStyle, ellipsisStyle, maxHeightStyle} from './index.css';
+import {getIconStyleClass, hoverStyle, ellipsisStyle, maxHeightStyle, customLinkStyle} from './index.css';
 import assets from './assets';
 import {ScomPostBubbleMenu} from './components/bubbleMenu';
 
@@ -81,6 +81,8 @@ export class ScomPost extends Module {
     private pnlMore: GridLayout;
     private pnlReply: VStack;
     private pnlReplies: VStack;
+    private pnlGridPost: VStack;
+    private pnlRepost: HStack;
     private gridPost: GridLayout;
     private pnlPost: Panel;
     private btnViewMore: HStack;
@@ -184,7 +186,7 @@ export class ScomPost extends Module {
 
     private async renderUI() {
         this.clear();
-        const {stats, parentAuthor, contentElements} = this._data?.data || {};
+        const {stats, parentAuthor, contentElements, repost} = this._data?.data || {};
         this.renderPostType();
 
         if (parentAuthor) {
@@ -192,12 +194,27 @@ export class ScomPost extends Module {
             this.lbReplyTo.caption = parentAuthor.displayName || '';
         }
         this.pnlActiveBd.visible = this.isActive;
-        this.gridPost.border.radius = this.isActive ? '0.25rem' : '0.5rem';
-        this.gridPost.cursor = this.isActive ? 'default' : 'pointer';
+        this.pnlGridPost.border.radius = this.isActive ? '0.25rem' : '0.5rem';
+        this.pnlGridPost.cursor = this.isActive ? 'default' : 'pointer';
 
         if (!this.isQuotedPost) this.renderAnalytics(stats);
         this.groupAnalysis.visible = !this.isQuotedPost;
         this.pnlSubscribe.visible = !this.isQuotedPost;
+        
+        if (repost) {
+            this.pnlRepost.clearInnerHTML();
+            this.pnlRepost.append(
+                <i-hstack width="2.75rem" horizontalAlignment='end'>
+                    <i-icon width="1rem" height="1rem" name="retweet" fill={Theme.text.secondary}></i-icon>
+                </i-hstack>,
+                <i-label
+                    caption={(repost.displayName || repost.username || "") + " reposted"}
+                    font={{ size: "0.875rem", color: Theme.text.secondary }}
+                    onClick={() => this.onGoProfile(repost.npub || repost.id)}
+                ></i-label>
+            )
+            this.pnlRepost.visible = true;
+        }
 
         // let _height = 0;
         if (contentElements?.length) {
@@ -205,19 +222,78 @@ export class ScomPost extends Module {
                 if (item.category === 'quotedPost') {
                     this.addQuotedPost(item?.data?.properties);
                 } else {
-                    await getEmbedElement(item, this.pnlContent, (elm: any) => {
-                        // _height += Number(elm.height || 0);
-                        // if (_height > MAX_HEIGHT && !this.btnViewMore.visible) {
-                        //   this.pnlOverlay.visible = true;
-                        //   this.btnViewMore.visible = true;
+                    if (item.module) {
+                        await getEmbedElement(item, this.pnlContent, (elm: any) => {
+                            // _height += Number(elm.height || 0);
+                            // if (_height > MAX_HEIGHT && !this.btnViewMore.visible) {
+                            //   this.pnlOverlay.visible = true;
+                            //   this.btnViewMore.visible = true;
+                            // }
+                            // this.pnlContent.minHeight = 'auto';
+                            // const mdEditor = this.pnlContent.querySelector('i-markdown-editor');
+                            // this.btnShowMore.visible = mdEditor && mdEditor['offsetHeight'] < mdEditor.scrollHeight;
+                        });
+                    } else {
+                        let content: string = item?.data?.properties?.content || '';
+                        this.appendLabel(content);
+                        // const tableMdRegex = /(?<=(\r\n){2}|^)([^\r\n]*\|[^\r\n]*(\r?\n)?)+(?=(\r?\n){2}|$)/gm;
+                        // const matches: {
+                        //     type: 'table';
+                        //     index: number;
+                        //     length: number;
+                        //     content: string;
+                        // }[] = [];
+                        // const contentArr = content.split(/[\s]+/);
+                        // console.log(contentArr)
+                        // let match;
+                        // while ((match = tableMdRegex.exec(content)) !== null) {
+                        //     const breakRegex = /\|(\s)*:?(-+):?(\s)*\|/gm;
+                        //     if (breakRegex.test(match[0])) {
+                        //         let length = contentArr.find(c => c.startsWith(match[0]))?.length || match[0].length;
+                        //         matches.push({
+                        //             type: 'table',
+                        //             index: match.index,
+                        //             length: length,
+                        //             content: match[0]
+                        //         });
+                        //     }
                         // }
-                        // this.pnlContent.minHeight = 'auto';
-                        // const mdEditor = this.pnlContent.querySelector('i-markdown-editor');
-                        // this.btnShowMore.visible = mdEditor && mdEditor['offsetHeight'] < mdEditor.scrollHeight;
-                    });
+                        // matches.sort((a, b) => a.index - b.index);
+                        // let lastIndex = 0;
+
+                        // for (let match of matches) {
+                        //     if (match.index > lastIndex) {
+                        //         let textContent = content.slice(lastIndex, match.index);
+                        //         if (textContent.trim().length > 0) {
+                        //            this.appendLabel(textContent);
+                        //         }
+                        //     }
+                        //     if (match.type === 'table') {
+                        //         const parsed = await new Markdown().load(match.content);
+                        //         this.appendLabel(parsed, 'markdown');
+                        //     }
+                        //     lastIndex = match.index + match.length;
+                        // }
+                        // if (lastIndex < content.length) {
+                        //     let textContent = content.slice(lastIndex);
+                        //     if (textContent.trim().length > 0) {
+                        //         this.appendLabel(textContent);
+                        //     }
+                        // }
+                    }
                 }
             }
         }
+    }
+
+    private appendLabel(text: string) {
+        const label = <i-label width={'100%'} overflowWrap="anywhere" class={customLinkStyle}></i-label> as Label;
+        const hrefRegex = /https?:\/\/\S+/g;
+        text = text.replace(/\n/gm, ' <br> ').replace(hrefRegex, (match) => {
+            return ` <a href="${match}" target="_blank">${match}</a> `;
+        });
+        label.caption = text;
+        this.pnlContent.appendChild(label);
     }
 
     private addQuotedPost(post: IPost) {
@@ -313,7 +389,7 @@ export class ScomPost extends Module {
             this.gridPost.templateColumns = ['2.75rem', 'minmax(auto, calc(100% - 3.5rem))'];
             this.gridPost.templateRows = ['auto'];
         }
-        this.gridPost.background.color = Theme.background.paper;
+        this.pnlGridPost.background.color = Theme.background.paper;
         this.pnlPost.background.color = Theme.background.paper;
         if (this.isQuotedPost) {
             this.renderInfo(true);
@@ -326,7 +402,7 @@ export class ScomPost extends Module {
                 this.gridPost.templateColumns = ['1.75rem', 'minmax(auto, calc(100% - 4.5rem))'];
                 this.gridPost.templateRows = ['1.75rem', 'auto'];
             }
-            this.gridPost.background.color = Theme.background.default;
+            this.pnlGridPost.background.color = Theme.background.default;
             this.pnlPost.background.color = Theme.background.default;
         } else if (this.type === 'short') {
             this.renderInfo();
@@ -378,6 +454,13 @@ export class ScomPost extends Module {
         this.groupAnalysis.clearInnerHTML();
         for (let item of dataList) {
             const value = FormatUtils.formatNumber(item.value, {shortScale: true, decimalFigures: 0});
+            const lblValue = (
+                <i-label
+                    caption={value}
+                    font={{color: Theme.colors.secondary.light, size: '1.125rem'}}
+                    tag={item.value}
+                ></i-label>
+            )
             let itemEl = (
                 <i-hstack
                     verticalAlignment="center"
@@ -391,15 +474,17 @@ export class ScomPost extends Module {
                         fill={Theme.text.secondary}
                         name={item.icon.name as IconName}
                     ></i-icon>
-                    <i-label
-                        caption={value}
-                        font={{color: Theme.colors.secondary.light, size: '1.125rem'}}
-                    ></i-label>
+                    {lblValue}
                 </i-hstack>
             )
             this.groupAnalysis.appendChild(itemEl);
             itemEl.onClick = (target: Control, event: Event) => {
                 if (item.onClick) item.onClick(itemEl, event);
+                if (item.name === 'Like' || item.name === 'Repost') {
+                    const newValue = (lblValue.tag??0) + 1;
+                    lblValue.caption = FormatUtils.formatNumber(newValue, {shortScale: true, decimalFigures: 0});
+                    lblValue.tag = newValue;
+                }
             }
         }
     }
@@ -484,9 +569,10 @@ export class ScomPost extends Module {
         this.btnViewMore.visible = false;
     }
 
-    private onGoProfile() {
-        if (this.postData?.author?.npub) {
-            window.open(`#/p/${this.postData.author.npub}`, '_self');
+    private onGoProfile(npub?: string) {
+        if (!npub) npub = this.postData?.author?.npub;
+        if (npub) {
+            window.open(`#/p/${npub}`, '_self');
         }
     }
 
@@ -643,7 +729,7 @@ export class ScomPost extends Module {
             </i-panel>);
 
         } else {
-            this.gridPost.visible = true;
+            this.pnlGridPost.visible = true;
             this.gridPost.append(
                 <i-panel
                     id="pnlActiveBd"
@@ -836,17 +922,11 @@ export class ScomPost extends Module {
                 {/*          alignItems={'end'}>*/}
                 {/*    <i-button id={"btnShowMore"} caption={"Show more"} margin={{bottom: 10}} background={{color: 'transparent'}} font={{color: Theme.colors.primary.main}} boxShadow={'unset'} onClick={this.handleShowMoreClick.bind(this)}/>*/}
                 {/*</i-hstack>*/}
-                <i-grid-layout
-                    id="gridPost"
-                    // maxHeight={"calc(100vh - 50px - 94px)"}
-                    // overflow={'hidden'}
-                    templateColumns={['2.75rem', 'minmax(auto, calc(100% - 3.5rem))']}
-                    templateRows={['auto']}
-                    gap={{column: '0.75rem'}}
+                <i-vstack
+                    id="pnlGridPost"
+                    width="100%"
                     padding={{left: '1.25rem', right: '1.25rem', top: '1rem', bottom: '1rem'}}
-                    position='relative'
                     border={{radius: '0.5rem'}}
-                    visible={false}
                     mediaQueries={[
                         {
                             maxWidth: '767px',
@@ -855,9 +935,20 @@ export class ScomPost extends Module {
                             }
                         }
                     ]}
+                    visible={false}
                 >
-
-                </i-grid-layout>
+                    <i-hstack id="pnlRepost" padding={{ bottom: "0.5rem" }} margin={{ top: "-0.5rem" }} gap="0.75rem" visible={false}></i-hstack>
+                    <i-grid-layout
+                        id="gridPost"
+                        // maxHeight={"calc(100vh - 50px - 94px)"}
+                        // overflow={'hidden'}
+                        templateColumns={['2.75rem', 'minmax(auto, calc(100% - 3.5rem))']}
+                        templateRows={['auto']}
+                        gap={{column: '0.75rem'}}
+                        position='relative'
+                    >
+                    </i-grid-layout>
+                </i-vstack>
                 <i-panel
                     id={"pnlPost"}
                     position='relative'
