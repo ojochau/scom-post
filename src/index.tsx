@@ -13,7 +13,8 @@ import {
     Control,
     VStack,
     IconName,
-    Button
+    Button,
+    Markdown
 } from '@ijstech/components';
 import {
     getDuration,
@@ -23,7 +24,7 @@ import {
     IPostStats,
     IAuthor
 } from './global';
-import {getIconStyleClass, hoverStyle, ellipsisStyle, maxHeightStyle} from './index.css';
+import {getIconStyleClass, hoverStyle, ellipsisStyle, maxHeightStyle, customLinkStyle} from './index.css';
 import assets from './assets';
 import {ScomPostBubbleMenu} from './components/bubbleMenu';
 
@@ -202,19 +203,78 @@ export class ScomPost extends Module {
                 if (item.category === 'quotedPost') {
                     this.addQuotedPost(item?.data?.properties);
                 } else {
-                    await getEmbedElement(item, this.pnlContent, (elm: any) => {
-                        // _height += Number(elm.height || 0);
-                        // if (_height > MAX_HEIGHT && !this.btnViewMore.visible) {
-                        //   this.pnlOverlay.visible = true;
-                        //   this.btnViewMore.visible = true;
+                    if (item.module) {
+                        await getEmbedElement(item, this.pnlContent, (elm: any) => {
+                            // _height += Number(elm.height || 0);
+                            // if (_height > MAX_HEIGHT && !this.btnViewMore.visible) {
+                            //   this.pnlOverlay.visible = true;
+                            //   this.btnViewMore.visible = true;
+                            // }
+                            // this.pnlContent.minHeight = 'auto';
+                            // const mdEditor = this.pnlContent.querySelector('i-markdown-editor');
+                            // this.btnShowMore.visible = mdEditor && mdEditor['offsetHeight'] < mdEditor.scrollHeight;
+                        });
+                    } else {
+                        let content: string = item?.data?.properties?.content || '';
+                        this.appendLabel(content);
+                        // const tableMdRegex = /(?<=(\r\n){2}|^)([^\r\n]*\|[^\r\n]*(\r?\n)?)+(?=(\r?\n){2}|$)/gm;
+                        // const matches: {
+                        //     type: 'table';
+                        //     index: number;
+                        //     length: number;
+                        //     content: string;
+                        // }[] = [];
+                        // const contentArr = content.split(/[\s]+/);
+                        // console.log(contentArr)
+                        // let match;
+                        // while ((match = tableMdRegex.exec(content)) !== null) {
+                        //     const breakRegex = /\|(\s)*:?(-+):?(\s)*\|/gm;
+                        //     if (breakRegex.test(match[0])) {
+                        //         let length = contentArr.find(c => c.startsWith(match[0]))?.length || match[0].length;
+                        //         matches.push({
+                        //             type: 'table',
+                        //             index: match.index,
+                        //             length: length,
+                        //             content: match[0]
+                        //         });
+                        //     }
                         // }
-                        // this.pnlContent.minHeight = 'auto';
-                        // const mdEditor = this.pnlContent.querySelector('i-markdown-editor');
-                        // this.btnShowMore.visible = mdEditor && mdEditor['offsetHeight'] < mdEditor.scrollHeight;
-                    });
+                        // matches.sort((a, b) => a.index - b.index);
+                        // let lastIndex = 0;
+
+                        // for (let match of matches) {
+                        //     if (match.index > lastIndex) {
+                        //         let textContent = content.slice(lastIndex, match.index);
+                        //         if (textContent.trim().length > 0) {
+                        //            this.appendLabel(textContent);
+                        //         }
+                        //     }
+                        //     if (match.type === 'table') {
+                        //         const parsed = await new Markdown().load(match.content);
+                        //         this.appendLabel(parsed, 'markdown');
+                        //     }
+                        //     lastIndex = match.index + match.length;
+                        // }
+                        // if (lastIndex < content.length) {
+                        //     let textContent = content.slice(lastIndex);
+                        //     if (textContent.trim().length > 0) {
+                        //         this.appendLabel(textContent);
+                        //     }
+                        // }
+                    }
                 }
             }
         }
+    }
+
+    private appendLabel(text: string) {
+        const label = <i-label width={'100%'} overflowWrap="anywhere" class={customLinkStyle}></i-label> as Label;
+        const hrefRegex = /https?:\/\/\S+/g;
+        text = text.replace(/\n/gm, ' <br> ').replace(hrefRegex, (match) => {
+            return ` <a href="${match}" target="_blank">${match}</a> `;
+        });
+        label.caption = text;
+        this.pnlContent.appendChild(label);
     }
 
     private addQuotedPost(post: IPost) {

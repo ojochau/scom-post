@@ -61,6 +61,7 @@ declare module "@scom/scom-post/index.css.ts" {
     export const hoverStyle: string;
     export const ellipsisStyle: string;
     export const maxHeightStyle: string;
+    export const customLinkStyle: string;
 }
 /// <amd-module name="@scom/scom-post/assets.ts" />
 declare module "@scom/scom-post/assets.ts" {
@@ -187,6 +188,7 @@ declare module "@scom/scom-post" {
         get isQuotedPost(): boolean;
         clear(): void;
         private renderUI;
+        private appendLabel;
         private addQuotedPost;
         private renderInfo;
         private renderPostType;

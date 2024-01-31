@@ -123,7 +123,7 @@ define("@scom/scom-post/global/index.ts", ["require", "exports", "@ijstech/compo
 define("@scom/scom-post/index.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.maxHeightStyle = exports.ellipsisStyle = exports.hoverStyle = exports.getIconStyleClass = void 0;
+    exports.customLinkStyle = exports.maxHeightStyle = exports.ellipsisStyle = exports.hoverStyle = exports.getIconStyleClass = void 0;
     const Theme = components_3.Styles.Theme.ThemeVars;
     const getIconStyleClass = (color) => {
         const styleObj = {
@@ -188,6 +188,17 @@ define("@scom/scom-post/index.css.ts", ["require", "exports", "@ijstech/componen
             //   }
             // },
             '#btnShowMore': {}
+        }
+    });
+    exports.customLinkStyle = components_3.Styles.style({
+        $nest: {
+            'a': {
+                color: `${Theme.colors.primary.main}!important`,
+                display: `inline !important`,
+            },
+            'img': {
+                maxWidth: '100%'
+            }
         }
     });
 });
@@ -383,19 +394,77 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                         this.addQuotedPost(item?.data?.properties);
                     }
                     else {
-                        await (0, global_1.getEmbedElement)(item, this.pnlContent, (elm) => {
-                            // _height += Number(elm.height || 0);
-                            // if (_height > MAX_HEIGHT && !this.btnViewMore.visible) {
-                            //   this.pnlOverlay.visible = true;
-                            //   this.btnViewMore.visible = true;
+                        if (item.module) {
+                            await (0, global_1.getEmbedElement)(item, this.pnlContent, (elm) => {
+                                // _height += Number(elm.height || 0);
+                                // if (_height > MAX_HEIGHT && !this.btnViewMore.visible) {
+                                //   this.pnlOverlay.visible = true;
+                                //   this.btnViewMore.visible = true;
+                                // }
+                                // this.pnlContent.minHeight = 'auto';
+                                // const mdEditor = this.pnlContent.querySelector('i-markdown-editor');
+                                // this.btnShowMore.visible = mdEditor && mdEditor['offsetHeight'] < mdEditor.scrollHeight;
+                            });
+                        }
+                        else {
+                            let content = item?.data?.properties?.content || '';
+                            this.appendLabel(content);
+                            // const tableMdRegex = /(?<=(\r\n){2}|^)([^\r\n]*\|[^\r\n]*(\r?\n)?)+(?=(\r?\n){2}|$)/gm;
+                            // const matches: {
+                            //     type: 'table';
+                            //     index: number;
+                            //     length: number;
+                            //     content: string;
+                            // }[] = [];
+                            // const contentArr = content.split(/[\s]+/);
+                            // console.log(contentArr)
+                            // let match;
+                            // while ((match = tableMdRegex.exec(content)) !== null) {
+                            //     const breakRegex = /\|(\s)*:?(-+):?(\s)*\|/gm;
+                            //     if (breakRegex.test(match[0])) {
+                            //         let length = contentArr.find(c => c.startsWith(match[0]))?.length || match[0].length;
+                            //         matches.push({
+                            //             type: 'table',
+                            //             index: match.index,
+                            //             length: length,
+                            //             content: match[0]
+                            //         });
+                            //     }
                             // }
-                            // this.pnlContent.minHeight = 'auto';
-                            // const mdEditor = this.pnlContent.querySelector('i-markdown-editor');
-                            // this.btnShowMore.visible = mdEditor && mdEditor['offsetHeight'] < mdEditor.scrollHeight;
-                        });
+                            // matches.sort((a, b) => a.index - b.index);
+                            // let lastIndex = 0;
+                            // for (let match of matches) {
+                            //     if (match.index > lastIndex) {
+                            //         let textContent = content.slice(lastIndex, match.index);
+                            //         if (textContent.trim().length > 0) {
+                            //            this.appendLabel(textContent);
+                            //         }
+                            //     }
+                            //     if (match.type === 'table') {
+                            //         const parsed = await new Markdown().load(match.content);
+                            //         this.appendLabel(parsed, 'markdown');
+                            //     }
+                            //     lastIndex = match.index + match.length;
+                            // }
+                            // if (lastIndex < content.length) {
+                            //     let textContent = content.slice(lastIndex);
+                            //     if (textContent.trim().length > 0) {
+                            //         this.appendLabel(textContent);
+                            //     }
+                            // }
+                        }
                     }
                 }
             }
+        }
+        appendLabel(text) {
+            const label = this.$render("i-label", { width: '100%', overflowWrap: "anywhere", class: index_css_2.customLinkStyle });
+            const hrefRegex = /https?:\/\/\S+/g;
+            text = text.replace(/\n/gm, ' <br> ').replace(hrefRegex, (match) => {
+                return ` <a href="${match}" target="_blank">${match}</a> `;
+            });
+            label.caption = text;
+            this.pnlContent.appendChild(label);
         }
         addQuotedPost(post) {
             const postEl = (this.$render("i-scom-post", { type: "quoted", data: post, display: "block", border: { radius: '0.5rem', width: '1px', style: 'solid', color: Theme.colors.secondary.dark } }));
