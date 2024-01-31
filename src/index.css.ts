@@ -34,7 +34,7 @@ export const ellipsisStyle = Styles.style({
   $nest: {
     'i-markdown-editor': {
       display: '-webkit-box',
-      '-webkit-line-clamp': 10,
+      '-webkit-line-clamp': 20,
       // @ts-ignore
       '-webkit-box-orient': 'vertical'
     }
@@ -42,32 +42,11 @@ export const ellipsisStyle = Styles.style({
 })
 
 export const maxHeightStyle = Styles.style({
-  // maxHeight: 500,
-  // overflow: 'hidden',
   $nest: {
     '#pnlDetail': {
-      maxHeight: 500,
+      maxHeight: 400,
       overflow: 'hidden',
     },
-    // '#pnlDetail:container(height > 500px)': {
-    //   $nest: {
-    //     '#showMoreWrapper': {
-    //       display: 'block',
-    //       background: 'black !important'
-    //     }
-    //   }
-    // },
-    // '#pnlDetail:container(height <= 500px)': {
-    //   $nest: {
-    //     '#showMoreWrapper': {
-    //       display: 'block',
-    //       background: 'white !important'
-    //     }
-    //   }
-    // },
-    '#btnShowMore': {
-      
-    }
   }
 })
 

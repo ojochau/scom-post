@@ -157,37 +157,18 @@ define("@scom/scom-post/index.css.ts", ["require", "exports", "@ijstech/componen
         $nest: {
             'i-markdown-editor': {
                 display: '-webkit-box',
-                '-webkit-line-clamp': 10,
+                '-webkit-line-clamp': 20,
                 // @ts-ignore
                 '-webkit-box-orient': 'vertical'
             }
         }
     });
     exports.maxHeightStyle = components_3.Styles.style({
-        // maxHeight: 500,
-        // overflow: 'hidden',
         $nest: {
             '#pnlDetail': {
-                maxHeight: 500,
+                maxHeight: 400,
                 overflow: 'hidden',
             },
-            // '#pnlDetail:container(height > 500px)': {
-            //   $nest: {
-            //     '#showMoreWrapper': {
-            //       display: 'block',
-            //       background: 'black !important'
-            //     }
-            //   }
-            // },
-            // '#pnlDetail:container(height <= 500px)': {
-            //   $nest: {
-            //     '#showMoreWrapper': {
-            //       display: 'block',
-            //       background: 'white !important'
-            //     }
-            //   }
-            // },
-            '#btnShowMore': {}
         }
     });
     exports.customLinkStyle = components_3.Styles.style({
@@ -473,7 +454,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             this.pnlContent.appendChild(label);
         }
         addQuotedPost(post) {
-            const postEl = (this.$render("i-scom-post", { type: "quoted", data: post, display: "block", border: { radius: '0.5rem', width: '1px', style: 'solid', color: Theme.colors.secondary.dark } }));
+            const postEl = (this.$render("i-scom-post", { type: "quoted", data: post, display: "block", border: { radius: '0.5rem', width: '1px', style: 'solid', color: Theme.colors.secondary.dark }, overflowEllipse: true, limitHeight: true }));
             postEl.onClick = this.onQuotedPostClicked;
             postEl.onQuotedPostClicked = this.onQuotedPostClicked;
             this.pnlQuoted.append(postEl);
@@ -624,7 +605,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             }
         }
         renderReply(reply, isPrepend) {
-            const childElm = this.$render("i-scom-post", null);
+            const childElm = this.$render("i-scom-post", { overflowEllipse: true });
             childElm.onReplyClicked = this.onReplyClicked;
             childElm.onLikeClicked = this.onLikeClicked;
             childElm.onRepostClicked = this.onRepostClicked;
@@ -680,12 +661,12 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         // }
         async init() {
             super.init();
-            console.log('init');
             this.onReplyClicked = this.getAttribute('onReplyClicked', true) || this.onReplyClicked;
             this.onLikeClicked = this.getAttribute('onLikeClicked', true) || this.onLikeClicked;
             this.onRepostClicked = this.getAttribute('onRepostClicked', true) || this.onRepostClicked;
             this.onProfileClicked = this.getAttribute('onProfileClicked', true) || this.onProfileClicked;
             this.onQuotedPostClicked = this.getAttribute('onQuotedPostClicked', true) || this.onQuotedPostClicked;
+            this.overflowEllipse = this.getAttribute('overflowEllipse', true) || this.overflowEllipse;
             this.disableGutters = this.getAttribute('disableGutters', true) || this.disableGutters;
             this.limitHeight = this.getAttribute('limitHeight', true) || this.limitHeight;
             this.isReply = this.getAttribute('isReply', true) || this.isReply;
@@ -717,9 +698,9 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                         this.$render("i-label", { id: "lbReplyTo", font: { size: '0.875rem', color: Theme.colors.primary.main }, cursor: "pointer", onClick: () => this.onGoProfile() })),
                     this.$render("i-vstack", { width: '100%', grid: { area: 'content' }, margin: { top: '1rem' } },
                         this.$render("i-panel", { id: "pnlDetail" },
-                            this.$render("i-hstack", { id: "showMoreWrapper", visible: false, height: 500, width: '100%', zIndex: 1, background: { color: 'linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(102,102,102,.5) 90%, rgba(170,170,170,1) 100%)' }, position: 'absolute', justifyContent: 'center', alignItems: 'end' },
-                                this.$render("i-button", { id: "btnShowMore", caption: "Show more", margin: { bottom: 10 }, background: { color: 'transparent' }, font: { color: Theme.colors.primary.main }, boxShadow: 'unset', onClick: this.handleShowMoreClick.bind(this) })),
-                            this.$render("i-vstack", { id: "pnlContent", gap: "0.75rem", class: index_css_2.ellipsisStyle }),
+                            this.$render("i-hstack", { id: "showMoreWrapper", visible: false, height: 400, width: '100%', zIndex: 1, background: { color: 'linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(40,40,40,.5) 80%, rgba(80, 80, 80,1) 100%)' }, position: 'absolute', justifyContent: 'center', alignItems: 'end' },
+                                this.$render("i-button", { id: "btnShowMore", caption: "Show more", margin: { bottom: 10 }, background: { color: 'transparent' }, font: { color: Theme.colors.primary.main, weight: 800, size: '1rem' }, boxShadow: 'unset', onClick: this.handleShowMoreClick.bind(this) })),
+                            this.$render("i-vstack", { id: "pnlContent", gap: "0.75rem" }),
                             this.$render("i-panel", { id: "pnlQuoted", visible: false }),
                             this.$render("i-panel", { id: "pnlOverlay", visible: false, height: '5rem', width: '100%', position: 'absolute', bottom: "0px", background: { color: `linear-gradient(0, var(--card-bg-color) 0%, transparent 100%)` } })),
                         this.$render("i-hstack", { id: "btnViewMore", verticalAlignment: "center", padding: { top: '1rem' }, gap: '0.25rem', visible: false, onClick: this.onViewMore },
@@ -743,9 +724,9 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     this.$render("i-label", { id: "lbReplyTo", font: { size: '0.875rem', color: Theme.colors.primary.main }, cursor: "pointer", onClick: () => this.onGoProfile() })));
                 this.gridPost.append(this.$render("i-vstack", { width: '100%', grid: { area: 'content' }, margin: { top: '1rem' } },
                     this.$render("i-panel", { id: "pnlDetail" },
-                        this.$render("i-hstack", { id: "showMoreWrapper", visible: false, height: 500, width: '100%', zIndex: 1, background: { color: 'linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(102,102,102,.5) 90%, rgba(170,170,170,1) 100%)' }, position: 'absolute', justifyContent: 'center', alignItems: 'end' },
-                            this.$render("i-button", { id: "btnShowMore", caption: "Show more", margin: { bottom: 10 }, background: { color: 'transparent' }, font: { color: Theme.colors.primary.main }, boxShadow: 'unset', onClick: this.handleShowMoreClick.bind(this) })),
-                        this.$render("i-vstack", { id: "pnlContent", gap: "0.75rem", class: index_css_2.ellipsisStyle }),
+                        this.$render("i-hstack", { id: "showMoreWrapper", visible: false, height: 400, width: '100%', zIndex: 1, background: { color: 'linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(40,40,40,.5) 80%, rgba(80,80,80,1) 100%)' }, position: 'absolute', justifyContent: 'center', alignItems: 'end' },
+                            this.$render("i-button", { id: "btnShowMore", caption: "Show more", margin: { bottom: 10 }, background: { color: 'transparent' }, font: { color: Theme.colors.primary.main, weight: 800, size: '1rem' }, boxShadow: 'unset', onClick: this.handleShowMoreClick.bind(this) })),
+                        this.$render("i-vstack", { id: "pnlContent", gap: "0.75rem" }),
                         this.$render("i-panel", { id: "pnlQuoted", visible: false }),
                         this.$render("i-panel", { id: "pnlOverlay", visible: false, height: '5rem', width: '100%', position: 'absolute', bottom: "0px", background: { color: `linear-gradient(0, var(--card-bg-color) 0%, transparent 100%)` } })),
                     this.$render("i-hstack", { id: "btnViewMore", verticalAlignment: "center", padding: { top: '1rem' }, gap: '0.25rem', visible: false, onClick: this.onViewMore },
@@ -758,37 +739,21 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             if (!this.bubbleMenu) {
                 this.bubbleMenu = await bubbleMenu_1.ScomPostBubbleMenu.create();
             }
-            setTimeout(() => {
-                if ((this.isReply || this.limitHeight) && this.type !== 'quoted') {
+            if (this.overflowEllipse) {
+                if ((this.isReply || this.limitHeight)) {
                     this.classList.add(index_css_2.maxHeightStyle);
                 }
-                if (this.type !== 'quoted' && (this.isReply || this.limitHeight) && (this.pnlDetail.scrollHeight > this.pnlDetail.offsetHeight) || (this.gridPost.scrollHeight > this.gridPost.offsetHeight)) {
+                if (this.isReply) {
+                    this.showMoreWrapper.height = '100%';
+                }
+            }
+            const resizeObserver = new ResizeObserver((entries) => {
+                if ((this.isReply || this.limitHeight) && (this.pnlDetail.scrollHeight > this.pnlDetail.offsetHeight) || (this.gridPost.scrollHeight > this.gridPost.offsetHeight)) {
                     this.showMoreWrapper.visible = true;
                 }
-                if (this.isReply) {
-                    this.showMoreWrapper.height = 'calc(100vh - 240px)';
-                }
-            }, 500);
+            });
+            resizeObserver.observe(this.pnlDetail);
             this.addEventListener("mouseup", this.showBubbleMenu);
-        }
-        renderShowMore() {
-            const maxRetries = 10;
-            let retries = 0;
-            const interval = setInterval(() => {
-                if ((this.isReply || this.limitHeight) && this.type !== 'quoted') {
-                    this.classList.add(index_css_2.maxHeightStyle);
-                }
-                if (this.type !== 'quoted' && (this.isReply || this.limitHeight) && (this.pnlDetail.scrollHeight > this.pnlDetail.offsetHeight) || (this.gridPost.scrollHeight > this.gridPost.offsetHeight)) {
-                    this.showMoreWrapper.visible = true;
-                }
-                if (this.isReply) {
-                    this.showMoreWrapper.height = 'calc(100vh - 240px)';
-                }
-                if (this.pnlDetail.scrollHeight > 0 || this.pnlDetail.offsetHeight > 0 || retries >= maxRetries) {
-                    clearInterval(interval);
-                }
-                retries++;
-            }, 500);
         }
         async showBubbleMenu(event) {
             event.preventDefault();

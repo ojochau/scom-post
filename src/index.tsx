@@ -44,6 +44,7 @@ interface ScomPostElement extends ControlElement {
     disableGutters?: boolean;
     limitHeight?: boolean;
     isReply?: boolean;
+    overflowEllipse?: boolean;
 }
 
 declare global {
@@ -97,6 +98,7 @@ export class ScomPost extends Module {
     private disableGutters: boolean;
     private limitHeight: boolean;
     private isReply: boolean;
+    private overflowEllipse: boolean;
 
     private _data: IPostConfig;
     private _replies: IPost[];
@@ -301,7 +303,8 @@ export class ScomPost extends Module {
                 data={post}
                 display="block"
                 border={{radius: '0.5rem', width: '1px', style: 'solid', color: Theme.colors.secondary.dark}}
-                // limitHeight={true}
+                overflowEllipse={true}
+                limitHeight={true}
             ></i-scom-post>
         )
         postEl.onClick = this.onQuotedPostClicked;
@@ -513,7 +516,7 @@ export class ScomPost extends Module {
     }
 
     private renderReply(reply: IPost, isPrepend?: boolean) {
-        const childElm = <i-scom-post/> as ScomPost;
+        const childElm = <i-scom-post overflowEllipse={true}/> as ScomPost;
         childElm.onReplyClicked = this.onReplyClicked;
         childElm.onLikeClicked = this.onLikeClicked;
         childElm.onRepostClicked = this.onRepostClicked;
@@ -580,12 +583,12 @@ export class ScomPost extends Module {
 
     async init() {
         super.init();
-        console.log('init');
         this.onReplyClicked = this.getAttribute('onReplyClicked', true) || this.onReplyClicked;
         this.onLikeClicked = this.getAttribute('onLikeClicked', true) || this.onLikeClicked;
         this.onRepostClicked = this.getAttribute('onRepostClicked', true) || this.onRepostClicked;
         this.onProfileClicked = this.getAttribute('onProfileClicked', true) || this.onProfileClicked;
         this.onQuotedPostClicked = this.getAttribute('onQuotedPostClicked', true) || this.onQuotedPostClicked;
+        this.overflowEllipse = this.getAttribute('overflowEllipse', true) || this.overflowEllipse;
         this.disableGutters = this.getAttribute('disableGutters', true) || this.disableGutters;
         this.limitHeight = this.getAttribute('limitHeight', true) || this.limitHeight;
         this.isReply = this.getAttribute('isReply', true) || this.isReply;
@@ -683,16 +686,16 @@ export class ScomPost extends Module {
                     <i-panel id="pnlDetail">
                         <i-hstack id={"showMoreWrapper"}
                                   visible={false}
-                                  height={500}
+                                  height={400}
                                   width={'100%'}
                                   zIndex={1}
-                                  background={{color: 'linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(102,102,102,.5) 90%, rgba(170,170,170,1) 100%)'}}
+                                  background={{color: 'linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(40,40,40,.5) 80%, rgba(80, 80, 80,1) 100%)'}}
                                   position={'absolute'}
                                   justifyContent={'center'}
                                   alignItems={'end'}>
-                            <i-button id={"btnShowMore"} caption={"Show more"} margin={{bottom: 10}} background={{color: 'transparent'}} font={{color: Theme.colors.primary.main}} boxShadow={'unset'} onClick={this.handleShowMoreClick.bind(this)}/>
+                            <i-button id={"btnShowMore"} caption={"Show more"} margin={{bottom: 10}} background={{color: 'transparent'}} font={{color: Theme.colors.primary.main, weight: 800, size: '1rem'}} boxShadow={'unset'} onClick={this.handleShowMoreClick.bind(this)}/>
                         </i-hstack>
-                        <i-vstack id="pnlContent" gap="0.75rem" class={ellipsisStyle}></i-vstack>
+                        <i-vstack id="pnlContent" gap="0.75rem"></i-vstack>
                         {/*<i-button id={'btnShowMore'} background={{color: 'transparent'}} onClick={this.handleShowMoreClick.bind(this)} caption={"Show more..."} font={{color: Theme.colors.primary.main}} visible={false}></i-button>*/}
                         <i-panel id="pnlQuoted" visible={false}></i-panel>
                         <i-panel
@@ -802,16 +805,16 @@ export class ScomPost extends Module {
                 <i-panel id="pnlDetail">
                     <i-hstack id={"showMoreWrapper"}
                               visible={false}
-                              height={500}
+                              height={400}
                               width={'100%'}
                               zIndex={1}
-                              background={{color: 'linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(102,102,102,.5) 90%, rgba(170,170,170,1) 100%)'}}
+                              background={{color: 'linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(40,40,40,.5) 80%, rgba(80,80,80,1) 100%)'}}
                               position={'absolute'}
                               justifyContent={'center'}
                               alignItems={'end'}>
-                        <i-button id={"btnShowMore"} caption={"Show more"} margin={{bottom: 10}} background={{color: 'transparent'}} font={{color: Theme.colors.primary.main}} boxShadow={'unset'} onClick={this.handleShowMoreClick.bind(this)}/>
+                        <i-button id={"btnShowMore"} caption={"Show more"} margin={{bottom: 10}} background={{color: 'transparent'}} font={{color: Theme.colors.primary.main, weight: 800, size: '1rem'}}  boxShadow={'unset'} onClick={this.handleShowMoreClick.bind(this)}/>
                     </i-hstack>
-                    <i-vstack id="pnlContent" gap="0.75rem" class={ellipsisStyle}></i-vstack>
+                    <i-vstack id="pnlContent" gap="0.75rem"></i-vstack>
                     {/*<i-button id={'btnShowMore'} background={{color: 'transparent'}} onClick={this.handleShowMoreClick.bind(this)} caption={"Show more..."} font={{color: Theme.colors.primary.main}} visible={false}></i-button>*/}
                     <i-panel id="pnlQuoted" visible={false}></i-panel>
                     <i-panel
@@ -850,42 +853,22 @@ export class ScomPost extends Module {
             this.bubbleMenu = await ScomPostBubbleMenu.create() as ScomPostBubbleMenu;
         }
 
-
-        setTimeout(() => {
-            if((this.isReply || this.limitHeight) && this.type !== 'quoted') {
-                this.classList.add(maxHeightStyle);
-            }
-            if(this.type !== 'quoted' && (this.isReply || this.limitHeight) && (this.pnlDetail.scrollHeight > this.pnlDetail.offsetHeight) || (this.gridPost.scrollHeight > this.gridPost.offsetHeight)) {
-                this.showMoreWrapper.visible = true;
+        if(this.overflowEllipse) {
+            if((this.isReply || this.limitHeight)) {
+                    this.classList.add(maxHeightStyle);
             }
             if(this.isReply) {
-                this.showMoreWrapper.height = 'calc(100vh - 240px)';
+                this.showMoreWrapper.height = '100%';
             }
-        }, 500);
+        }
 
+        const resizeObserver = new ResizeObserver((entries) => {
+            if( (this.isReply || this.limitHeight) && (this.pnlDetail.scrollHeight > this.pnlDetail.offsetHeight) || (this.gridPost.scrollHeight > this.gridPost.offsetHeight)) {
+                this.showMoreWrapper.visible = true;
+            }
+        });
+        resizeObserver.observe(this.pnlDetail);
         this.addEventListener("mouseup", this.showBubbleMenu);
-    }
-
-    renderShowMore() {
-        const maxRetries = 10;
-        let retries = 0;
-        const interval = setInterval(() => {
-            if((this.isReply || this.limitHeight) && this.type !== 'quoted') {
-                this.classList.add(maxHeightStyle);
-            }
-            if(this.type !== 'quoted' && (this.isReply || this.limitHeight) && (this.pnlDetail.scrollHeight > this.pnlDetail.offsetHeight) || (this.gridPost.scrollHeight > this.gridPost.offsetHeight)) {
-                this.showMoreWrapper.visible = true;
-            }
-            if(this.isReply) {
-                this.showMoreWrapper.height = 'calc(100vh - 240px)';
-            }
-            if(this.pnlDetail.scrollHeight > 0 || this.pnlDetail.offsetHeight > 0 || retries >= maxRetries) {
-                clearInterval(interval)
-            }
-            retries++;
-        }, 500)
-
-
     }
 
     private async showBubbleMenu(event: MouseEvent) {
