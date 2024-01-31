@@ -16,6 +16,7 @@ declare module "@scom/scom-post/global/interface.ts" {
         publishDate: Date | string;
         stats?: IPostStats;
         contentElements: IPostData[];
+        repost?: IAuthor;
     }
     export interface IPostStats {
         replies?: number;
@@ -152,6 +153,8 @@ declare module "@scom/scom-post" {
         private pnlMore;
         private pnlReply;
         private pnlReplies;
+        private pnlGridPost;
+        private pnlRepost;
         private gridPost;
         private pnlPost;
         private btnViewMore;
