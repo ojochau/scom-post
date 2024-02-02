@@ -686,10 +686,11 @@ export class ScomPost extends Module {
                     <i-panel id="pnlDetail">
                         <i-hstack id={"showMoreWrapper"}
                                   visible={false}
-                                  height={400}
+                                  height={50}
+                                  bottom={0}
                                   width={'100%'}
                                   zIndex={1}
-                                  background={{color: 'linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(40,40,40,.5) 80%, rgba(80, 80, 80,1) 100%)'}}
+                                  background={{color: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(10, 10, 10) 100%)'}}
                                   position={'absolute'}
                                   justifyContent={'center'}
                                   alignItems={'end'}>
@@ -805,10 +806,11 @@ export class ScomPost extends Module {
                 <i-panel id="pnlDetail">
                     <i-hstack id={"showMoreWrapper"}
                               visible={false}
-                              height={400}
+                              height={50}
+                              bottom={0}
                               width={'100%'}
                               zIndex={1}
-                              background={{color: 'linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(40,40,40,.5) 80%, rgba(80,80,80,1) 100%)'}}
+                              background={{color: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(10, 10, 10) 100%)'}}
                               position={'absolute'}
                               justifyContent={'center'}
                               alignItems={'end'}>
@@ -857,14 +859,20 @@ export class ScomPost extends Module {
             if((this.isReply || this.limitHeight)) {
                     this.classList.add(maxHeightStyle);
             }
-            if(this.isReply) {
-                this.showMoreWrapper.height = '100%';
-            }
+            // if(this.isReply) {
+            //     this.showMoreWrapper.height = '100%';
+            // }
         }
 
         const resizeObserver = new ResizeObserver((entries) => {
             console.log('resizeObserver', this.isReply, this.limitHeight, this.pnlDetail.scrollHeight, this.pnlDetail.offsetHeight, this.gridPost.scrollHeight, this.gridPost.offsetHeight)
-            if( (this.isReply || this.limitHeight) && ((this.pnlDetail.scrollHeight > this.pnlDetail.offsetHeight) || (this.gridPost.scrollHeight > this.gridPost.offsetHeight)) && (this.pnlDetail.scrollHeight >= 400 || this.gridPost.scrollHeight >= 400)) {
+            if( (this.isReply || this.limitHeight)
+                && (
+                    (this.pnlDetail.scrollHeight > this.pnlDetail.offsetHeight && this.pnlDetail.scrollHeight - this.pnlDetail.offsetHeight > 1)
+                    || (this.gridPost.scrollHeight > this.gridPost.offsetHeight && this.gridPost.scrollHeight - this.gridPost.offsetHeight > 1)
+                )
+                && (this.pnlDetail.scrollHeight >= 400 || this.gridPost.scrollHeight >= 400)
+            ) {
                 this.showMoreWrapper.visible = true;
             }
         });

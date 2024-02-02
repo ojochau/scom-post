@@ -698,7 +698,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                         this.$render("i-label", { id: "lbReplyTo", font: { size: '0.875rem', color: Theme.colors.primary.main }, cursor: "pointer", onClick: () => this.onGoProfile() })),
                     this.$render("i-vstack", { width: '100%', grid: { area: 'content' }, margin: { top: '1rem' } },
                         this.$render("i-panel", { id: "pnlDetail" },
-                            this.$render("i-hstack", { id: "showMoreWrapper", visible: false, height: 400, width: '100%', zIndex: 1, background: { color: 'linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(40,40,40,.5) 80%, rgba(80, 80, 80,1) 100%)' }, position: 'absolute', justifyContent: 'center', alignItems: 'end' },
+                            this.$render("i-hstack", { id: "showMoreWrapper", visible: false, height: 50, bottom: 0, width: '100%', zIndex: 1, background: { color: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(10, 10, 10) 100%)' }, position: 'absolute', justifyContent: 'center', alignItems: 'end' },
                                 this.$render("i-button", { id: "btnShowMore", caption: "Show more", margin: { bottom: 10 }, background: { color: 'transparent' }, font: { color: Theme.colors.primary.main, weight: 800, size: '1rem' }, boxShadow: 'unset', onClick: this.handleShowMoreClick.bind(this) })),
                             this.$render("i-vstack", { id: "pnlContent", gap: "0.75rem" }),
                             this.$render("i-panel", { id: "pnlQuoted", visible: false }),
@@ -724,7 +724,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     this.$render("i-label", { id: "lbReplyTo", font: { size: '0.875rem', color: Theme.colors.primary.main }, cursor: "pointer", onClick: () => this.onGoProfile() })));
                 this.gridPost.append(this.$render("i-vstack", { width: '100%', grid: { area: 'content' }, margin: { top: '1rem' } },
                     this.$render("i-panel", { id: "pnlDetail" },
-                        this.$render("i-hstack", { id: "showMoreWrapper", visible: false, height: 400, width: '100%', zIndex: 1, background: { color: 'linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(40,40,40,.5) 80%, rgba(80,80,80,1) 100%)' }, position: 'absolute', justifyContent: 'center', alignItems: 'end' },
+                        this.$render("i-hstack", { id: "showMoreWrapper", visible: false, height: 50, bottom: 0, width: '100%', zIndex: 1, background: { color: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(10, 10, 10) 100%)' }, position: 'absolute', justifyContent: 'center', alignItems: 'end' },
                             this.$render("i-button", { id: "btnShowMore", caption: "Show more", margin: { bottom: 10 }, background: { color: 'transparent' }, font: { color: Theme.colors.primary.main, weight: 800, size: '1rem' }, boxShadow: 'unset', onClick: this.handleShowMoreClick.bind(this) })),
                         this.$render("i-vstack", { id: "pnlContent", gap: "0.75rem" }),
                         this.$render("i-panel", { id: "pnlQuoted", visible: false }),
@@ -743,13 +743,16 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                 if ((this.isReply || this.limitHeight)) {
                     this.classList.add(index_css_2.maxHeightStyle);
                 }
-                if (this.isReply) {
-                    this.showMoreWrapper.height = '100%';
-                }
+                // if(this.isReply) {
+                //     this.showMoreWrapper.height = '100%';
+                // }
             }
             const resizeObserver = new ResizeObserver((entries) => {
                 console.log('resizeObserver', this.isReply, this.limitHeight, this.pnlDetail.scrollHeight, this.pnlDetail.offsetHeight, this.gridPost.scrollHeight, this.gridPost.offsetHeight);
-                if ((this.isReply || this.limitHeight) && ((this.pnlDetail.scrollHeight > this.pnlDetail.offsetHeight) || (this.gridPost.scrollHeight > this.gridPost.offsetHeight)) && (this.pnlDetail.scrollHeight >= 400 || this.gridPost.scrollHeight >= 400)) {
+                if ((this.isReply || this.limitHeight)
+                    && ((this.pnlDetail.scrollHeight > this.pnlDetail.offsetHeight && this.pnlDetail.scrollHeight - this.pnlDetail.offsetHeight > 1)
+                        || (this.gridPost.scrollHeight > this.gridPost.offsetHeight && this.gridPost.scrollHeight - this.gridPost.offsetHeight > 1))
+                    && (this.pnlDetail.scrollHeight >= 400 || this.gridPost.scrollHeight >= 400)) {
                     this.showMoreWrapper.visible = true;
                 }
             });
