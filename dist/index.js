@@ -445,7 +445,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             }
         }
         appendLabel(text) {
-            const label = this.$render("i-label", { width: '100%', overflowWrap: "anywhere", class: index_css_2.customLinkStyle });
+            const label = this.$render("i-label", { width: '100%', overflowWrap: "anywhere", class: index_css_2.customLinkStyle, lineHeight: "1.3125rem" });
             const hrefRegex = /https?:\/\/\S+/g;
             text = text.replace(/\n/gm, ' <br> ').replace(hrefRegex, (match) => {
                 return ` <a href="${match}" target="_blank">${match}</a> `;
