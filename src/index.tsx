@@ -863,7 +863,8 @@ export class ScomPost extends Module {
         }
 
         const resizeObserver = new ResizeObserver((entries) => {
-            if( (this.isReply || this.limitHeight) && (this.pnlDetail.scrollHeight > this.pnlDetail.offsetHeight) || (this.gridPost.scrollHeight > this.gridPost.offsetHeight)) {
+            console.log('resizeObserver', this.isReply, this.limitHeight, this.pnlDetail.scrollHeight, this.pnlDetail.offsetHeight, this.gridPost.scrollHeight, this.gridPost.offsetHeight)
+            if( (this.isReply || this.limitHeight) && ((this.pnlDetail.scrollHeight > this.pnlDetail.offsetHeight) || (this.gridPost.scrollHeight > this.gridPost.offsetHeight)) && (this.pnlDetail.scrollHeight >= 400 || this.gridPost.scrollHeight >= 400)) {
                 this.showMoreWrapper.visible = true;
             }
         });
