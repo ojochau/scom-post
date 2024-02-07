@@ -200,7 +200,7 @@ export class ScomPost extends Module {
         if (!this.isQuotedPost) this.renderAnalytics(stats);
         this.groupAnalysis.visible = !this.isQuotedPost;
         this.pnlSubscribe.visible = !this.isQuotedPost;
-        
+
         if (repost) {
             this.pnlRepost.clearInnerHTML();
             this.pnlRepost.append(
@@ -865,7 +865,6 @@ export class ScomPost extends Module {
         }
 
         const resizeObserver = new ResizeObserver((entries) => {
-            console.log('resizeObserver', this.isReply, this.limitHeight, this.pnlDetail.scrollHeight, this.pnlDetail.offsetHeight, this.gridPost.scrollHeight, this.gridPost.offsetHeight)
             if( (this.isReply || this.limitHeight)
                 && (
                     (this.pnlDetail.scrollHeight > this.pnlDetail.offsetHeight && this.pnlDetail.scrollHeight - this.pnlDetail.offsetHeight > 1)
