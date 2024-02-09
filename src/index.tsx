@@ -698,7 +698,7 @@ export class ScomPost extends Module {
                         </i-hstack>
                         <i-vstack id="pnlContent" gap="0.75rem"></i-vstack>
                         {/*<i-button id={'btnShowMore'} background={{color: 'transparent'}} onClick={this.handleShowMoreClick.bind(this)} caption={"Show more..."} font={{color: Theme.colors.primary.main}} visible={false}></i-button>*/}
-                        <i-vstack id="pnlQuoted" visible={false} gap={'0.5rem'}></i-vstack>
+                        <i-vstack id="pnlQuoted" visible={false} gap={'0.5rem'} padding={{top: '0.5rem'}}></i-vstack>
                         <i-panel
                             id="pnlOverlay"
                             visible={false}
@@ -818,7 +818,7 @@ export class ScomPost extends Module {
                     </i-hstack>
                     <i-vstack id="pnlContent" gap="0.75rem"></i-vstack>
                     {/*<i-button id={'btnShowMore'} background={{color: 'transparent'}} onClick={this.handleShowMoreClick.bind(this)} caption={"Show more..."} font={{color: Theme.colors.primary.main}} visible={false}></i-button>*/}
-                    <i-vstack id="pnlQuoted" gap={'0.5rem'} visible={false}></i-vstack>
+                    <i-vstack id="pnlQuoted" gap={'0.5rem'} visible={false} padding={{top: '0.5rem'}}></i-vstack>
                     <i-panel
                         id="pnlOverlay"
                         visible={false}
