@@ -341,7 +341,7 @@ export class ScomPost extends Module {
                     id="lblOwner"
                     caption={author?.displayName || author?.username || ''}
                     textOverflow="ellipsis"
-                    maxWidth={this.isQuotedPost ? '9.375rem' : '6.25rem'}
+                    maxWidth={this.isQuotedPost ? '9.375rem' : '8.75rem'}
                     font={{size: this.isQuotedPost ? '1rem' : '0.875rem', weight: 500}}
                     lineHeight={'0.875rem'}
                 ></i-label>
@@ -369,7 +369,7 @@ export class ScomPost extends Module {
             <i-label
                 id="lblUsername"
                 caption={`${author?.internetIdentifier || ''}`}
-                maxWidth={this.isQuotedPost ? '13.75rem' : '100%'}
+                maxWidth={this.isQuotedPost ? '13.75rem' : '12.5rem'}
                 textOverflow="ellipsis"
                 font={{size: this.isQuotedPost ? '1rem' : '0.875rem', color: Theme.text.secondary}}
                 lineHeight={'0.875rem'}
