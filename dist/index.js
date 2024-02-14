@@ -355,7 +355,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         }
         async renderUI() {
             this.clear();
-            const { stats, parentAuthor, contentElements, repost } = this._data?.data || {};
+            const { stats, parentAuthor, contentElements, repost, community } = this._data?.data || {};
             this.renderPostType();
             if (parentAuthor) {
                 this.pnlReplyPath.visible = true;
@@ -373,6 +373,12 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                 this.pnlRepost.append(this.$render("i-hstack", { width: "2.75rem", horizontalAlignment: 'end' },
                     this.$render("i-icon", { width: "1rem", height: "1rem", name: "retweet", fill: Theme.text.secondary })), this.$render("i-label", { caption: (repost.displayName || repost.username || "") + " reposted", font: { size: "0.875rem", color: Theme.text.secondary }, onClick: () => this.onGoProfile(repost.npub || repost.id) }));
                 this.pnlRepost.visible = true;
+            }
+            if (community) {
+                this.pnlCommunity.clearInnerHTML();
+                this.pnlCommunity.append(this.$render("i-hstack", { width: "2.75rem", horizontalAlignment: 'end' },
+                    this.$render("i-icon", { width: "1rem", height: "1rem", name: "users", fill: Theme.text.secondary })), this.$render("i-label", { caption: community.communityId, font: { size: "0.875rem", color: Theme.text.secondary }, onClick: () => this.onGoCommunity(community.communityId, community.creatorId) }));
+                this.pnlCommunity.visible = true;
             }
             // let _height = 0;
             if (contentElements?.length) {
@@ -467,12 +473,12 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             const imgWidth = this.isQuotedPost ? '1.75rem' : '2.75rem';
             this.imgAvatar.width = this.imgAvatar.height = imgWidth;
             const userEl = (this.$render("i-hstack", { verticalAlignment: 'center', gap: "0.25rem" },
-                this.$render("i-label", { id: "lblOwner", caption: author?.displayName || author?.username || '', textOverflow: "ellipsis", maxWidth: this.isQuotedPost ? '9.375rem' : '6.25rem', font: { size: this.isQuotedPost ? '1rem' : '0.875rem', weight: 500 }, lineHeight: '0.875rem' }),
+                this.$render("i-label", { id: "lblOwner", caption: author?.displayName || author?.username || '', textOverflow: "ellipsis", maxWidth: this.isQuotedPost ? '9.375rem' : '8.75rem', font: { size: this.isQuotedPost ? '1rem' : '0.875rem', weight: 500 }, lineHeight: '0.875rem' }),
                 this.$render("i-icon", { id: "imgVerified", width: '0.875rem', height: '0.875rem', name: "certificate", fill: Theme.text.secondary, display: "inline-flex" })));
             const dateEl = (this.$render("i-hstack", { gap: '0.25rem', stack: { shrink: '0' } },
                 this.$render("i-panel", { border: { left: { width: '1px', style: 'solid', color: Theme.text.secondary } } }),
                 this.$render("i-label", { id: "lblDate", font: { size: '0.875rem', color: Theme.text.secondary }, caption: `${(0, global_1.getDuration)(publishDate)}`, lineHeight: '0.875rem' })));
-            const usernameEl = (this.$render("i-label", { id: "lblUsername", caption: `${author?.internetIdentifier || ''}`, maxWidth: this.isQuotedPost ? '13.75rem' : '100%', textOverflow: "ellipsis", font: { size: this.isQuotedPost ? '1rem' : '0.875rem', color: Theme.text.secondary }, lineHeight: '0.875rem' }));
+            const usernameEl = (this.$render("i-label", { id: "lblUsername", caption: `${author?.internetIdentifier || ''}`, maxWidth: this.isQuotedPost ? '13.75rem' : '12.5rem', textOverflow: "ellipsis", font: { size: this.isQuotedPost ? '1rem' : '0.875rem', color: Theme.text.secondary }, lineHeight: '0.875rem' }));
             if (oneLine) {
                 this.pnlInfo.append(this.$render("i-hstack", { height: "100%", gap: "0.25rem", verticalAlignment: "center" },
                     userEl,
@@ -655,6 +661,9 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                 window.open(`#/p/${npub}`, '_self');
             }
         }
+        onGoCommunity(communityId, creatorId) {
+            window.open(`#/c/${communityId}/${creatorId}`, '_self');
+        }
         // private handleShowMoreClick() {
         //     this.pnlContent.classList.remove(ellipsisStyle);
         //     this.btnShowMore.visible = false;
@@ -799,7 +808,8 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                             }
                         }
                     ], visible: false },
-                    this.$render("i-hstack", { id: "pnlRepost", padding: { bottom: "0.5rem" }, margin: { top: "-0.5rem" }, gap: "0.75rem", visible: false }),
+                    this.$render("i-hstack", { id: "pnlRepost", padding: { bottom: "0.75rem" }, margin: { top: "-0.5rem" }, gap: "0.75rem", visible: false }),
+                    this.$render("i-hstack", { id: "pnlCommunity", padding: { bottom: "0.75rem" }, margin: { top: "-0.5rem" }, gap: "0.75rem", visible: false }),
                     this.$render("i-grid-layout", { id: "gridPost", 
                         // maxHeight={"calc(100vh - 50px - 94px)"}
                         // overflow={'hidden'}

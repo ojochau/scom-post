@@ -17,6 +17,7 @@ declare module "@scom/scom-post/global/interface.ts" {
         stats?: IPostStats;
         contentElements: IPostData[];
         repost?: IAuthor;
+        community?: ICommunity;
     }
     export interface IPostStats {
         replies?: number;
@@ -29,6 +30,11 @@ declare module "@scom/scom-post/global/interface.ts" {
         module: string;
         category?: "widget" | "quotedPost";
         data: any;
+    }
+    export interface ICommunity {
+        communityUri?: string;
+        creatorId?: string;
+        communityId?: string;
     }
 }
 /// <amd-module name="@scom/scom-post/store/index.ts" />
@@ -156,6 +162,7 @@ declare module "@scom/scom-post" {
         private pnlReplies;
         private pnlGridPost;
         private pnlRepost;
+        private pnlCommunity;
         private gridPost;
         private pnlPost;
         private btnViewMore;
@@ -207,6 +214,7 @@ declare module "@scom/scom-post" {
         private onProfileShown;
         private onViewMore;
         private onGoProfile;
+        private onGoCommunity;
         init(): Promise<void>;
         private showBubbleMenu;
         private handleShowMoreClick;

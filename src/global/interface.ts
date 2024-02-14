@@ -15,6 +15,7 @@ export interface IPost {
 	stats?: IPostStats;
 	contentElements: IPostData[];
   repost?: IAuthor;
+  community?: ICommunity;
 };
 export interface IPostStats {
 	replies?: number;
@@ -28,3 +29,8 @@ export interface IPostData {
   category?: "widget" | "quotedPost";
   data: any;
 };
+export interface ICommunity {
+  communityUri?: string;
+	creatorId?: string;
+	communityId?: string;
+}
