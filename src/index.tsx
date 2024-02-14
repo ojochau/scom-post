@@ -83,6 +83,7 @@ export class ScomPost extends Module {
     private pnlReplies: VStack;
     private pnlGridPost: VStack;
     private pnlRepost: HStack;
+    private pnlCommunity: HStack;
     private gridPost: GridLayout;
     private pnlPost: Panel;
     private btnViewMore: HStack;
@@ -186,7 +187,7 @@ export class ScomPost extends Module {
 
     private async renderUI() {
         this.clear();
-        const {stats, parentAuthor, contentElements, repost} = this._data?.data || {};
+        const {stats, parentAuthor, contentElements, repost, community} = this._data?.data || {};
         this.renderPostType();
 
         if (parentAuthor) {
@@ -214,6 +215,21 @@ export class ScomPost extends Module {
                 ></i-label>
             )
             this.pnlRepost.visible = true;
+        }
+
+        if (community) {
+            this.pnlCommunity.clearInnerHTML();
+            this.pnlCommunity.append(
+                <i-hstack width="2.75rem" horizontalAlignment='end'>
+                    <i-icon width="1rem" height="1rem" name="users" fill={Theme.text.secondary}></i-icon>
+                </i-hstack>,
+                <i-label
+                    caption={community.communityId}
+                    font={{ size: "0.875rem", color: Theme.text.secondary }}
+                    onClick={() => this.onGoCommunity(community.communityId, community.creatorId)}
+                ></i-label>
+            )
+            this.pnlCommunity.visible = true;
         }
 
         // let _height = 0;
@@ -574,6 +590,10 @@ export class ScomPost extends Module {
         if (npub) {
             window.open(`#/p/${npub}`, '_self');
         }
+    }
+
+    private onGoCommunity(communityId: string, creatorId: string) {
+        window.open(`#/c/${communityId}/${creatorId}`, '_self');
     }
 
     // private handleShowMoreClick() {
@@ -945,7 +965,8 @@ export class ScomPost extends Module {
                     ]}
                     visible={false}
                 >
-                    <i-hstack id="pnlRepost" padding={{ bottom: "0.5rem" }} margin={{ top: "-0.5rem" }} gap="0.75rem" visible={false}></i-hstack>
+                    <i-hstack id="pnlRepost" padding={{ bottom: "0.75rem" }} margin={{ top: "-0.5rem" }} gap="0.75rem" visible={false}></i-hstack>
+                    <i-hstack id="pnlCommunity" padding={{ bottom: "0.75rem" }} margin={{ top: "-0.5rem" }} gap="0.75rem" visible={false}></i-hstack>
                     <i-grid-layout
                         id="gridPost"
                         // maxHeight={"calc(100vh - 50px - 94px)"}

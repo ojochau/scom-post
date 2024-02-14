@@ -355,7 +355,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         }
         async renderUI() {
             this.clear();
-            const { stats, parentAuthor, contentElements, repost } = this._data?.data || {};
+            const { stats, parentAuthor, contentElements, repost, community } = this._data?.data || {};
             this.renderPostType();
             if (parentAuthor) {
                 this.pnlReplyPath.visible = true;
@@ -373,6 +373,12 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                 this.pnlRepost.append(this.$render("i-hstack", { width: "2.75rem", horizontalAlignment: 'end' },
                     this.$render("i-icon", { width: "1rem", height: "1rem", name: "retweet", fill: Theme.text.secondary })), this.$render("i-label", { caption: (repost.displayName || repost.username || "") + " reposted", font: { size: "0.875rem", color: Theme.text.secondary }, onClick: () => this.onGoProfile(repost.npub || repost.id) }));
                 this.pnlRepost.visible = true;
+            }
+            if (community) {
+                this.pnlCommunity.clearInnerHTML();
+                this.pnlCommunity.append(this.$render("i-hstack", { width: "2.75rem", horizontalAlignment: 'end' },
+                    this.$render("i-icon", { width: "1rem", height: "1rem", name: "users", fill: Theme.text.secondary })), this.$render("i-label", { caption: community.communityId, font: { size: "0.875rem", color: Theme.text.secondary }, onClick: () => this.onGoCommunity(community.communityId, community.creatorId) }));
+                this.pnlCommunity.visible = true;
             }
             // let _height = 0;
             if (contentElements?.length) {
@@ -655,6 +661,9 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                 window.open(`#/p/${npub}`, '_self');
             }
         }
+        onGoCommunity(communityId, creatorId) {
+            window.open(`#/c/${communityId}/${creatorId}`, '_self');
+        }
         // private handleShowMoreClick() {
         //     this.pnlContent.classList.remove(ellipsisStyle);
         //     this.btnShowMore.visible = false;
@@ -748,7 +757,6 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                 // }
             }
             const resizeObserver = new ResizeObserver((entries) => {
-                console.log('resizeObserver', this.isReply, this.limitHeight, this.pnlDetail.scrollHeight, this.pnlDetail.offsetHeight, this.gridPost.scrollHeight, this.gridPost.offsetHeight);
                 if ((this.isReply || this.limitHeight)
                     && ((this.pnlDetail.scrollHeight > this.pnlDetail.offsetHeight && this.pnlDetail.scrollHeight - this.pnlDetail.offsetHeight > 1)
                         || (this.gridPost.scrollHeight > this.gridPost.offsetHeight && this.gridPost.scrollHeight - this.gridPost.offsetHeight > 1))
@@ -799,7 +807,8 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                             }
                         }
                     ], visible: false },
-                    this.$render("i-hstack", { id: "pnlRepost", padding: { bottom: "0.5rem" }, margin: { top: "-0.5rem" }, gap: "0.75rem", visible: false }),
+                    this.$render("i-hstack", { id: "pnlRepost", padding: { bottom: "0.75rem" }, margin: { top: "-0.5rem" }, gap: "0.75rem", visible: false }),
+                    this.$render("i-hstack", { id: "pnlCommunity", padding: { bottom: "0.75rem" }, margin: { top: "-0.5rem" }, gap: "0.75rem", visible: false }),
                     this.$render("i-grid-layout", { id: "gridPost", 
                         // maxHeight={"calc(100vh - 50px - 94px)"}
                         // overflow={'hidden'}
