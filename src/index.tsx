@@ -72,7 +72,7 @@ export class ScomPost extends Module {
     private lblUsername: Label;
     private lblDate: Label;
     private imgVerified: Image;
-    private pnlQuoted: Panel;
+    private pnlQuoted: VStack;
     private btnShowMore: Button;
 
     private showMoreWrapper: HStack;
@@ -303,8 +303,8 @@ export class ScomPost extends Module {
                 data={post}
                 display="block"
                 border={{radius: '0.5rem', width: '1px', style: 'solid', color: Theme.colors.secondary.dark}}
-                overflowEllipse={true}
-                limitHeight={true}
+                // overflowEllipse={true}
+                // limitHeight={true}
             ></i-scom-post>
         )
         postEl.onClick = this.onQuotedPostClicked;
@@ -698,7 +698,7 @@ export class ScomPost extends Module {
                         </i-hstack>
                         <i-vstack id="pnlContent" gap="0.75rem"></i-vstack>
                         {/*<i-button id={'btnShowMore'} background={{color: 'transparent'}} onClick={this.handleShowMoreClick.bind(this)} caption={"Show more..."} font={{color: Theme.colors.primary.main}} visible={false}></i-button>*/}
-                        <i-panel id="pnlQuoted" visible={false}></i-panel>
+                        <i-vstack id="pnlQuoted" visible={false} gap={'0.5rem'} padding={{top: '0.5rem'}}></i-vstack>
                         <i-panel
                             id="pnlOverlay"
                             visible={false}
@@ -818,7 +818,7 @@ export class ScomPost extends Module {
                     </i-hstack>
                     <i-vstack id="pnlContent" gap="0.75rem"></i-vstack>
                     {/*<i-button id={'btnShowMore'} background={{color: 'transparent'}} onClick={this.handleShowMoreClick.bind(this)} caption={"Show more..."} font={{color: Theme.colors.primary.main}} visible={false}></i-button>*/}
-                    <i-panel id="pnlQuoted" visible={false}></i-panel>
+                    <i-vstack id="pnlQuoted" gap={'0.5rem'} visible={false} padding={{top: '0.5rem'}}></i-vstack>
                     <i-panel
                         id="pnlOverlay"
                         visible={false}
@@ -865,13 +865,14 @@ export class ScomPost extends Module {
         }
 
         const resizeObserver = new ResizeObserver((entries) => {
-            if( (this.isReply || this.limitHeight)
+            if( (this.isReply || this.limitHeight )
                 && (
                     (this.pnlDetail.scrollHeight > this.pnlDetail.offsetHeight && this.pnlDetail.scrollHeight - this.pnlDetail.offsetHeight > 1)
                     || (this.gridPost.scrollHeight > this.gridPost.offsetHeight && this.gridPost.scrollHeight - this.gridPost.offsetHeight > 1)
                 )
                 && (this.pnlDetail.scrollHeight >= 400 || this.gridPost.scrollHeight >= 400)
             ) {
+                if(this.type !== 'quoted')
                 this.showMoreWrapper.visible = true;
             }
         });

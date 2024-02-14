@@ -454,7 +454,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             this.pnlContent.appendChild(label);
         }
         addQuotedPost(post) {
-            const postEl = (this.$render("i-scom-post", { type: "quoted", data: post, display: "block", border: { radius: '0.5rem', width: '1px', style: 'solid', color: Theme.colors.secondary.dark }, overflowEllipse: true, limitHeight: true }));
+            const postEl = (this.$render("i-scom-post", { type: "quoted", data: post, display: "block", border: { radius: '0.5rem', width: '1px', style: 'solid', color: Theme.colors.secondary.dark } }));
             postEl.onClick = this.onQuotedPostClicked;
             postEl.onQuotedPostClicked = this.onQuotedPostClicked;
             this.pnlQuoted.append(postEl);
@@ -701,7 +701,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                             this.$render("i-hstack", { id: "showMoreWrapper", visible: false, height: 50, bottom: 0, width: '100%', zIndex: 1, background: { color: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(10, 10, 10) 100%)' }, position: 'absolute', justifyContent: 'center', alignItems: 'end' },
                                 this.$render("i-button", { id: "btnShowMore", caption: "Show more", margin: { bottom: 10 }, background: { color: 'transparent' }, font: { color: Theme.colors.primary.main, weight: 800, size: '1rem' }, boxShadow: 'unset', onClick: this.handleShowMoreClick.bind(this) })),
                             this.$render("i-vstack", { id: "pnlContent", gap: "0.75rem" }),
-                            this.$render("i-panel", { id: "pnlQuoted", visible: false }),
+                            this.$render("i-vstack", { id: "pnlQuoted", visible: false, gap: '0.5rem', padding: { top: '0.5rem' } }),
                             this.$render("i-panel", { id: "pnlOverlay", visible: false, height: '5rem', width: '100%', position: 'absolute', bottom: "0px", background: { color: `linear-gradient(0, var(--card-bg-color) 0%, transparent 100%)` } })),
                         this.$render("i-hstack", { id: "btnViewMore", verticalAlignment: "center", padding: { top: '1rem' }, gap: '0.25rem', visible: false, onClick: this.onViewMore },
                             this.$render("i-label", { caption: 'Read more', font: { size: '0.9rem', color: Theme.colors.primary.main } }),
@@ -727,7 +727,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                         this.$render("i-hstack", { id: "showMoreWrapper", visible: false, height: 50, bottom: 0, width: '100%', zIndex: 1, background: { color: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(10, 10, 10) 100%)' }, position: 'absolute', justifyContent: 'center', alignItems: 'end' },
                             this.$render("i-button", { id: "btnShowMore", caption: "Show more", margin: { bottom: 10 }, background: { color: 'transparent' }, font: { color: Theme.colors.primary.main, weight: 800, size: '1rem' }, boxShadow: 'unset', onClick: this.handleShowMoreClick.bind(this) })),
                         this.$render("i-vstack", { id: "pnlContent", gap: "0.75rem" }),
-                        this.$render("i-panel", { id: "pnlQuoted", visible: false }),
+                        this.$render("i-vstack", { id: "pnlQuoted", gap: '0.5rem', visible: false, padding: { top: '0.5rem' } }),
                         this.$render("i-panel", { id: "pnlOverlay", visible: false, height: '5rem', width: '100%', position: 'absolute', bottom: "0px", background: { color: `linear-gradient(0, var(--card-bg-color) 0%, transparent 100%)` } })),
                     this.$render("i-hstack", { id: "btnViewMore", verticalAlignment: "center", padding: { top: '1rem' }, gap: '0.25rem', visible: false, onClick: this.onViewMore },
                         this.$render("i-label", { caption: 'Read more', font: { size: '0.9rem', color: Theme.colors.primary.main } }),
@@ -748,12 +748,12 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                 // }
             }
             const resizeObserver = new ResizeObserver((entries) => {
-                console.log('resizeObserver', this.isReply, this.limitHeight, this.pnlDetail.scrollHeight, this.pnlDetail.offsetHeight, this.gridPost.scrollHeight, this.gridPost.offsetHeight);
                 if ((this.isReply || this.limitHeight)
                     && ((this.pnlDetail.scrollHeight > this.pnlDetail.offsetHeight && this.pnlDetail.scrollHeight - this.pnlDetail.offsetHeight > 1)
                         || (this.gridPost.scrollHeight > this.gridPost.offsetHeight && this.gridPost.scrollHeight - this.gridPost.offsetHeight > 1))
                     && (this.pnlDetail.scrollHeight >= 400 || this.gridPost.scrollHeight >= 400)) {
-                    this.showMoreWrapper.visible = true;
+                    if (this.type !== 'quoted')
+                        this.showMoreWrapper.visible = true;
                 }
             });
             resizeObserver.observe(this.pnlDetail);
