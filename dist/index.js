@@ -693,6 +693,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                             }
                         }
                     ], padding: { left: '1.25rem', right: '1.25rem', top: '1rem', bottom: '1rem' } },
+                    this.$render("i-hstack", { id: "pnlCommunity", padding: { bottom: "0.75rem" }, margin: { top: "-0.5rem" }, gap: "0.75rem", visible: false }),
                     this.$render("i-hstack", { horizontalAlignment: "space-between", gap: "0.5rem", width: "100%", grid: { area: 'user' }, position: 'relative' },
                         this.$render("i-hstack", { alignItems: 'center', gap: 10 },
                             this.$render("i-panel", { id: "pnlAvatar", grid: { area: 'avatar' } },
@@ -719,6 +720,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             }
             else {
                 this.pnlGridPost.visible = true;
+                this.pnlGridPost.insertBefore(this.$render("i-hstack", { id: "pnlCommunity", padding: { bottom: "0.75rem" }, margin: { top: "-0.5rem" }, gap: "0.75rem", visible: false }), this.gridPost);
                 this.gridPost.append(this.$render("i-panel", { id: "pnlActiveBd", visible: false, width: '0.25rem', height: '100%', left: "0px", top: "0px", border: { radius: '0.25rem 0 0 0.25rem' }, background: { color: Theme.background.gradient } }));
                 this.gridPost.append(this.$render("i-panel", { id: "pnlAvatar", grid: { area: 'avatar' } },
                     this.$render("i-image", { id: "imgAvatar", width: '2.75rem', height: '2.75rem', display: "block", background: { color: Theme.background.main }, border: { radius: '50%' }, overflow: 'hidden', objectFit: 'cover', fallbackUrl: assets_2.default.fullPath('img/default_avatar.png'), onClick: () => this.onGoProfile() })));
@@ -809,7 +811,6 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                         }
                     ], visible: false },
                     this.$render("i-hstack", { id: "pnlRepost", padding: { bottom: "0.75rem" }, margin: { top: "-0.5rem" }, gap: "0.75rem", visible: false }),
-                    this.$render("i-hstack", { id: "pnlCommunity", padding: { bottom: "0.75rem" }, margin: { top: "-0.5rem" }, gap: "0.75rem", visible: false }),
                     this.$render("i-grid-layout", { id: "gridPost", 
                         // maxHeight={"calc(100vh - 50px - 94px)"}
                         // overflow={'hidden'}
