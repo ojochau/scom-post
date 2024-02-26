@@ -405,8 +405,8 @@ export class ScomPost extends Module {
             this.gridPost.templateColumns = ['2.75rem', 'minmax(auto, calc(100% - 3.5rem))'];
             this.gridPost.templateRows = ['auto'];
         }
-        this.pnlGridPost.background.color = Theme.background.paper;
-        this.pnlPost.background.color = Theme.background.paper;
+        // this.pnlGridPost.background.color = Theme.background.paper;
+        // this.pnlPost.background.color = Theme.background.paper;
         if (this.isQuotedPost) {
             this.renderInfo(true);
             this.gridPost.templateAreas = [
@@ -513,7 +513,7 @@ export class ScomPost extends Module {
     };
 
     appendReplyPanel() {
-        this.pnlReply = <i-vstack id="pnlReply" visible={!this.pnlMore} padding={{ top: '0.5rem' }}>
+        this.pnlReply = <i-vstack id="pnlReply" visible={!this.pnlMore} padding={{ top: '0.5rem' }} border={{top: { width: 1, style: 'solid', color: 'rgb(47, 51, 54)'}}}>
             <i-vstack id="pnlReplies" gap={'0.5rem'} padding={{ bottom: 50 }}></i-vstack>
         </i-vstack>
         this.pnlWrapper.appendChild(this.pnlReply);
@@ -532,7 +532,7 @@ export class ScomPost extends Module {
     }
 
     private renderReply(reply: IPost, isPrepend?: boolean) {
-        const childElm = <i-scom-post overflowEllipse={true} /> as ScomPost;
+        const childElm = <i-scom-post overflowEllipse={true} border={{top: { width: 1, style: 'solid', color: 'rgb(47, 51, 54)'}}}/> as ScomPost;
         childElm.onReplyClicked = this.onReplyClicked;
         childElm.onLikeClicked = this.onLikeClicked;
         childElm.onRepostClicked = this.onRepostClicked;
@@ -626,7 +626,7 @@ export class ScomPost extends Module {
                     width={'0.25rem'} height={'100%'}
                     left="0px" top="0px"
                     border={{ radius: '0.25rem 0 0 0.25rem' }}
-                    background={{ color: Theme.background.gradient }}
+                    // background={{ color: Theme.background.gradient }}
                 ></i-panel>);
             this.pnlPost.append(
                 <i-panel

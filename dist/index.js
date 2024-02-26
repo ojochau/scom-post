@@ -498,8 +498,8 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                 this.gridPost.templateColumns = ['2.75rem', 'minmax(auto, calc(100% - 3.5rem))'];
                 this.gridPost.templateRows = ['auto'];
             }
-            this.pnlGridPost.background.color = Theme.background.paper;
-            this.pnlPost.background.color = Theme.background.paper;
+            // this.pnlGridPost.background.color = Theme.background.paper;
+            // this.pnlPost.background.color = Theme.background.paper;
             if (this.isQuotedPost) {
                 this.renderInfo(true);
                 this.gridPost.templateAreas = [
@@ -593,7 +593,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         }
         ;
         appendReplyPanel() {
-            this.pnlReply = this.$render("i-vstack", { id: "pnlReply", visible: !this.pnlMore, padding: { top: '0.5rem' } },
+            this.pnlReply = this.$render("i-vstack", { id: "pnlReply", visible: !this.pnlMore, padding: { top: '0.5rem' }, border: { top: { width: 1, style: 'solid', color: 'rgb(47, 51, 54)' } } },
                 this.$render("i-vstack", { id: "pnlReplies", gap: '0.5rem', padding: { bottom: 50 } }));
             this.pnlWrapper.appendChild(this.pnlReply);
             return this.pnlReply;
@@ -611,7 +611,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             }
         }
         renderReply(reply, isPrepend) {
-            const childElm = this.$render("i-scom-post", { overflowEllipse: true });
+            const childElm = this.$render("i-scom-post", { overflowEllipse: true, border: { top: { width: 1, style: 'solid', color: 'rgb(47, 51, 54)' } } });
             childElm.onReplyClicked = this.onReplyClicked;
             childElm.onLikeClicked = this.onLikeClicked;
             childElm.onRepostClicked = this.onRepostClicked;
@@ -684,7 +684,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             const type = this.getAttribute('type', true);
             if (this.disableGutters) {
                 this.pnlPost.visible = true;
-                this.pnlPost.append(this.$render("i-panel", { id: "pnlActiveBd", visible: false, width: '0.25rem', height: '100%', left: "0px", top: "0px", border: { radius: '0.25rem 0 0 0.25rem' }, background: { color: Theme.background.gradient } }));
+                this.pnlPost.append(this.$render("i-panel", { id: "pnlActiveBd", visible: false, width: '0.25rem', height: '100%', left: "0px", top: "0px", border: { radius: '0.25rem 0 0 0.25rem' } }));
                 this.pnlPost.append(this.$render("i-panel", { mediaQueries: [
                         {
                             maxWidth: '767px',
