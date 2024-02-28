@@ -369,9 +369,14 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             this.groupAnalysis.visible = !this.isQuotedPost;
             this.pnlSubscribe.visible = !this.isQuotedPost;
             if (repost) {
+                let reposters = repost.displayName || repost.username || components_7.FormatUtils.truncateWalletAddress(repost.npub);
+                if (stats?.reposts > 1) {
+                    const others = stats.reposts - 1;
+                    reposters += ` and ${others} ${others > 1 ? 'others' : 'other'}`;
+                }
                 this.pnlRepost.clearInnerHTML();
                 this.pnlRepost.append(this.$render("i-hstack", { width: "2.75rem", horizontalAlignment: 'end' },
-                    this.$render("i-icon", { width: "1rem", height: "1rem", name: "retweet", fill: Theme.text.secondary })), this.$render("i-label", { caption: (repost.displayName || repost.username || "") + " reposted", font: { size: "0.875rem", color: Theme.text.secondary }, onClick: () => this.onGoProfile(repost.npub || repost.id) }));
+                    this.$render("i-icon", { width: "1rem", height: "1rem", name: "retweet", fill: Theme.text.secondary })), this.$render("i-label", { caption: reposters + " reposted", font: { size: "0.875rem", color: Theme.text.secondary }, onClick: () => this.onGoProfile(repost.npub || repost.id) }));
                 this.pnlRepost.visible = true;
             }
             if (community) {

@@ -203,13 +203,18 @@ export class ScomPost extends Module {
         this.pnlSubscribe.visible = !this.isQuotedPost;
 
         if (repost) {
+            let reposters = repost.displayName || repost.username || FormatUtils.truncateWalletAddress(repost.npub);
+            if (stats?.reposts > 1) {
+                const others = stats.reposts - 1;
+                reposters += ` and ${others} ${others > 1 ? 'others' : 'other'}`;
+            }
             this.pnlRepost.clearInnerHTML();
             this.pnlRepost.append(
                 <i-hstack width="2.75rem" horizontalAlignment='end'>
                     <i-icon width="1rem" height="1rem" name="retweet" fill={Theme.text.secondary}></i-icon>
                 </i-hstack>,
                 <i-label
-                    caption={(repost.displayName || repost.username || "") + " reposted"}
+                    caption={reposters + " reposted"}
                     font={{ size: "0.875rem", color: Theme.text.secondary }}
                     onClick={() => this.onGoProfile(repost.npub || repost.id)}
                 ></i-label>
