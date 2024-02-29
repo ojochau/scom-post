@@ -949,7 +949,7 @@ export class ScomPost extends Module {
             <i-vstack
                 id="pnlWrapper"
                 width="100%"
-                border={{ radius: 'inherit' }}>
+                border={{ radius: 'inherit', top: {width: 1, style: 'solid', color: Theme.divider} }}>
                 {/*<i-hstack id={"showMoreWrapper"}*/}
                 {/*          visible={false}*/}
                 {/*          height={500}*/}
