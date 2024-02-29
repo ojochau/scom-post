@@ -806,7 +806,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             this.removeEventListener("mouseup", this.showBubbleMenu);
         }
         render() {
-            return (this.$render("i-vstack", { id: "pnlWrapper", width: "100%", border: { radius: 'inherit' } },
+            return (this.$render("i-vstack", { id: "pnlWrapper", width: "100%", border: { radius: 'inherit', top: { width: 1, style: 'solid', color: Theme.divider } } },
                 this.$render("i-vstack", { id: "pnlGridPost", width: "100%", padding: { left: '1.25rem', right: '1.25rem', top: '1rem', bottom: '1rem' }, border: { radius: '0.5rem' }, mediaQueries: [
                         {
                             maxWidth: '767px',
