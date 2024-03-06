@@ -478,7 +478,7 @@ export class ScomPost extends Module {
             const lblValue = (
                 <i-label
                     caption={value}
-                    font={{ color: Theme.colors.secondary.light, size: '1.125rem' }}
+                    font={{ color: Theme.colors.secondary.light, size: '0.8125rem' }}
                     tag={item.value}
                 ></i-label>
             )
