@@ -179,6 +179,7 @@ declare module "@scom/scom-post" {
         private limitHeight;
         private isReply;
         private overflowEllipse;
+        private expanded;
         private _data;
         private _replies;
         onReplyClicked: callbackType;

@@ -100,6 +100,7 @@ export class ScomPost extends Module {
     private limitHeight: boolean;
     private isReply: boolean;
     private overflowEllipse: boolean;
+    private expanded = false;
 
     private _data: IPostConfig;
     private _replies: IPost[];
@@ -902,7 +903,7 @@ export class ScomPost extends Module {
                 )
                 && (this.pnlDetail.scrollHeight >= 400 || this.gridPost.scrollHeight >= 400)
             ) {
-                if (this.type !== 'quoted')
+                if (this.type !== 'quoted' && !this.expanded)
                     this.showMoreWrapper.visible = true;
             }
         });
@@ -937,6 +938,7 @@ export class ScomPost extends Module {
 
     private handleShowMoreClick() {
         this.showMoreWrapper.visible = false;
+        this.expanded = true;
         this.classList.remove(maxHeightStyle);
     }
 

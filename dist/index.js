@@ -292,6 +292,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
     let ScomPost = class ScomPost extends components_7.Module {
         constructor(parent, options) {
             super(parent, options);
+            this.expanded = false;
             this.onProfileShown = this.onProfileShown.bind(this);
             this.onShowMore = this.onShowMore.bind(this);
             this.showBubbleMenu = this.showBubbleMenu.bind(this);
@@ -768,7 +769,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     && ((this.pnlDetail.scrollHeight > this.pnlDetail.offsetHeight && this.pnlDetail.scrollHeight - this.pnlDetail.offsetHeight > 1)
                         || (this.gridPost.scrollHeight > this.gridPost.offsetHeight && this.gridPost.scrollHeight - this.gridPost.offsetHeight > 1))
                     && (this.pnlDetail.scrollHeight >= 400 || this.gridPost.scrollHeight >= 400)) {
-                    if (this.type !== 'quoted')
+                    if (this.type !== 'quoted' && !this.expanded)
                         this.showMoreWrapper.visible = true;
                 }
             });
@@ -800,6 +801,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         }
         handleShowMoreClick() {
             this.showMoreWrapper.visible = false;
+            this.expanded = true;
             this.classList.remove(index_css_2.maxHeightStyle);
         }
         onHide() {
