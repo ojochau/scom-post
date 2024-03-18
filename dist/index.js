@@ -550,6 +550,15 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     }
                 },
                 {
+                    name: 'Zap',
+                    icon: { name: "bolt" },
+                    hoveredColor: Theme.text.secondary,
+                    onClick: (target, event) => {
+                        if (this.onZapClicked)
+                            this.onZapClicked(target, this.postData, event);
+                    }
+                },
+                {
                     value: analytics?.upvotes || 0,
                     name: 'Like',
                     icon: { name: "heart" },
@@ -619,6 +628,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         renderReply(reply, isPrepend) {
             const childElm = this.$render("i-scom-post", { overflowEllipse: true, border: { top: { width: 1, style: 'solid', color: 'rgb(47, 51, 54)' } } });
             childElm.onReplyClicked = this.onReplyClicked;
+            childElm.onZapClicked = this.onZapClicked;
             childElm.onLikeClicked = this.onLikeClicked;
             childElm.onRepostClicked = this.onRepostClicked;
             childElm.onProfileClicked = this.onProfileClicked;
@@ -677,6 +687,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         async init() {
             super.init();
             this.onReplyClicked = this.getAttribute('onReplyClicked', true) || this.onReplyClicked;
+            this.onZapClicked = this.getAttribute('onZapClicked', true) || this.onZapClicked;
             this.onLikeClicked = this.getAttribute('onLikeClicked', true) || this.onLikeClicked;
             this.onRepostClicked = this.getAttribute('onRepostClicked', true) || this.onRepostClicked;
             this.onProfileClicked = this.getAttribute('onProfileClicked', true) || this.onProfileClicked;
