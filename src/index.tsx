@@ -37,6 +37,7 @@ interface ScomPostElement extends ControlElement {
     type?: PostType;
     isActive?: boolean;
     onReplyClicked?: callbackType;
+    onZapClicked?: callbackType;
     onLikeClicked?: (target: ScomPost, event?: MouseEvent) => void;
     onRepostClicked?: (target: ScomPost, event?: MouseEvent) => void;
     onProfileClicked?: callbackType;
@@ -105,6 +106,7 @@ export class ScomPost extends Module {
     private _data: IPostConfig;
     private _replies: IPost[];
     public onReplyClicked: callbackType;
+    public onZapClicked: callbackType;
     public onLikeClicked: callbackType;
     public onRepostClicked: callbackType;
     public onProfileClicked: callbackType;
@@ -455,6 +457,14 @@ export class ScomPost extends Module {
                 }
             },
             {
+                name: 'Zap',
+                icon: { name: "bolt" },
+                hoveredColor: Theme.text.secondary,
+                onClick: (target: Control, event: Event) => {
+                    if (this.onZapClicked) this.onZapClicked(target, this.postData, event)
+                }
+            },
+            {
                 value: analytics?.upvotes || 0,
                 name: 'Like',
                 icon: { name: "heart" },
@@ -540,6 +550,7 @@ export class ScomPost extends Module {
     private renderReply(reply: IPost, isPrepend?: boolean) {
         const childElm = <i-scom-post overflowEllipse={true} border={{top: { width: 1, style: 'solid', color: 'rgb(47, 51, 54)'}}}/> as ScomPost;
         childElm.onReplyClicked = this.onReplyClicked;
+        childElm.onZapClicked = this.onZapClicked;
         childElm.onLikeClicked = this.onLikeClicked;
         childElm.onRepostClicked = this.onRepostClicked;
         childElm.onProfileClicked = this.onProfileClicked;
@@ -610,6 +621,7 @@ export class ScomPost extends Module {
     async init() {
         super.init();
         this.onReplyClicked = this.getAttribute('onReplyClicked', true) || this.onReplyClicked;
+        this.onZapClicked = this.getAttribute('onZapClicked', true) || this.onZapClicked;
         this.onLikeClicked = this.getAttribute('onLikeClicked', true) || this.onLikeClicked;
         this.onRepostClicked = this.getAttribute('onRepostClicked', true) || this.onRepostClicked;
         this.onProfileClicked = this.getAttribute('onProfileClicked', true) || this.onProfileClicked;
