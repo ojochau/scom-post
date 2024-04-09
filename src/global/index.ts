@@ -21,6 +21,7 @@ export const getEmbedElement = async (postData: IPostData, parent: Control, call
   if (builderTarget?.setTag && data.tag) {
     await builderTarget.setTag(data.tag);
   }
+  application.EventBus.dispatch('POST_CREATED_EMBED_ELEMENT', { module, elm });
   if (callback) callback(elm);
   return elm;
 }
