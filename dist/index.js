@@ -114,6 +114,7 @@ define("@scom/scom-post/global/index.ts", ["require", "exports", "@ijstech/compo
         if (builderTarget?.setTag && data.tag) {
             await builderTarget.setTag(data.tag);
         }
+        components_2.application.EventBus.dispatch('POST_CREATED_EMBED_ELEMENT', { module, elm });
         if (callback)
             callback(elm);
         return elm;
