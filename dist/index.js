@@ -551,6 +551,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     }
                 },
                 {
+                    value: analytics?.satszapped || 0,
                     name: 'Zap',
                     icon: { name: "bolt" },
                     hoveredColor: Theme.text.secondary,

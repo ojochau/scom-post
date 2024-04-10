@@ -25,6 +25,7 @@ declare module "@scom/scom-post/global/interface.ts" {
         upvotes?: number;
         downvotes?: number;
         views?: number;
+        satszapped?: number;
     }
     export interface IPostData {
         module: string;
