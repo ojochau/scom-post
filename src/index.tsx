@@ -460,7 +460,7 @@ export class ScomPost extends Module {
                 value: analytics?.satszapped || 0,
                 name: 'Zap',
                 icon: { name: "bolt" },
-                hoveredColor: Theme.text.secondary,
+                hoveredColor: Theme.colors.warning.main,
                 onClick: (target: Control, event: Event) => {
                     if (this.onZapClicked) this.onZapClicked(target, this.postData, event)
                 }

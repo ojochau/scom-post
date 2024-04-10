@@ -554,7 +554,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     value: analytics?.satszapped || 0,
                     name: 'Zap',
                     icon: { name: "bolt" },
-                    hoveredColor: Theme.text.secondary,
+                    hoveredColor: Theme.colors.warning.main,
                     onClick: (target, event) => {
                         if (this.onZapClicked)
                             this.onZapClicked(target, this.postData, event);
