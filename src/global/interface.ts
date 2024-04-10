@@ -23,6 +23,7 @@ export interface IPostStats {
   upvotes?: number; //likes
   downvotes?: number;
   views?: number;
+	satszapped?: number;
 };
 export interface IPostData {
   module: string; //e.g. @scom/scom-markdown, @scom/scom-image, @scom/scom-video

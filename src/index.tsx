@@ -457,6 +457,7 @@ export class ScomPost extends Module {
                 }
             },
             {
+                value: analytics?.satszapped || 0,
                 name: 'Zap',
                 icon: { name: "bolt" },
                 hoveredColor: Theme.text.secondary,
