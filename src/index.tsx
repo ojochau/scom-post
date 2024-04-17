@@ -22,7 +22,8 @@ import {
     IPost,
     IPostData,
     IPostStats,
-    IAuthor
+    IAuthor,
+    IPostActions
 } from './global';
 import { getIconStyleClass, hoverStyle, ellipsisStyle, maxHeightStyle, customLinkStyle } from './index.css';
 import assets from './assets';
@@ -64,6 +65,7 @@ interface IPostConfig {
 
 type PostType = 'full' | 'standard' | 'short' | 'quoted';
 type callbackType = (target: Control, data: IPost, event?: Event, contentElement?: Control) => void;
+type likeCallbackType = (target: Control, data: IPost, event?: Event, contentElement?: Control) => Promise<boolean>;
 
 @customElements('i-scom-post')
 export class ScomPost extends Module {
@@ -107,7 +109,7 @@ export class ScomPost extends Module {
     private _replies: IPost[];
     public onReplyClicked: callbackType;
     public onZapClicked: callbackType;
-    public onLikeClicked: callbackType;
+    public onLikeClicked: likeCallbackType;
     public onRepostClicked: callbackType;
     public onProfileClicked: callbackType;
     public onQuotedPostClicked: (target: ScomPost, event?: MouseEvent) => void;
@@ -190,7 +192,7 @@ export class ScomPost extends Module {
 
     private async renderUI() {
         this.clear();
-        const { stats, parentAuthor, contentElements, repost, community } = this._data?.data || {};
+        const { actions, stats, parentAuthor, contentElements, repost, community } = this._data?.data || {};
         this.renderPostType();
 
         if (parentAuthor) {
@@ -201,7 +203,7 @@ export class ScomPost extends Module {
         this.pnlGridPost.border.radius = this.isActive ? '0.25rem' : '0.5rem';
         this.pnlGridPost.cursor = this.isActive ? 'default' : 'pointer';
 
-        if (!this.isQuotedPost) this.renderAnalytics(stats);
+        if (!this.isQuotedPost) this.renderAnalytics(stats, actions);
         this.groupAnalysis.visible = !this.isQuotedPost;
         this.pnlSubscribe.visible = !this.isQuotedPost;
 
@@ -445,24 +447,28 @@ export class ScomPost extends Module {
         }
     }
 
-    private renderAnalytics(analytics: IPostStats) {
+    private renderAnalytics(analytics: IPostStats, actions?: IPostActions) {
         const dataList: any[] = [
             {
                 value: analytics?.replies || 0,
                 name: 'Reply',
                 icon: { name: "comment-alt" },
                 hoveredColor: Theme.text.secondary,
+                highlighted: actions?.replied,
                 onClick: (target: Control, event: Event) => {
-                    if (this.onReplyClicked) this.onReplyClicked(target, this.postData, event)
+                    if (this.onReplyClicked) this.onReplyClicked(target, this.postData, event);
+                    return true;
                 }
             },
             {
                 value: analytics?.satszapped || 0,
                 name: 'Zap',
                 icon: { name: "bolt" },
-                hoveredColor: Theme.text.secondary,
+                hoveredColor: Theme.colors.warning.main,
+                highlighted: actions?.zapped,
                 onClick: (target: Control, event: Event) => {
-                    if (this.onZapClicked) this.onZapClicked(target, this.postData, event)
+                    if (this.onZapClicked) this.onZapClicked(target, this.postData, event);
+                    return true;
                 }
             },
             {
@@ -470,8 +476,11 @@ export class ScomPost extends Module {
                 name: 'Like',
                 icon: { name: "heart" },
                 hoveredColor: Theme.colors.error.main,
-                onClick: (target: Control, event: Event) => {
-                    if (this.onLikeClicked) this.onLikeClicked(target, this.postData, event)
+                highlighted: actions?.liked,
+                onClick: async (target: Control, event: Event) => {
+                    let success = true;
+                    if (this.onLikeClicked) success = await this.onLikeClicked(target, this.postData, event);
+                    return success;
                 }
             },
             {
@@ -479,8 +488,10 @@ export class ScomPost extends Module {
                 name: 'Repost',
                 icon: { name: "retweet" },
                 hoveredColor: Theme.colors.success.main,
+                highlighted: actions?.reposted,
                 onClick: (target: Control, event: Event) => {
-                    if (this.onRepostClicked) this.onRepostClicked(target, this.postData, event)
+                    if (this.onRepostClicked) this.onRepostClicked(target, this.postData, event);
+                    return true;
                 }
             }
         ]
@@ -501,6 +512,7 @@ export class ScomPost extends Module {
                     tooltip={{ content: value, placement: 'bottomLeft' }}
                     cursor='pointer'
                     class={getIconStyleClass(item.hoveredColor)}
+                    padding={{ top: '0.25rem', bottom: '0.25rem' }}
                 >
                     <i-icon
                         width={'1rem'} height={'1rem'}
@@ -510,13 +522,16 @@ export class ScomPost extends Module {
                     {lblValue}
                 </i-hstack>
             )
+            if (item.highlighted) itemEl.classList.add('highlighted');
             this.groupAnalysis.appendChild(itemEl);
-            itemEl.onClick = (target: Control, event: Event) => {
-                if (item.onClick) item.onClick(itemEl, event);
-                if (item.name === 'Like' || item.name === 'Repost') {
+            itemEl.onClick = async (target: Control, event: Event) => {
+                let success = true;
+                if (item.onClick) success = await item.onClick(itemEl, event);
+                if (success && (item.name === 'Like' || item.name === 'Repost')) {
                     const newValue = (lblValue.tag ?? 0) + 1;
                     lblValue.caption = FormatUtils.formatNumber(newValue, { shortScale: true, decimalFigures: 0 });
                     lblValue.tag = newValue;
+                    itemEl.classList.add('highlighted');
                 }
             }
         }
@@ -763,7 +778,7 @@ export class ScomPost extends Module {
                         <i-hstack
                             id="groupAnalysis"
                             horizontalAlignment="space-between"
-                            padding={{ top: '1.063rem' }}
+                            padding={{ top: '0.563rem' }}
                             width={'100%'}
                         />
                     </i-vstack>
@@ -887,7 +902,7 @@ export class ScomPost extends Module {
                 <i-hstack
                     id="groupAnalysis"
                     horizontalAlignment="space-between"
-                    padding={{ top: '1.063rem' }}
+                    padding={{ top: '0.563rem' }}
                     width={'100%'}
                 />
             </i-vstack>)

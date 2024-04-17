@@ -16,6 +16,7 @@ export interface IPost {
 	contentElements: IPostData[];
   repost?: IAuthor;
   community?: ICommunity;
+  actions?: IPostActions;
 };
 export interface IPostStats {
 	replies?: number;
@@ -25,6 +26,12 @@ export interface IPostStats {
   views?: number;
 	satszapped?: number;
 };
+export interface IPostActions {
+	liked?: boolean;
+	replied?: boolean;
+	reposted?: boolean;
+	zapped?: boolean;
+}
 export interface IPostData {
   module: string; //e.g. @scom/scom-markdown, @scom/scom-image, @scom/scom-video
   category?: "widget" | "quotedPost";

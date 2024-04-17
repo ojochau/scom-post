@@ -129,8 +129,18 @@ define("@scom/scom-post/index.css.ts", ["require", "exports", "@ijstech/componen
     const getIconStyleClass = (color) => {
         const styleObj = {
             $nest: {
-                'i-label': {
-                    transition: 'color 0.3s ease-in'
+                // 'i-label': {
+                //   transition: 'color 0.3s ease-in'
+                // },
+                '&.highlighted': {
+                    $nest: {
+                        'i-icon svg': {
+                            fill: `${color}!important`
+                        },
+                        'i-label': {
+                            color: `${color}!important`
+                        }
+                    }
                 },
                 '&:hover': {
                     $nest: {
@@ -357,7 +367,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         }
         async renderUI() {
             this.clear();
-            const { stats, parentAuthor, contentElements, repost, community } = this._data?.data || {};
+            const { actions, stats, parentAuthor, contentElements, repost, community } = this._data?.data || {};
             this.renderPostType();
             if (parentAuthor) {
                 this.pnlReplyPath.visible = true;
@@ -367,7 +377,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             this.pnlGridPost.border.radius = this.isActive ? '0.25rem' : '0.5rem';
             this.pnlGridPost.cursor = this.isActive ? 'default' : 'pointer';
             if (!this.isQuotedPost)
-                this.renderAnalytics(stats);
+                this.renderAnalytics(stats, actions);
             this.groupAnalysis.visible = !this.isQuotedPost;
             this.pnlSubscribe.visible = !this.isQuotedPost;
             if (repost) {
@@ -538,26 +548,30 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                 ];
             }
         }
-        renderAnalytics(analytics) {
+        renderAnalytics(analytics, actions) {
             const dataList = [
                 {
                     value: analytics?.replies || 0,
                     name: 'Reply',
                     icon: { name: "comment-alt" },
                     hoveredColor: Theme.text.secondary,
+                    highlighted: actions?.replied,
                     onClick: (target, event) => {
                         if (this.onReplyClicked)
                             this.onReplyClicked(target, this.postData, event);
+                        return true;
                     }
                 },
                 {
                     value: analytics?.satszapped || 0,
                     name: 'Zap',
                     icon: { name: "bolt" },
-                    hoveredColor: Theme.text.secondary,
+                    hoveredColor: Theme.colors.warning.main,
+                    highlighted: actions?.zapped,
                     onClick: (target, event) => {
                         if (this.onZapClicked)
                             this.onZapClicked(target, this.postData, event);
+                        return true;
                     }
                 },
                 {
@@ -565,9 +579,12 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     name: 'Like',
                     icon: { name: "heart" },
                     hoveredColor: Theme.colors.error.main,
-                    onClick: (target, event) => {
+                    highlighted: actions?.liked,
+                    onClick: async (target, event) => {
+                        let success = true;
                         if (this.onLikeClicked)
-                            this.onLikeClicked(target, this.postData, event);
+                            success = await this.onLikeClicked(target, this.postData, event);
+                        return success;
                     }
                 },
                 {
@@ -575,9 +592,11 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     name: 'Repost',
                     icon: { name: "retweet" },
                     hoveredColor: Theme.colors.success.main,
+                    highlighted: actions?.reposted,
                     onClick: (target, event) => {
                         if (this.onRepostClicked)
                             this.onRepostClicked(target, this.postData, event);
+                        return true;
                     }
                 }
             ];
@@ -585,17 +604,21 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             for (let item of dataList) {
                 const value = components_7.FormatUtils.formatNumber(item.value, { shortScale: true, decimalFigures: 0 });
                 const lblValue = (this.$render("i-label", { caption: value, font: { color: Theme.colors.secondary.light, size: '0.8125rem' }, tag: item.value }));
-                let itemEl = (this.$render("i-hstack", { verticalAlignment: "center", gap: '0.5rem', tooltip: { content: value, placement: 'bottomLeft' }, cursor: 'pointer', class: (0, index_css_2.getIconStyleClass)(item.hoveredColor) },
+                let itemEl = (this.$render("i-hstack", { verticalAlignment: "center", gap: '0.5rem', tooltip: { content: value, placement: 'bottomLeft' }, cursor: 'pointer', class: (0, index_css_2.getIconStyleClass)(item.hoveredColor), padding: { top: '0.25rem', bottom: '0.25rem' } },
                     this.$render("i-icon", { width: '1rem', height: '1rem', fill: Theme.text.secondary, name: item.icon.name }),
                     lblValue));
+                if (item.highlighted)
+                    itemEl.classList.add('highlighted');
                 this.groupAnalysis.appendChild(itemEl);
-                itemEl.onClick = (target, event) => {
+                itemEl.onClick = async (target, event) => {
+                    let success = true;
                     if (item.onClick)
-                        item.onClick(itemEl, event);
-                    if (item.name === 'Like' || item.name === 'Repost') {
+                        success = await item.onClick(itemEl, event);
+                    if (success && (item.name === 'Like' || item.name === 'Repost')) {
                         const newValue = (lblValue.tag ?? 0) + 1;
                         lblValue.caption = components_7.FormatUtils.formatNumber(newValue, { shortScale: true, decimalFigures: 0 });
                         lblValue.tag = newValue;
+                        itemEl.classList.add('highlighted');
                     }
                 };
             }
@@ -735,7 +758,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                         this.$render("i-hstack", { id: "btnViewMore", verticalAlignment: "center", padding: { top: '1rem' }, gap: '0.25rem', visible: false, onClick: this.onViewMore },
                             this.$render("i-label", { caption: 'Read more', font: { size: '0.9rem', color: Theme.colors.primary.main } }),
                             this.$render("i-icon", { name: "angle-down", width: 16, height: 16, fill: Theme.colors.primary.main })),
-                        this.$render("i-hstack", { id: "groupAnalysis", horizontalAlignment: "space-between", padding: { top: '1.063rem' }, width: '100%' }))));
+                        this.$render("i-hstack", { id: "groupAnalysis", horizontalAlignment: "space-between", padding: { top: '0.563rem' }, width: '100%' }))));
             }
             else {
                 this.pnlGridPost.visible = true;
@@ -762,7 +785,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     this.$render("i-hstack", { id: "btnViewMore", verticalAlignment: "center", padding: { top: '1rem' }, gap: '0.25rem', visible: false, onClick: this.onViewMore },
                         this.$render("i-label", { caption: 'Read more', font: { size: '0.9rem', color: Theme.colors.primary.main } }),
                         this.$render("i-icon", { name: "angle-down", width: 16, height: 16, fill: Theme.colors.primary.main })),
-                    this.$render("i-hstack", { id: "groupAnalysis", horizontalAlignment: "space-between", padding: { top: '1.063rem' }, width: '100%' })));
+                    this.$render("i-hstack", { id: "groupAnalysis", horizontalAlignment: "space-between", padding: { top: '0.563rem' }, width: '100%' })));
             }
             if (data)
                 await this.setData({ data, isActive, type });
