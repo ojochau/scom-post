@@ -4,8 +4,18 @@ const Theme = Styles.Theme.ThemeVars;
 export const getIconStyleClass = (color: string) => {
   const styleObj: any = {
     $nest: {
-      'i-label': {
-        transition: 'color 0.3s ease-in'
+      // 'i-label': {
+      //   transition: 'color 0.3s ease-in'
+      // },
+      '&.highlighted': {
+        $nest: {
+          'i-icon svg': {
+            fill: `${color}!important`
+          },
+          'i-label': {
+            color: `${color}!important`
+          }
+        }
       },
       '&:hover': {
         $nest: {

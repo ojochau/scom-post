@@ -18,6 +18,7 @@ declare module "@scom/scom-post/global/interface.ts" {
         contentElements: IPostData[];
         repost?: IAuthor;
         community?: ICommunity;
+        actions?: IPostActions;
     }
     export interface IPostStats {
         replies?: number;
@@ -26,6 +27,12 @@ declare module "@scom/scom-post/global/interface.ts" {
         downvotes?: number;
         views?: number;
         satszapped?: number;
+    }
+    export interface IPostActions {
+        liked?: boolean;
+        replied?: boolean;
+        reposted?: boolean;
+        zapped?: boolean;
     }
     export interface IPostData {
         module: string;
@@ -147,6 +154,7 @@ declare module "@scom/scom-post" {
     }
     type PostType = 'full' | 'standard' | 'short' | 'quoted';
     type callbackType = (target: Control, data: IPost, event?: Event, contentElement?: Control) => void;
+    type likeCallbackType = (target: Control, data: IPost, event?: Event, contentElement?: Control) => Promise<boolean>;
     export class ScomPost extends Module {
         private pnlInfo;
         private imgAvatar;
@@ -186,7 +194,7 @@ declare module "@scom/scom-post" {
         private _replies;
         onReplyClicked: callbackType;
         onZapClicked: callbackType;
-        onLikeClicked: callbackType;
+        onLikeClicked: likeCallbackType;
         onRepostClicked: callbackType;
         onProfileClicked: callbackType;
         onQuotedPostClicked: (target: ScomPost, event?: MouseEvent) => void;
