@@ -71,3 +71,26 @@ export const customLinkStyle = Styles.style({
     }
   }
 })
+
+export const cardContentStyle = Styles.style({
+  $nest: {
+    'i-image': {
+      transform: 'translateY(-100%)',
+      $nest: {
+        '&>img': {
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          objectPosition: 'center'
+        }
+      }
+    },
+    '@media only screen and (max-width: 767px)': {
+      $nest: {
+        '.entry-content': {
+          "-webkit-line-clamp": `3 !important`
+        }
+      }
+    }
+  }
+});

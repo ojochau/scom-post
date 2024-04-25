@@ -77,6 +77,7 @@ declare module "@scom/scom-post/index.css.ts" {
     export const ellipsisStyle: string;
     export const maxHeightStyle: string;
     export const customLinkStyle: string;
+    export const cardContentStyle: string;
 }
 /// <amd-module name="@scom/scom-post/assets.ts" />
 declare module "@scom/scom-post/assets.ts" {
@@ -152,7 +153,7 @@ declare module "@scom/scom-post" {
         type?: PostType;
         isActive?: boolean;
     }
-    type PostType = 'full' | 'standard' | 'short' | 'quoted';
+    type PostType = 'full' | 'standard' | 'short' | 'quoted' | 'card';
     type callbackType = (target: Control, data: IPost, event?: Event, contentElement?: Control) => void;
     type likeCallbackType = (target: Control, data: IPost, event?: Event, contentElement?: Control) => Promise<boolean>;
     export class ScomPost extends Module {
@@ -185,6 +186,8 @@ declare module "@scom/scom-post" {
         private lbReplyTo;
         private pnlSubscribe;
         private bubbleMenu;
+        private pnlCardContentBlock;
+        private markdownViewer;
         private disableGutters;
         private limitHeight;
         private isReply;
@@ -211,6 +214,9 @@ declare module "@scom/scom-post" {
         get replies(): IPost[];
         get isQuotedPost(): boolean;
         clear(): void;
+        private isMarkdown;
+        private constructPostCard;
+        private renderCardContent;
         private renderUI;
         private appendLabel;
         private addQuotedPost;
