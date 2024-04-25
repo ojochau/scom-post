@@ -235,9 +235,20 @@ export class ScomPost extends Module {
                             data.content = textToken.text;
                         }
                     }
-                } else if (item.module === '@scom/scom-image-gallery' && !data.img) {
-                    const images = item?.data?.properties?.images || [];
-                    data.img = images[0]?.url;
+                }
+                if (!data.img) {
+                    if (item.module === '@scom/scom-image-gallery') {
+                        const images = item?.data?.properties?.images || [];
+                        data.img = images[0]?.url;
+                    }
+                    if (item.module === '@scom/scom-video') {
+                        const url = item?.data?.properties?.url;
+                        let regex = /(youtu.*be.*)\/(watch\?v=|watch\?.+&v=|live\/|shorts\/|embed\/|v\/|)(.*?((?=[&#?])|$))/gm;
+                        let videoId = regex.exec(url)?.[3];
+                        if (videoId) {
+                            data.img = `https://img.youtube.com/vi/${videoId}/0.jpg`
+                        }
+                    }
                 }
                 if (data.title && data.content && data.img) break;
             }
