@@ -124,7 +124,7 @@ define("@scom/scom-post/global/index.ts", ["require", "exports", "@ijstech/compo
 define("@scom/scom-post/index.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.customLinkStyle = exports.maxHeightStyle = exports.ellipsisStyle = exports.hoverStyle = exports.getIconStyleClass = void 0;
+    exports.cardContentStyle = exports.customLinkStyle = exports.maxHeightStyle = exports.ellipsisStyle = exports.hoverStyle = exports.getIconStyleClass = void 0;
     const Theme = components_3.Styles.Theme.ThemeVars;
     const getIconStyleClass = (color) => {
         const styleObj = {
@@ -190,6 +190,28 @@ define("@scom/scom-post/index.css.ts", ["require", "exports", "@ijstech/componen
             },
             'img': {
                 maxWidth: '100%'
+            }
+        }
+    });
+    exports.cardContentStyle = components_3.Styles.style({
+        $nest: {
+            'i-image': {
+                transform: 'translateY(-100%)',
+                $nest: {
+                    '&>img': {
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        objectPosition: 'center'
+                    }
+                }
+            },
+            '@media only screen and (max-width: 767px)': {
+                $nest: {
+                    '.entry-content': {
+                        "-webkit-line-clamp": `3 !important`
+                    }
+                }
             }
         }
     });
@@ -365,10 +387,105 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             if (this.pnlInfo)
                 this.pnlInfo.clearInnerHTML();
         }
+        async isMarkdown() {
+            const { contentElements } = this._data?.data || {};
+            for (let item of contentElements) {
+                if (!item.module) {
+                    let content = item?.data?.properties?.content || '';
+                    if (!content)
+                        continue;
+                    const tokens = await this.markdownViewer.getTokens(content);
+                    let heading1 = tokens.find(token => token.type === "heading" && token.depth === 1);
+                    if (heading1) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        async constructPostCard() {
+            let data = {};
+            const { contentElements } = this._data?.data || {};
+            if (contentElements?.length) {
+                for (let item of contentElements) {
+                    if (!item.module) {
+                        let content = item?.data?.properties?.content || '';
+                        if (!content)
+                            continue;
+                        const tokens = await this.markdownViewer.getTokens(content);
+                        if (!data.title) {
+                            let heading1Token = tokens.find(token => token.type === "heading" && token.depth === 1);
+                            if (heading1Token) {
+                                data.title = heading1Token.text;
+                            }
+                        }
+                        if (!data.content) {
+                            let textToken = tokens.find(token => token.type === "paragraph" || token.type === "text");
+                            if (textToken) {
+                                data.content = textToken.text;
+                            }
+                        }
+                    }
+                    if (!data.img) {
+                        if (item.module === '@scom/scom-image-gallery') {
+                            const images = item?.data?.properties?.images || [];
+                            data.img = images[0]?.url;
+                        }
+                        if (item.module === '@scom/scom-video') {
+                            const url = item?.data?.properties?.url;
+                            let regex = /(youtu.*be.*)\/(watch\?v=|watch\?.+&v=|live\/|shorts\/|embed\/|v\/|)(.*?((?=[&#?])|$))/gm;
+                            let videoId = regex.exec(url)?.[3];
+                            if (videoId) {
+                                data.img = `https://img.youtube.com/vi/${videoId}/0.jpg`;
+                            }
+                        }
+                    }
+                    if (data.title && data.content && data.img)
+                        break;
+                }
+            }
+            return data;
+        }
+        renderCardContent(data) {
+            this.pnlContent.appendChild(this.$render("i-stack", { class: index_css_2.cardContentStyle, width: '100%', direction: "horizontal", gap: '0.875rem', mediaQueries: [
+                    {
+                        maxWidth: '767px',
+                        properties: {
+                            direction: "vertical"
+                        }
+                    }
+                ] },
+                this.$render("i-hstack", { width: "100%", height: "100%", stack: { shrink: '0' }, overflow: "hidden", mediaQueries: [
+                        {
+                            minWidth: '768px',
+                            properties: {
+                                width: "7rem",
+                                height: "7rem",
+                                border: { radius: "0.75rem" }
+                            }
+                        }
+                    ], visible: !!data.img },
+                    this.$render("i-panel", { width: "100%", height: 0, overflow: "hidden", padding: { bottom: "100%" }, background: { color: Theme.action.disabledBackground }, mediaQueries: [
+                            {
+                                maxWidth: '767px',
+                                properties: {
+                                    padding: { bottom: '50%' }
+                                }
+                            }
+                        ] },
+                        this.$render("i-image", { position: "absolute", display: "block", width: "100%", height: "100%", top: "100%", left: 0, url: data.img }))),
+                this.$render("i-vstack", { id: "pnlCardContentBlock", justifyContent: 'space-between', gap: '0.5rem', stack: { shrink: '1', grow: '1' }, overflow: 'hidden' },
+                    this.$render("i-vstack", { gap: '0.5rem' },
+                        this.$render("i-label", { caption: data.title || 'Untitled', font: { size: '1.25rem', weight: 500 }, wordBreak: "break-word", lineHeight: '1.5rem' }),
+                        this.$render("i-label", { class: "entry-content", caption: data.content || '', lineClamp: 1, font: { size: "1rem" }, lineHeight: '1.5rem', visible: !!data.content })))));
+            this.groupAnalysis.parent = this.pnlCardContentBlock;
+            this.pnlCardContentBlock.appendChild(this.groupAnalysis);
+        }
         async renderUI() {
             this.clear();
             const { actions, stats, parentAuthor, contentElements, repost, community } = this._data?.data || {};
             this.renderPostType();
+            let isMarkdown = await this.isMarkdown();
             if (parentAuthor) {
                 this.pnlReplyPath.visible = true;
                 this.lbReplyTo.caption = parentAuthor.displayName || '';
@@ -397,71 +514,36 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     this.$render("i-icon", { width: "1rem", height: "1rem", name: "users", fill: Theme.text.secondary })), this.$render("i-label", { caption: community.communityId, font: { size: "0.875rem", color: Theme.text.secondary }, onClick: () => this.onGoCommunity(community.communityId, community.creatorId) }));
                 this.pnlCommunity.visible = true;
             }
-            // let _height = 0;
-            if (contentElements?.length) {
+            if (this.type === 'card' && isMarkdown) {
+                const templateAreas = [
+                    ['avatar', 'user'],
+                    ['avatar', 'path'],
+                    ['content', 'content']
+                ];
+                if (!this.pnlReplyPath.visible)
+                    templateAreas.splice(1, 1);
+                this.gridPost.templateAreas = templateAreas;
+                this.overflowEllipse = false;
+                this.classList.remove(index_css_2.maxHeightStyle);
+                let data = await this.constructPostCard();
+                this.renderCardContent(data);
+            }
+            else if (contentElements?.length) {
                 for (let item of contentElements) {
                     if (item.category === 'quotedPost') {
                         this.addQuotedPost(item?.data?.properties);
                     }
                     else {
+                        if (!item.module && isMarkdown) {
+                            item.module = '@scom/scom-markdown-editor';
+                        }
                         if (item.module) {
                             await (0, global_1.getEmbedElement)(item, this.pnlContent, (elm) => {
-                                // _height += Number(elm.height || 0);
-                                // if (_height > MAX_HEIGHT && !this.btnViewMore.visible) {
-                                //   this.pnlOverlay.visible = true;
-                                //   this.btnViewMore.visible = true;
-                                // }
-                                // this.pnlContent.minHeight = 'auto';
-                                // const mdEditor = this.pnlContent.querySelector('i-markdown-editor');
-                                // this.btnShowMore.visible = mdEditor && mdEditor['offsetHeight'] < mdEditor.scrollHeight;
                             });
                         }
                         else {
                             let content = item?.data?.properties?.content || '';
                             this.appendLabel(content);
-                            // const tableMdRegex = /(?<=(\r\n){2}|^)([^\r\n]*\|[^\r\n]*(\r?\n)?)+(?=(\r?\n){2}|$)/gm;
-                            // const matches: {
-                            //     type: 'table';
-                            //     index: number;
-                            //     length: number;
-                            //     content: string;
-                            // }[] = [];
-                            // const contentArr = content.split(/[\s]+/);
-                            // console.log(contentArr)
-                            // let match;
-                            // while ((match = tableMdRegex.exec(content)) !== null) {
-                            //     const breakRegex = /\|(\s)*:?(-+):?(\s)*\|/gm;
-                            //     if (breakRegex.test(match[0])) {
-                            //         let length = contentArr.find(c => c.startsWith(match[0]))?.length || match[0].length;
-                            //         matches.push({
-                            //             type: 'table',
-                            //             index: match.index,
-                            //             length: length,
-                            //             content: match[0]
-                            //         });
-                            //     }
-                            // }
-                            // matches.sort((a, b) => a.index - b.index);
-                            // let lastIndex = 0;
-                            // for (let match of matches) {
-                            //     if (match.index > lastIndex) {
-                            //         let textContent = content.slice(lastIndex, match.index);
-                            //         if (textContent.trim().length > 0) {
-                            //            this.appendLabel(textContent);
-                            //         }
-                            //     }
-                            //     if (match.type === 'table') {
-                            //         const parsed = await new Markdown().load(match.content);
-                            //         this.appendLabel(parsed, 'markdown');
-                            //     }
-                            //     lastIndex = match.index + match.length;
-                            // }
-                            // if (lastIndex < content.length) {
-                            //     let textContent = content.slice(lastIndex);
-                            //     if (textContent.trim().length > 0) {
-                            //         this.appendLabel(textContent);
-                            //     }
-                            // }
                         }
                     }
                 }
@@ -865,7 +947,8 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                                 padding: { left: '1rem', right: '1rem', top: '1rem', bottom: '1rem' }
                             }
                         }
-                    ], visible: false })));
+                    ], visible: false }),
+                this.$render("i-markdown", { id: 'markdownViewer', visible: false })));
         }
     };
     ScomPost = __decorate([

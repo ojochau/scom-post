@@ -25,7 +25,7 @@ import {
     IAuthor,
     IPostActions
 } from './global';
-import { getIconStyleClass, hoverStyle, ellipsisStyle, maxHeightStyle, customLinkStyle } from './index.css';
+import { getIconStyleClass, hoverStyle, ellipsisStyle, maxHeightStyle, customLinkStyle, cardContentStyle } from './index.css';
 import assets from './assets';
 import { ScomPostBubbleMenu } from './components/bubbleMenu';
 
@@ -63,7 +63,13 @@ interface IPostConfig {
     isActive?: boolean;
 }
 
-type PostType = 'full' | 'standard' | 'short' | 'quoted';
+interface IPostCard {
+    title?: string;
+    content?: string;
+    img?: string;
+}
+
+type PostType = 'full' | 'standard' | 'short' | 'quoted' | 'card';
 type callbackType = (target: Control, data: IPost, event?: Event, contentElement?: Control) => void;
 type likeCallbackType = (target: Control, data: IPost, event?: Event, contentElement?: Control) => Promise<boolean>;
 
@@ -99,6 +105,8 @@ export class ScomPost extends Module {
     private lbReplyTo: Label;
     private pnlSubscribe: Panel;
     private bubbleMenu: ScomPostBubbleMenu;
+    private pnlCardContentBlock: VStack;
+    private markdownViewer: Markdown;
     private disableGutters: boolean;
     private limitHeight: boolean;
     private isReply: boolean;
@@ -190,10 +198,153 @@ export class ScomPost extends Module {
             this.pnlInfo.clearInnerHTML();
     }
 
+    private async isMarkdown() {
+        const { contentElements } = this._data?.data || {};
+        for (let item of contentElements) {
+            if (!item.module) {
+                let content: string = item?.data?.properties?.content || '';
+                if (!content) continue;
+                const tokens: any[] = await this.markdownViewer.getTokens(content);
+                let heading1 = tokens.find(token => token.type === "heading" && token.depth === 1);
+                if (heading1) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private async constructPostCard() {
+        let data: IPostCard = {}
+        const { contentElements } = this._data?.data || {};
+        if (contentElements?.length) {
+            for (let item of contentElements) {
+                if (!item.module) {
+                    let content: string = item?.data?.properties?.content || '';
+                    if (!content) continue;
+                    const tokens: any[] = await this.markdownViewer.getTokens(content);
+                    if (!data.title) {
+                        let heading1Token = tokens.find(token => token.type === "heading" && token.depth === 1);
+                        if (heading1Token) {
+                            data.title = heading1Token.text;
+                        }
+                    }
+                    if (!data.content) {
+                        let textToken = tokens.find(token => token.type === "paragraph" || token.type === "text");
+                        if (textToken) {
+                            data.content = textToken.text;
+                        }
+                    }
+                }
+                if (!data.img) {
+                    if (item.module === '@scom/scom-image-gallery') {
+                        const images = item?.data?.properties?.images || [];
+                        data.img = images[0]?.url;
+                    }
+                    if (item.module === '@scom/scom-video') {
+                        const url = item?.data?.properties?.url;
+                        let regex = /(youtu.*be.*)\/(watch\?v=|watch\?.+&v=|live\/|shorts\/|embed\/|v\/|)(.*?((?=[&#?])|$))/gm;
+                        let videoId = regex.exec(url)?.[3];
+                        if (videoId) {
+                            data.img = `https://img.youtube.com/vi/${videoId}/0.jpg`
+                        }
+                    }
+                }
+                if (data.title && data.content && data.img) break;
+            }
+        }
+        return data;
+    }
+
+    private renderCardContent(data: IPostCard) {
+        this.pnlContent.appendChild(
+            <i-stack
+                class={cardContentStyle}
+                width={'100%'}
+                direction="horizontal"
+                gap='0.875rem'
+                mediaQueries={[
+                    {
+                        maxWidth: '767px',
+                        properties: {
+                            direction: "vertical"
+                        }
+                    }
+                ]}
+            >
+                <i-hstack
+                    width="100%"
+                    height="100%"
+                    stack={{ shrink: '0' }}
+                    overflow="hidden"
+                    mediaQueries={[
+                        {
+                            minWidth: '768px',
+                            properties: {
+                                width: "7rem",
+                                height: "7rem",
+                                border: { radius: "0.75rem" }
+                            }
+                        }
+                    ]}
+                    visible={!!data.img}
+                >
+                    <i-panel
+                        width="100%"
+                        height={0}
+                        overflow="hidden"
+                        padding={{ bottom: "100%" }}
+                        background={{ color: Theme.action.disabledBackground }}
+                        mediaQueries={[
+                            {
+                                maxWidth: '767px',
+                                properties: {
+                                    padding: { bottom: '50%' }
+                                }
+                            }
+                        ]}
+                    >
+                        <i-image
+                            position="absolute"
+                            display="block"
+                            width="100%"
+                            height="100%"
+                            top="100%"
+                            left={0}
+                            url={data.img}
+                        ></i-image>
+                    </i-panel>
+                </i-hstack>
+                <i-vstack
+                    id="pnlCardContentBlock"
+                    justifyContent='space-between'
+                    gap={'0.5rem'}
+                    stack={{ shrink: '1', grow: '1' }}
+                    overflow={'hidden'}
+                >
+                    <i-vstack gap={'0.5rem'}>
+                        <i-label caption={data.title || 'Untitled'} font={{ size: '1.25rem', weight: 500 }} wordBreak="break-word" lineHeight={'1.5rem'}></i-label>
+                        <i-label
+                            class="entry-content"
+                            caption={data.content || ''}
+                            lineClamp={1}
+                            font={{ size: "1rem" }}
+                            lineHeight={'1.5rem'}
+                            visible={!!data.content}
+                        ></i-label>
+                    </i-vstack>
+                </i-vstack>
+            </i-stack>
+        );
+        this.groupAnalysis.parent = this.pnlCardContentBlock;
+        this.pnlCardContentBlock.appendChild(this.groupAnalysis);
+    }
+
     private async renderUI() {
         this.clear();
         const { actions, stats, parentAuthor, contentElements, repost, community } = this._data?.data || {};
         this.renderPostType();
+        let isMarkdown = await this.isMarkdown();
 
         if (parentAuthor) {
             this.pnlReplyPath.visible = true;
@@ -241,71 +392,33 @@ export class ScomPost extends Module {
             )
             this.pnlCommunity.visible = true;
         }
-
-        // let _height = 0;
-        if (contentElements?.length) {
+        
+        if (this.type === 'card' && isMarkdown) {
+            const templateAreas = [
+                ['avatar', 'user'],
+                ['avatar', 'path'],
+                ['content', 'content']
+            ];
+            if (!this.pnlReplyPath.visible) templateAreas.splice(1, 1);
+            this.gridPost.templateAreas = templateAreas;
+            this.overflowEllipse = false;
+            this.classList.remove(maxHeightStyle);
+            let data = await this.constructPostCard();
+            this.renderCardContent(data);
+        } else if (contentElements?.length) {
             for (let item of contentElements) {
                 if (item.category === 'quotedPost') {
                     this.addQuotedPost(item?.data?.properties);
                 } else {
+                    if (!item.module && isMarkdown) {
+                        item.module = '@scom/scom-markdown-editor';
+                    }
                     if (item.module) {
                         await getEmbedElement(item, this.pnlContent, (elm: any) => {
-                            // _height += Number(elm.height || 0);
-                            // if (_height > MAX_HEIGHT && !this.btnViewMore.visible) {
-                            //   this.pnlOverlay.visible = true;
-                            //   this.btnViewMore.visible = true;
-                            // }
-                            // this.pnlContent.minHeight = 'auto';
-                            // const mdEditor = this.pnlContent.querySelector('i-markdown-editor');
-                            // this.btnShowMore.visible = mdEditor && mdEditor['offsetHeight'] < mdEditor.scrollHeight;
                         });
                     } else {
                         let content: string = item?.data?.properties?.content || '';
                         this.appendLabel(content);
-                        // const tableMdRegex = /(?<=(\r\n){2}|^)([^\r\n]*\|[^\r\n]*(\r?\n)?)+(?=(\r?\n){2}|$)/gm;
-                        // const matches: {
-                        //     type: 'table';
-                        //     index: number;
-                        //     length: number;
-                        //     content: string;
-                        // }[] = [];
-                        // const contentArr = content.split(/[\s]+/);
-                        // console.log(contentArr)
-                        // let match;
-                        // while ((match = tableMdRegex.exec(content)) !== null) {
-                        //     const breakRegex = /\|(\s)*:?(-+):?(\s)*\|/gm;
-                        //     if (breakRegex.test(match[0])) {
-                        //         let length = contentArr.find(c => c.startsWith(match[0]))?.length || match[0].length;
-                        //         matches.push({
-                        //             type: 'table',
-                        //             index: match.index,
-                        //             length: length,
-                        //             content: match[0]
-                        //         });
-                        //     }
-                        // }
-                        // matches.sort((a, b) => a.index - b.index);
-                        // let lastIndex = 0;
-
-                        // for (let match of matches) {
-                        //     if (match.index > lastIndex) {
-                        //         let textContent = content.slice(lastIndex, match.index);
-                        //         if (textContent.trim().length > 0) {
-                        //            this.appendLabel(textContent);
-                        //         }
-                        //     }
-                        //     if (match.type === 'table') {
-                        //         const parsed = await new Markdown().load(match.content);
-                        //         this.appendLabel(parsed, 'markdown');
-                        //     }
-                        //     lastIndex = match.index + match.length;
-                        // }
-                        // if (lastIndex < content.length) {
-                        //     let textContent = content.slice(lastIndex);
-                        //     if (textContent.trim().length > 0) {
-                        //         this.appendLabel(textContent);
-                        //     }
-                        // }
                     }
                 }
             }
@@ -1033,6 +1146,7 @@ export class ScomPost extends Module {
                     visible={false}
                 >
                 </i-panel>
+                <i-markdown id='markdownViewer' visible={false}></i-markdown>
             </i-vstack>
         );
     }
