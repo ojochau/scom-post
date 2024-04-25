@@ -477,7 +477,8 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                 this.$render("i-vstack", { id: "pnlCardContentBlock", justifyContent: 'space-between', gap: '0.5rem', stack: { shrink: '1', grow: '1' }, overflow: 'hidden' },
                     this.$render("i-vstack", { gap: '0.5rem' },
                         this.$render("i-label", { caption: data.title || 'Untitled', font: { size: '1.25rem', weight: 500 }, wordBreak: "break-word", lineHeight: '1.5rem' }),
-                        this.$render("i-label", { class: "entry-content", caption: data.content || '', lineClamp: 1, font: { size: "1rem" }, visible: !!data.content })))));
+                        this.$render("i-label", { class: "entry-content", caption: data.content || '', lineClamp: 1, font: { size: "1rem" }, lineHeight: '1.5rem', visible: !!data.content })))));
+            this.groupAnalysis.parent = this.pnlCardContentBlock;
             this.pnlCardContentBlock.appendChild(this.groupAnalysis);
         }
         async renderUI() {

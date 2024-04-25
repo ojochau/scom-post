@@ -329,12 +329,14 @@ export class ScomPost extends Module {
                             caption={data.content || ''}
                             lineClamp={1}
                             font={{ size: "1rem" }}
+                            lineHeight={'1.5rem'}
                             visible={!!data.content}
                         ></i-label>
                     </i-vstack>
                 </i-vstack>
             </i-stack>
         );
+        this.groupAnalysis.parent = this.pnlCardContentBlock;
         this.pnlCardContentBlock.appendChild(this.groupAnalysis);
     }
 
