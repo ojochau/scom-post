@@ -473,7 +473,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                                 }
                             }
                         ] },
-                        this.$render("i-image", { position: "absolute", display: "block", width: "100%", height: "100%", top: "100%", left: 0, url: data.img }))),
+                        this.$render("i-image", { position: "absolute", display: "block", width: "100%", height: "100%", top: "100%", left: 0, url: data.img, objectFit: "cover" }))),
                 this.$render("i-vstack", { id: "pnlCardContentBlock", justifyContent: 'space-between', gap: '0.5rem', stack: { shrink: '1', grow: '1' }, overflow: 'hidden' },
                     this.$render("i-vstack", { gap: '0.5rem' },
                         this.$render("i-label", { caption: data.title || 'Untitled', font: { size: '1.25rem', weight: 500 }, wordBreak: "break-word", lineHeight: '1.5rem' }),
@@ -781,11 +781,11 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             if (!npub)
                 npub = this.postData?.author?.npub;
             if (npub) {
-                window.open(`#/p/${npub}`, '_self');
+                window.open(`#!/p/${npub}`, '_self');
             }
         }
         onGoCommunity(communityId, creatorId) {
-            window.open(`#/c/${communityId}/${creatorId}`, '_self');
+            window.open(`#!/c/${communityId}/${creatorId}`, '_self');
         }
         // private handleShowMoreClick() {
         //     this.pnlContent.classList.remove(ellipsisStyle);
