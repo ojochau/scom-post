@@ -312,6 +312,7 @@ export class ScomPost extends Module {
                             top="100%"
                             left={0}
                             url={data.img}
+                            objectFit="cover"
                         ></i-image>
                     </i-panel>
                 </i-hstack>
@@ -734,12 +735,12 @@ export class ScomPost extends Module {
     private onGoProfile(npub?: string) {
         if (!npub) npub = this.postData?.author?.npub;
         if (npub) {
-            window.open(`#/p/${npub}`, '_self');
+            window.open(`#!/p/${npub}`, '_self');
         }
     }
 
     private onGoCommunity(communityId: string, creatorId: string) {
-        window.open(`#/c/${communityId}/${creatorId}`, '_self');
+        window.open(`#!/c/${communityId}/${creatorId}`, '_self');
     }
 
     // private handleShowMoreClick() {
