@@ -366,6 +366,13 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         get isQuotedPost() {
             return this.type === 'quoted';
         }
+        get isPinned() {
+            return this._isPinned;
+        }
+        set isPinned(value) {
+            this._isPinned = value || false;
+            this.pnlPinned.visible = this._isPinned;
+        }
         clear() {
             if (this.pnlOverlay)
                 this.pnlOverlay.visible = false;
@@ -447,7 +454,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             return data;
         }
         renderCardContent(data) {
-            this.pnlContent.appendChild(this.$render("i-stack", { class: index_css_2.cardContentStyle, width: '100%', direction: this.isPinned ? "vertical" : "horizontal", gap: '0.875rem', mediaQueries: [
+            this.pnlContent.appendChild(this.$render("i-stack", { class: index_css_2.cardContentStyle, width: '100%', direction: this.pinView ? "vertical" : "horizontal", gap: '0.875rem', mediaQueries: [
                     {
                         maxWidth: '767px',
                         properties: {
@@ -455,7 +462,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                         }
                     }
                 ] },
-                this.$render("i-hstack", { width: "100%", height: "100%", stack: { shrink: '0' }, border: this.isPinned ? { radius: "0.75rem" } : {}, overflow: "hidden", mediaQueries: this.isPinned ? [] : [
+                this.$render("i-hstack", { width: "100%", height: "100%", stack: { shrink: '0' }, border: this.pinView ? { radius: "0.75rem" } : {}, overflow: "hidden", mediaQueries: this.pinView ? [] : [
                         {
                             minWidth: '768px',
                             properties: {
@@ -465,7 +472,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                             }
                         }
                     ], visible: !!data.img },
-                    this.$render("i-panel", { width: "100%", height: 0, overflow: "hidden", padding: { bottom: this.isPinned ? "50%" : "100%" }, background: { color: Theme.action.disabledBackground }, mediaQueries: [
+                    this.$render("i-panel", { width: "100%", height: 0, overflow: "hidden", padding: { bottom: this.pinView ? "50%" : "100%" }, background: { color: Theme.action.disabledBackground }, mediaQueries: [
                             {
                                 maxWidth: '767px',
                                 properties: {
@@ -477,7 +484,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                 this.$render("i-vstack", { id: "pnlCardContentBlock", justifyContent: 'space-between', gap: '0.5rem', stack: { shrink: '1', grow: '1' }, overflow: 'hidden' },
                     this.$render("i-vstack", { gap: '0.5rem' },
                         this.$render("i-label", { caption: data.title || 'Untitled', font: { size: '1.25rem', weight: 500 }, wordBreak: "break-word", lineHeight: '1.5rem' }),
-                        this.$render("i-label", { class: "entry-content", caption: data.content || '', lineClamp: this.isPinned ? 3 : 1, font: { size: "1rem" }, lineHeight: '1.5rem', visible: !!data.content })))));
+                        this.$render("i-label", { class: "entry-content", caption: data.content || '', lineClamp: this.pinView ? 3 : 1, font: { size: "1rem" }, lineHeight: '1.5rem', visible: !!data.content })))));
             this.groupAnalysis.parent = this.pnlCardContentBlock;
             this.pnlCardContentBlock.appendChild(this.groupAnalysis);
         }
@@ -495,8 +502,8 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             this.pnlGridPost.cursor = this.isActive ? 'default' : 'pointer';
             if (!this.isQuotedPost)
                 this.renderAnalytics(stats, actions);
-            this.groupAnalysis.visible = !this.isQuotedPost && !this.isPinned;
-            this.pnlSubscribe.visible = !this.isQuotedPost && !this.isPinned;
+            this.groupAnalysis.visible = !this.isQuotedPost && !this.pinView;
+            this.pnlSubscribe.visible = !this.isQuotedPost && !this.pinView;
             if (repost) {
                 let reposters = repost.displayName || repost.username || components_7.FormatUtils.truncateWalletAddress(repost.npub);
                 if (stats?.reposts > 1) {
@@ -504,7 +511,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     reposters += ` and ${others} ${others > 1 ? 'others' : 'other'}`;
                 }
                 this.pnlRepost.clearInnerHTML();
-                this.pnlRepost.append(this.$render("i-hstack", { width: "2.75rem", horizontalAlignment: 'end' },
+                this.pnlRepost.append(this.$render("i-stack", { direction: "horizontal", width: "2.75rem", justifyContent: "end" },
                     this.$render("i-icon", { width: "1rem", height: "1rem", name: "retweet", fill: Theme.text.secondary })), this.$render("i-label", { caption: reposters + " reposted", font: { size: "0.875rem", color: Theme.text.secondary }, onClick: () => this.onGoProfile(repost.npub || repost.id) }));
                 this.pnlRepost.visible = true;
             }
@@ -804,10 +811,11 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             this.limitHeight = this.getAttribute('limitHeight', true) || this.limitHeight;
             this.isReply = this.getAttribute('isReply', true) || this.isReply;
             this.isPinned = this.getAttribute('isPinned', true, false);
+            this.pinView = this.getAttribute('pinView', true, false);
             const data = this.getAttribute('data', true);
             const isActive = this.getAttribute('isActive', true, false);
             const type = this.getAttribute('type', true);
-            this.pnlGridPost.padding = this.isPinned ?
+            this.pnlGridPost.padding = this.pinView ?
                 { left: 0, right: 0, top: '1rem', bottom: '1rem' } :
                 { left: '1.25rem', right: '1.25rem', top: '1rem', bottom: '1rem' };
             if (this.disableGutters) {
@@ -827,7 +835,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                             this.$render("i-panel", { id: "pnlAvatar", grid: { area: 'avatar' } },
                                 this.$render("i-image", { id: "imgAvatar", width: '2.75rem', height: '2.75rem', display: "block", background: { color: Theme.background.main }, border: { radius: '50%' }, overflow: 'hidden', objectFit: 'cover', fallbackUrl: assets_2.default.fullPath('img/default_avatar.png'), onClick: () => this.onGoProfile() })),
                             this.$render("i-panel", { id: "pnlInfo", maxWidth: '100%', overflow: 'hidden' })),
-                        this.$render("i-hstack", { id: "pnlSubscribe", stack: { shrink: '0' }, horizontalAlignment: "end", gap: "0.5rem", visible: !this.isPinned },
+                        this.$render("i-hstack", { id: "pnlSubscribe", stack: { shrink: '0' }, horizontalAlignment: "end", gap: "0.5rem", visible: !this.pinView },
                             this.$render("i-button", { id: "btnSubscribe", minHeight: 32, padding: { left: '1rem', right: '1rem' }, background: { color: Theme.colors.primary.main }, font: { color: Theme.colors.primary.contrastText }, border: { radius: '1.875rem' }, visible: false, caption: 'Subscribe' }),
                             this.$render("i-panel", { onClick: this.onProfileShown, cursor: "pointer", class: index_css_2.hoverStyle },
                                 this.$render("i-icon", { name: "ellipsis-h", width: '1rem', height: '1rem', fill: Theme.text.secondary })))),
@@ -844,7 +852,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                         this.$render("i-hstack", { id: "btnViewMore", verticalAlignment: "center", padding: { top: '1rem' }, gap: '0.25rem', visible: false, onClick: this.onViewMore },
                             this.$render("i-label", { caption: 'Read more', font: { size: '0.9rem', color: Theme.colors.primary.main } }),
                             this.$render("i-icon", { name: "angle-down", width: 16, height: 16, fill: Theme.colors.primary.main })),
-                        this.$render("i-hstack", { id: "groupAnalysis", horizontalAlignment: "space-between", padding: { top: '0.563rem' }, width: '100%', visible: !this.isPinned }))));
+                        this.$render("i-hstack", { id: "groupAnalysis", horizontalAlignment: "space-between", padding: { top: '0.563rem' }, width: '100%', visible: !this.pinView }))));
             }
             else {
                 this.pnlGridPost.visible = true;
@@ -854,7 +862,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     this.$render("i-image", { id: "imgAvatar", width: '2.75rem', height: '2.75rem', display: "block", background: { color: Theme.background.main }, border: { radius: '50%' }, overflow: 'hidden', objectFit: 'cover', fallbackUrl: assets_2.default.fullPath('img/default_avatar.png'), onClick: () => this.onGoProfile() })));
                 this.gridPost.append(this.$render("i-hstack", { horizontalAlignment: "space-between", gap: "0.5rem", width: "100%", grid: { area: 'user' }, position: 'relative' },
                     this.$render("i-panel", { id: "pnlInfo", maxWidth: '100%', overflow: 'hidden' }),
-                    this.$render("i-hstack", { id: "pnlSubscribe", stack: { shrink: '0' }, horizontalAlignment: "end", gap: "0.5rem", visible: !this.isPinned },
+                    this.$render("i-hstack", { id: "pnlSubscribe", stack: { shrink: '0' }, horizontalAlignment: "end", gap: "0.5rem", visible: !this.pinView },
                         this.$render("i-button", { id: "btnSubscribe", minHeight: 32, padding: { left: '1rem', right: '1rem' }, background: { color: Theme.colors.primary.main }, font: { color: Theme.colors.primary.contrastText }, border: { radius: '1.875rem' }, visible: false, caption: 'Subscribe' }),
                         this.$render("i-panel", { onClick: this.onProfileShown, cursor: "pointer", class: index_css_2.hoverStyle },
                             this.$render("i-icon", { name: "ellipsis-h", width: '1rem', height: '1rem', fill: Theme.text.secondary })))));
@@ -871,7 +879,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     this.$render("i-hstack", { id: "btnViewMore", verticalAlignment: "center", padding: { top: '1rem' }, gap: '0.25rem', visible: false, onClick: this.onViewMore },
                         this.$render("i-label", { caption: 'Read more', font: { size: '0.9rem', color: Theme.colors.primary.main } }),
                         this.$render("i-icon", { name: "angle-down", width: 16, height: 16, fill: Theme.colors.primary.main })),
-                    this.$render("i-hstack", { id: "groupAnalysis", horizontalAlignment: "space-between", padding: { top: '0.563rem' }, width: '100%', visible: !this.isPinned })));
+                    this.$render("i-hstack", { id: "groupAnalysis", horizontalAlignment: "space-between", padding: { top: '0.563rem' }, width: '100%', visible: !this.pinView })));
             }
             if (data)
                 await this.setData({ data, isActive, type });
@@ -939,7 +947,11 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                             }
                         }
                     ], visible: false },
-                    this.$render("i-hstack", { id: "pnlRepost", padding: { bottom: "0.75rem" }, margin: { top: "-0.5rem" }, gap: "0.75rem", visible: false }),
+                    this.$render("i-stack", { id: "pnlPinned", direction: "horizontal", padding: { bottom: "0.75rem" }, margin: { top: "-0.5rem" }, gap: "0.75rem", visible: false },
+                        this.$render("i-stack", { direction: "horizontal", width: "2.75rem", justifyContent: "end" },
+                            this.$render("i-icon", { width: "1rem", height: "1rem", name: "thumbtack", fill: Theme.text.secondary })),
+                        this.$render("i-label", { caption: "Pinned", font: { size: "0.875rem", color: Theme.text.secondary } })),
+                    this.$render("i-stack", { id: "pnlRepost", direction: "horizontal", padding: { bottom: "0.75rem" }, margin: { top: "-0.5rem" }, gap: "0.75rem", visible: false }),
                     this.$render("i-grid-layout", { id: "gridPost", 
                         // maxHeight={"calc(100vh - 50px - 94px)"}
                         // overflow={'hidden'}

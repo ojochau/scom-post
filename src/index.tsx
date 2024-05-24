@@ -14,7 +14,8 @@ import {
     VStack,
     IconName,
     Button,
-    Markdown
+    Markdown,
+    StackLayout
 } from '@ijstech/components';
 import {
     getDuration,
@@ -48,6 +49,7 @@ interface ScomPostElement extends ControlElement {
     isReply?: boolean;
     overflowEllipse?: boolean;
     isPinned?: boolean;
+    pinView?: boolean;
 }
 
 declare global {
@@ -92,7 +94,8 @@ export class ScomPost extends Module {
     private pnlReply: VStack;
     private pnlReplies: VStack;
     private pnlGridPost: VStack;
-    private pnlRepost: HStack;
+    private pnlPinned: StackLayout;
+    private pnlRepost: StackLayout;
     private pnlCommunity: HStack;
     private gridPost: GridLayout;
     private pnlPost: Panel;
@@ -113,7 +116,8 @@ export class ScomPost extends Module {
     private isReply: boolean;
     private overflowEllipse: boolean;
     private expanded = false;
-    private isPinned: boolean;
+    private _isPinned: boolean;
+    private pinView: boolean;
 
     private _data: IPostConfig;
     private _replies: IPost[];
@@ -176,6 +180,15 @@ export class ScomPost extends Module {
 
     get isQuotedPost() {
         return this.type === 'quoted';
+    }
+    
+    get isPinned() {
+        return this._isPinned;
+    }
+
+    set isPinned(value: boolean) {
+        this._isPinned = value || false;
+        this.pnlPinned.visible = this._isPinned;
     }
 
     clear() {
@@ -263,7 +276,7 @@ export class ScomPost extends Module {
             <i-stack
                 class={cardContentStyle}
                 width={'100%'}
-                direction={this.isPinned ? "vertical" : "horizontal"}
+                direction={this.pinView ? "vertical" : "horizontal"}
                 gap='0.875rem'
                 mediaQueries={[
                     {
@@ -278,9 +291,9 @@ export class ScomPost extends Module {
                     width="100%"
                     height="100%"
                     stack={{ shrink: '0' }}
-                    border={this.isPinned ? { radius: "0.75rem" } : {}}
+                    border={this.pinView ? { radius: "0.75rem" } : {}}
                     overflow="hidden"
-                    mediaQueries={this.isPinned ? [] : [
+                    mediaQueries={this.pinView ? [] : [
                         {
                             minWidth: '768px',
                             properties: {
@@ -296,7 +309,7 @@ export class ScomPost extends Module {
                         width="100%"
                         height={0}
                         overflow="hidden"
-                        padding={{ bottom: this.isPinned ? "50%" : "100%" }}
+                        padding={{ bottom: this.pinView ? "50%" : "100%" }}
                         background={{ color: Theme.action.disabledBackground }}
                         mediaQueries={[
                             {
@@ -331,7 +344,7 @@ export class ScomPost extends Module {
                         <i-label
                             class="entry-content"
                             caption={data.content || ''}
-                            lineClamp={this.isPinned ? 3 : 1}
+                            lineClamp={this.pinView ? 3 : 1}
                             font={{ size: "1rem" }}
                             lineHeight={'1.5rem'}
                             visible={!!data.content}
@@ -359,8 +372,8 @@ export class ScomPost extends Module {
         this.pnlGridPost.cursor = this.isActive ? 'default' : 'pointer';
 
         if (!this.isQuotedPost) this.renderAnalytics(stats, actions);
-        this.groupAnalysis.visible = !this.isQuotedPost && !this.isPinned;
-        this.pnlSubscribe.visible = !this.isQuotedPost && !this.isPinned;
+        this.groupAnalysis.visible = !this.isQuotedPost && !this.pinView;
+        this.pnlSubscribe.visible = !this.isQuotedPost && !this.pinView;
 
         if (repost) {
             let reposters = repost.displayName || repost.username || FormatUtils.truncateWalletAddress(repost.npub);
@@ -370,9 +383,9 @@ export class ScomPost extends Module {
             }
             this.pnlRepost.clearInnerHTML();
             this.pnlRepost.append(
-                <i-hstack width="2.75rem" horizontalAlignment='end'>
+                <i-stack direction="horizontal" width="2.75rem" justifyContent="end">
                     <i-icon width="1rem" height="1rem" name="retweet" fill={Theme.text.secondary}></i-icon>
-                </i-hstack>,
+                </i-stack>,
                 <i-label
                     caption={reposters + " reposted"}
                     font={{ size: "0.875rem", color: Theme.text.secondary }}
@@ -723,7 +736,7 @@ export class ScomPost extends Module {
         this.pnlReply.visible = true;
         this.renderReplies();
     }
-
+ 
     private onProfileShown(target: Control, event: Event) {
         if (this.onProfileClicked) this.onProfileClicked(target, this.postData, event, this.pnlContent);
     }
@@ -764,12 +777,13 @@ export class ScomPost extends Module {
         this.limitHeight = this.getAttribute('limitHeight', true) || this.limitHeight;
         this.isReply = this.getAttribute('isReply', true) || this.isReply;
         this.isPinned = this.getAttribute('isPinned', true, false);
+        this.pinView = this.getAttribute('pinView', true, false);
 
         const data = this.getAttribute('data', true);
         const isActive = this.getAttribute('isActive', true, false);
         const type = this.getAttribute('type', true);
         
-        this.pnlGridPost.padding = this.isPinned ?
+        this.pnlGridPost.padding = this.pinView ?
             { left: 0, right: 0, top: '1rem', bottom: '1rem' } :
             { left: '1.25rem', right: '1.25rem', top: '1rem', bottom: '1rem' };
 
@@ -819,7 +833,7 @@ export class ScomPost extends Module {
                             id="pnlSubscribe" stack={{ shrink: '0' }}
                             horizontalAlignment="end"
                             gap="0.5rem"
-                            visible={!this.isPinned}
+                            visible={!this.pinView}
                         >
                             <i-button
                                 id="btnSubscribe"
@@ -903,7 +917,7 @@ export class ScomPost extends Module {
                             horizontalAlignment="space-between"
                             padding={{ top: '0.563rem' }}
                             width={'100%'}
-                            visible={!this.isPinned}
+                            visible={!this.pinView}
                         />
                     </i-vstack>
                 </i-panel>);
@@ -945,7 +959,7 @@ export class ScomPost extends Module {
                     id="pnlSubscribe" stack={{ shrink: '0' }}
                     horizontalAlignment="end"
                     gap="0.5rem"
-                    visible={!this.isPinned}
+                    visible={!this.pinView}
                 >
                     <i-button
                         id="btnSubscribe"
@@ -1029,7 +1043,7 @@ export class ScomPost extends Module {
                     horizontalAlignment="space-between"
                     padding={{ top: '0.563rem' }}
                     width={'100%'}
-                    visible={!this.isPinned}
+                    visible={!this.pinView}
                 />
             </i-vstack>)
         }
@@ -1132,7 +1146,13 @@ export class ScomPost extends Module {
                     ]}
                     visible={false}
                 >
-                    <i-hstack id="pnlRepost" padding={{ bottom: "0.75rem" }} margin={{ top: "-0.5rem" }} gap="0.75rem" visible={false}></i-hstack>
+                    <i-stack id="pnlPinned" direction="horizontal" padding={{ bottom: "0.75rem" }} margin={{ top: "-0.5rem" }} gap="0.75rem" visible={false}>
+                        <i-stack direction="horizontal" width="2.75rem" justifyContent="end">
+                            <i-icon width="1rem" height="1rem" name="thumbtack" fill={Theme.text.secondary}></i-icon>
+                        </i-stack>
+                        <i-label caption="Pinned" font={{ size: "0.875rem", color: Theme.text.secondary }}></i-label>
+                    </i-stack>
+                    <i-stack id="pnlRepost" direction="horizontal" padding={{ bottom: "0.75rem" }} margin={{ top: "-0.5rem" }} gap="0.75rem" visible={false}></i-stack>
                     <i-grid-layout
                         id="gridPost"
                         // maxHeight={"calc(100vh - 50px - 94px)"}
