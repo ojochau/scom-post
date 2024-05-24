@@ -140,6 +140,7 @@ declare module "@scom/scom-post" {
         limitHeight?: boolean;
         isReply?: boolean;
         overflowEllipse?: boolean;
+        isPinned?: boolean;
     }
     global {
         namespace JSX {
@@ -193,6 +194,7 @@ declare module "@scom/scom-post" {
         private isReply;
         private overflowEllipse;
         private expanded;
+        private isPinned;
         private _data;
         private _replies;
         onReplyClicked: callbackType;
