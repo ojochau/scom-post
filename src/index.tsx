@@ -47,6 +47,7 @@ interface ScomPostElement extends ControlElement {
     limitHeight?: boolean;
     isReply?: boolean;
     overflowEllipse?: boolean;
+    isPinned?: boolean;
 }
 
 declare global {
@@ -112,6 +113,7 @@ export class ScomPost extends Module {
     private isReply: boolean;
     private overflowEllipse: boolean;
     private expanded = false;
+    private isPinned: boolean;
 
     private _data: IPostConfig;
     private _replies: IPost[];
@@ -261,7 +263,7 @@ export class ScomPost extends Module {
             <i-stack
                 class={cardContentStyle}
                 width={'100%'}
-                direction="horizontal"
+                direction={this.isPinned ? "vertical" : "horizontal"}
                 gap='0.875rem'
                 mediaQueries={[
                     {
@@ -276,8 +278,9 @@ export class ScomPost extends Module {
                     width="100%"
                     height="100%"
                     stack={{ shrink: '0' }}
+                    border={this.isPinned ? { radius: "0.75rem" } : {}}
                     overflow="hidden"
-                    mediaQueries={[
+                    mediaQueries={this.isPinned ? [] : [
                         {
                             minWidth: '768px',
                             properties: {
@@ -293,7 +296,7 @@ export class ScomPost extends Module {
                         width="100%"
                         height={0}
                         overflow="hidden"
-                        padding={{ bottom: "100%" }}
+                        padding={{ bottom: this.isPinned ? "50%" : "100%" }}
                         background={{ color: Theme.action.disabledBackground }}
                         mediaQueries={[
                             {
@@ -328,7 +331,7 @@ export class ScomPost extends Module {
                         <i-label
                             class="entry-content"
                             caption={data.content || ''}
-                            lineClamp={1}
+                            lineClamp={this.isPinned ? 3 : 1}
                             font={{ size: "1rem" }}
                             lineHeight={'1.5rem'}
                             visible={!!data.content}
@@ -356,8 +359,8 @@ export class ScomPost extends Module {
         this.pnlGridPost.cursor = this.isActive ? 'default' : 'pointer';
 
         if (!this.isQuotedPost) this.renderAnalytics(stats, actions);
-        this.groupAnalysis.visible = !this.isQuotedPost;
-        this.pnlSubscribe.visible = !this.isQuotedPost;
+        this.groupAnalysis.visible = !this.isQuotedPost && !this.isPinned;
+        this.pnlSubscribe.visible = !this.isQuotedPost && !this.isPinned;
 
         if (repost) {
             let reposters = repost.displayName || repost.username || FormatUtils.truncateWalletAddress(repost.npub);
@@ -432,7 +435,7 @@ export class ScomPost extends Module {
         text = text.replace(/\n/gm, ' <br> ').replace(hrefRegex, (match) => {
             return ` <a href="${match}" target="_blank">${match}</a> `;
         });
-        label.caption = text;
+        label.caption = text || '';
         this.pnlContent.appendChild(label);
     }
 
@@ -760,10 +763,15 @@ export class ScomPost extends Module {
         this.disableGutters = this.getAttribute('disableGutters', true) || this.disableGutters;
         this.limitHeight = this.getAttribute('limitHeight', true) || this.limitHeight;
         this.isReply = this.getAttribute('isReply', true) || this.isReply;
+        this.isPinned = this.getAttribute('isPinned', true, false);
 
         const data = this.getAttribute('data', true);
         const isActive = this.getAttribute('isActive', true, false);
         const type = this.getAttribute('type', true);
+        
+        this.pnlGridPost.padding = this.isPinned ?
+            { left: 0, right: 0, top: '1rem', bottom: '1rem' } :
+            { left: '1.25rem', right: '1.25rem', top: '1rem', bottom: '1rem' };
 
         if (this.disableGutters) {
             this.pnlPost.visible = true;
@@ -811,6 +819,7 @@ export class ScomPost extends Module {
                             id="pnlSubscribe" stack={{ shrink: '0' }}
                             horizontalAlignment="end"
                             gap="0.5rem"
+                            visible={!this.isPinned}
                         >
                             <i-button
                                 id="btnSubscribe"
@@ -894,6 +903,7 @@ export class ScomPost extends Module {
                             horizontalAlignment="space-between"
                             padding={{ top: '0.563rem' }}
                             width={'100%'}
+                            visible={!this.isPinned}
                         />
                     </i-vstack>
                 </i-panel>);
@@ -935,6 +945,7 @@ export class ScomPost extends Module {
                     id="pnlSubscribe" stack={{ shrink: '0' }}
                     horizontalAlignment="end"
                     gap="0.5rem"
+                    visible={!this.isPinned}
                 >
                     <i-button
                         id="btnSubscribe"
@@ -1018,6 +1029,7 @@ export class ScomPost extends Module {
                     horizontalAlignment="space-between"
                     padding={{ top: '0.563rem' }}
                     width={'100%'}
+                    visible={!this.isPinned}
                 />
             </i-vstack>)
         }
