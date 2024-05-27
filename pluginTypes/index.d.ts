@@ -141,6 +141,7 @@ declare module "@scom/scom-post" {
         isReply?: boolean;
         overflowEllipse?: boolean;
         isPinned?: boolean;
+        pinView?: boolean;
     }
     global {
         namespace JSX {
@@ -173,6 +174,7 @@ declare module "@scom/scom-post" {
         private pnlReply;
         private pnlReplies;
         private pnlGridPost;
+        private pnlPinned;
         private pnlRepost;
         private pnlCommunity;
         private gridPost;
@@ -194,7 +196,8 @@ declare module "@scom/scom-post" {
         private isReply;
         private overflowEllipse;
         private expanded;
-        private isPinned;
+        private _isPinned;
+        private pinView;
         private _data;
         private _replies;
         onReplyClicked: callbackType;
@@ -215,6 +218,8 @@ declare module "@scom/scom-post" {
         getData(): IPostConfig;
         get replies(): IPost[];
         get isQuotedPost(): boolean;
+        get isPinned(): boolean;
+        set isPinned(value: boolean);
         clear(): void;
         private isMarkdown;
         private constructPostCard;
