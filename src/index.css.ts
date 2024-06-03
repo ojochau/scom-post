@@ -94,3 +94,8 @@ export const cardContentStyle = Styles.style({
     }
   }
 });
+
+export const linkPreviewImageStyle = Styles.style({
+  display: 'inline-flex',
+  aspectRatio: '16 / 9'
+});

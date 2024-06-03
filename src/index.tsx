@@ -24,11 +24,14 @@ import {
     IPostData,
     IPostStats,
     IAuthor,
-    IPostActions
+    IPostActions,
+    ILinkPreview,
+    getLinkPreview
 } from './global';
 import { getIconStyleClass, hoverStyle, ellipsisStyle, maxHeightStyle, customLinkStyle, cardContentStyle } from './index.css';
 import assets from './assets';
 import { ScomPostBubbleMenu } from './components/bubbleMenu';
+import { ScomPostLinkPreview } from './components/linkPreview';
 
 const Theme = Styles.Theme.ThemeVars;
 
@@ -450,6 +453,21 @@ export class ScomPost extends Module {
         });
         label.caption = text || '';
         this.pnlContent.appendChild(label);
+        const links = label.querySelectorAll('a');
+        for (let link of links) {
+            const regex = new RegExp(`${location.origin}/(#!/)?p/\\S+`, "g");
+            // tag mention
+            if (regex.test(link.href) && link.innerHTML.startsWith('@')) continue;
+            this.replaceLinkPreview(link.href, link.parentElement, link);
+        }
+    }
+    
+    private async replaceLinkPreview(url: string, parent: HTMLElement, linkElm: HTMLAnchorElement) {
+        const preview: ILinkPreview = await getLinkPreview(url);
+        if (!preview) return;
+        const linkPreview = new ScomPostLinkPreview();
+        parent.replaceChild(linkPreview, linkElm);
+        linkPreview.data = preview;
     }
 
     private addQuotedPost(post: IPost) {

@@ -93,7 +93,7 @@ define("@scom/scom-post/global/utils.ts", ["require", "exports", "@ijstech/compo
 define("@scom/scom-post/global/index.ts", ["require", "exports", "@ijstech/components", "@scom/scom-post/global/utils.ts", "@scom/scom-post/global/interface.ts"], function (require, exports, components_2, utils_1, interface_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getEmbedElement = exports.MAX_HEIGHT = void 0;
+    exports.getLinkPreview = exports.getEmbedElement = exports.MAX_HEIGHT = void 0;
     __exportStar(utils_1, exports);
     __exportStar(interface_1, exports);
     exports.MAX_HEIGHT = 352;
@@ -120,11 +120,26 @@ define("@scom/scom-post/global/index.ts", ["require", "exports", "@ijstech/compo
         return elm;
     };
     exports.getEmbedElement = getEmbedElement;
+    const getLinkPreview = async (url) => {
+        try {
+            const NOSTR_V0L_API_BASE = 'https://nostr.api.v0l.io/';
+            const response = await fetch(`${NOSTR_V0L_API_BASE}api/v1/preview?url=${encodeURI(url)}`);
+            const result = await response.json();
+            return {
+                url,
+                title: result.title,
+                description: result.description,
+                image: result.image
+            };
+        }
+        catch (err) { }
+    };
+    exports.getLinkPreview = getLinkPreview;
 });
 define("@scom/scom-post/index.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.cardContentStyle = exports.customLinkStyle = exports.maxHeightStyle = exports.ellipsisStyle = exports.hoverStyle = exports.getIconStyleClass = void 0;
+    exports.linkPreviewImageStyle = exports.cardContentStyle = exports.customLinkStyle = exports.maxHeightStyle = exports.ellipsisStyle = exports.hoverStyle = exports.getIconStyleClass = void 0;
     const Theme = components_3.Styles.Theme.ThemeVars;
     const getIconStyleClass = (color) => {
         const styleObj = {
@@ -214,6 +229,10 @@ define("@scom/scom-post/index.css.ts", ["require", "exports", "@ijstech/componen
                 }
             }
         }
+    });
+    exports.linkPreviewImageStyle = components_3.Styles.style({
+        display: 'inline-flex',
+        aspectRatio: '16 / 9'
     });
 });
 define("@scom/scom-post/assets.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_4) {
@@ -317,12 +336,53 @@ define("@scom/scom-post/components/bubbleMenu.tsx", ["require", "exports", "@ijs
     ], ScomPostBubbleMenu);
     exports.ScomPostBubbleMenu = ScomPostBubbleMenu;
 });
-define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/scom-post/global/index.ts", "@scom/scom-post/index.css.ts", "@scom/scom-post/assets.ts", "@scom/scom-post/components/bubbleMenu.tsx"], function (require, exports, components_7, global_1, index_css_2, assets_2, bubbleMenu_1) {
+define("@scom/scom-post/components/linkPreview.tsx", ["require", "exports", "@ijstech/components", "@scom/scom-post/index.css.ts"], function (require, exports, components_7, index_css_2) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.ScomPostLinkPreview = void 0;
+    const Theme = components_7.Styles.Theme.ThemeVars;
+    let ScomPostLinkPreview = class ScomPostLinkPreview extends components_7.Module {
+        set data(value) {
+            this._data = value;
+            this.imgPreview.url = value.image || '';
+            this.imgPreview.visible = !!value.image;
+            this.lblTitle.caption = value.title || '';
+            this.lblDesc.caption = value.description || '';
+            this.lblDesc.visible = !!value.description;
+            this.lblDomain.caption = value.url ? this.getDomain(value.url) : '';
+            this.lblDomain.visible = !!value.url;
+        }
+        getDomain(url) {
+            try {
+                return new URL(url.toLowerCase()).hostname;
+            }
+            catch (err) {
+                return url;
+            }
+        }
+        handleLinkPreviewClick() {
+            window.open(this._data.url, '_blank');
+        }
+        render() {
+            return (this.$render("i-panel", { width: "100%", background: { color: Theme.background.paper }, border: { radius: '0.75rem' }, overflow: "hidden", cursor: "pointer", onClick: this.handleLinkPreviewClick },
+                this.$render("i-image", { id: "imgPreview", class: index_css_2.linkPreviewImageStyle, width: "100%", maxHeight: 300, objectFit: "cover", overflow: "hidden", visible: false }),
+                this.$render("i-stack", { direction: "vertical", padding: { top: '0.75rem', bottom: '0.75rem', left: '0.75rem', right: '0.75rem' }, background: { color: Theme.background.paper } },
+                    this.$render("i-label", { id: "lblTitle", font: { size: '1rem', color: Theme.text.primary, weight: 600 }, lineHeight: "1.75rem" }),
+                    this.$render("i-label", { id: "lblDesc", lineClamp: 2, font: { size: '0.875rem', color: Theme.text.secondary }, lineHeight: "1.25rem" }),
+                    this.$render("i-label", { id: "lblDomain", font: { size: '0.75rem', color: Theme.text.secondary }, lineHeight: "1.25rem" }))));
+        }
+    };
+    ScomPostLinkPreview = __decorate([
+        (0, components_7.customElements)('i-scom-post-link-preview')
+    ], ScomPostLinkPreview);
+    exports.ScomPostLinkPreview = ScomPostLinkPreview;
+});
+define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/scom-post/global/index.ts", "@scom/scom-post/index.css.ts", "@scom/scom-post/assets.ts", "@scom/scom-post/components/bubbleMenu.tsx", "@scom/scom-post/components/linkPreview.tsx"], function (require, exports, components_8, global_1, index_css_3, assets_2, bubbleMenu_1, linkPreview_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ScomPost = void 0;
-    const Theme = components_7.Styles.Theme.ThemeVars;
-    let ScomPost = class ScomPost extends components_7.Module {
+    const Theme = components_8.Styles.Theme.ThemeVars;
+    let ScomPost = class ScomPost extends components_8.Module {
         constructor(parent, options) {
             super(parent, options);
             this.expanded = false;
@@ -454,7 +514,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             return data;
         }
         renderCardContent(data) {
-            this.pnlContent.appendChild(this.$render("i-stack", { class: index_css_2.cardContentStyle, width: '100%', direction: this.pinView ? "vertical" : "horizontal", gap: '0.875rem', mediaQueries: [
+            this.pnlContent.appendChild(this.$render("i-stack", { class: index_css_3.cardContentStyle, width: '100%', direction: this.pinView ? "vertical" : "horizontal", gap: '0.875rem', mediaQueries: [
                     {
                         maxWidth: '767px',
                         properties: {
@@ -505,7 +565,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             this.groupAnalysis.visible = !this.isQuotedPost && !this.pinView;
             this.pnlSubscribe.visible = !this.isQuotedPost && !this.pinView;
             if (repost) {
-                let reposters = repost.displayName || repost.username || components_7.FormatUtils.truncateWalletAddress(repost.npub);
+                let reposters = repost.displayName || repost.username || components_8.FormatUtils.truncateWalletAddress(repost.npub);
                 if (stats?.reposts > 1) {
                     const others = stats.reposts - 1;
                     reposters += ` and ${others} ${others > 1 ? 'others' : 'other'}`;
@@ -531,7 +591,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     templateAreas.splice(1, 1);
                 this.gridPost.templateAreas = templateAreas;
                 this.overflowEllipse = false;
-                this.classList.remove(index_css_2.maxHeightStyle);
+                this.classList.remove(index_css_3.maxHeightStyle);
                 let data = await this.constructPostCard();
                 this.renderCardContent(data);
             }
@@ -557,13 +617,29 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             }
         }
         appendLabel(text) {
-            const label = this.$render("i-label", { width: '100%', overflowWrap: "anywhere", class: index_css_2.customLinkStyle, lineHeight: "1.3125rem" });
+            const label = this.$render("i-label", { width: '100%', overflowWrap: "anywhere", class: index_css_3.customLinkStyle, lineHeight: "1.3125rem" });
             const hrefRegex = /https?:\/\/\S+/g;
             text = text.replace(/\n/gm, ' <br> ').replace(hrefRegex, (match) => {
                 return ` <a href="${match}" target="_blank">${match}</a> `;
             });
             label.caption = text || '';
             this.pnlContent.appendChild(label);
+            const links = label.querySelectorAll('a');
+            for (let link of links) {
+                const regex = new RegExp(`${location.origin}/(#!/)?p/\\S+`, "g");
+                // tag mention
+                if (regex.test(link.href) && link.innerHTML.startsWith('@'))
+                    continue;
+                this.replaceLinkPreview(link.href, link.parentElement, link);
+            }
+        }
+        async replaceLinkPreview(url, parent, linkElm) {
+            const preview = await (0, global_1.getLinkPreview)(url);
+            if (!preview)
+                return;
+            const linkPreview = new linkPreview_1.ScomPostLinkPreview();
+            parent.replaceChild(linkPreview, linkElm);
+            linkPreview.data = preview;
         }
         addQuotedPost(post) {
             const postEl = (this.$render("i-scom-post", { type: "quoted", data: post, display: "block", border: { radius: '0.5rem', width: '1px', style: 'solid', color: Theme.colors.secondary.dark } }));
@@ -691,9 +767,9 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             ];
             this.groupAnalysis.clearInnerHTML();
             for (let item of dataList) {
-                const value = components_7.FormatUtils.formatNumber(item.value, { shortScale: true, decimalFigures: 0 });
+                const value = components_8.FormatUtils.formatNumber(item.value, { shortScale: true, decimalFigures: 0 });
                 const lblValue = (this.$render("i-label", { caption: value, font: { color: Theme.colors.secondary.light, size: '0.8125rem' }, tag: item.value }));
-                let itemEl = (this.$render("i-hstack", { verticalAlignment: "center", gap: '0.5rem', tooltip: { content: value, placement: 'bottomLeft' }, cursor: 'pointer', class: (0, index_css_2.getIconStyleClass)(item.hoveredColor), padding: { top: '0.25rem', bottom: '0.25rem' } },
+                let itemEl = (this.$render("i-hstack", { verticalAlignment: "center", gap: '0.5rem', tooltip: { content: value, placement: 'bottomLeft' }, cursor: 'pointer', class: (0, index_css_3.getIconStyleClass)(item.hoveredColor), padding: { top: '0.25rem', bottom: '0.25rem' } },
                     this.$render("i-icon", { width: '1rem', height: '1rem', fill: Theme.text.secondary, name: item.icon.name }),
                     lblValue));
                 if (item.highlighted)
@@ -705,7 +781,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                         success = await item.onClick(itemEl, event);
                     if (success && (item.name === 'Like' || item.name === 'Repost')) {
                         const newValue = (lblValue.tag ?? 0) + 1;
-                        lblValue.caption = components_7.FormatUtils.formatNumber(newValue, { shortScale: true, decimalFigures: 0 });
+                        lblValue.caption = components_8.FormatUtils.formatNumber(newValue, { shortScale: true, decimalFigures: 0 });
                         lblValue.tag = newValue;
                         itemEl.classList.add('highlighted');
                     }
@@ -837,7 +913,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                             this.$render("i-panel", { id: "pnlInfo", maxWidth: '100%', overflow: 'hidden' })),
                         this.$render("i-hstack", { id: "pnlSubscribe", stack: { shrink: '0' }, horizontalAlignment: "end", gap: "0.5rem", visible: !this.pinView },
                             this.$render("i-button", { id: "btnSubscribe", minHeight: 32, padding: { left: '1rem', right: '1rem' }, background: { color: Theme.colors.primary.main }, font: { color: Theme.colors.primary.contrastText }, border: { radius: '1.875rem' }, visible: false, caption: 'Subscribe' }),
-                            this.$render("i-panel", { onClick: this.onProfileShown, cursor: "pointer", class: index_css_2.hoverStyle },
+                            this.$render("i-panel", { onClick: this.onProfileShown, cursor: "pointer", class: index_css_3.hoverStyle },
                                 this.$render("i-icon", { name: "ellipsis-h", width: '1rem', height: '1rem', fill: Theme.text.secondary })))),
                     this.$render("i-hstack", { id: "pnlReplyPath", verticalAlignment: "center", gap: "0.25rem", visible: false, grid: { area: 'path' }, margin: { top: '0.5rem' } },
                         this.$render("i-label", { caption: 'replying to', font: { size: '0.875rem', color: Theme.colors.secondary.light } }),
@@ -864,7 +940,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     this.$render("i-panel", { id: "pnlInfo", maxWidth: '100%', overflow: 'hidden' }),
                     this.$render("i-hstack", { id: "pnlSubscribe", stack: { shrink: '0' }, horizontalAlignment: "end", gap: "0.5rem", visible: !this.pinView },
                         this.$render("i-button", { id: "btnSubscribe", minHeight: 32, padding: { left: '1rem', right: '1rem' }, background: { color: Theme.colors.primary.main }, font: { color: Theme.colors.primary.contrastText }, border: { radius: '1.875rem' }, visible: false, caption: 'Subscribe' }),
-                        this.$render("i-panel", { onClick: this.onProfileShown, cursor: "pointer", class: index_css_2.hoverStyle },
+                        this.$render("i-panel", { onClick: this.onProfileShown, cursor: "pointer", class: index_css_3.hoverStyle },
                             this.$render("i-icon", { name: "ellipsis-h", width: '1rem', height: '1rem', fill: Theme.text.secondary })))));
                 this.gridPost.append(this.$render("i-hstack", { id: "pnlReplyPath", verticalAlignment: "center", gap: "0.25rem", visible: false, grid: { area: 'path' }, margin: { top: '0.5rem' } },
                     this.$render("i-label", { caption: 'replying to', font: { size: '0.875rem', color: Theme.colors.secondary.light } }),
@@ -888,7 +964,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             }
             if (this.overflowEllipse) {
                 if ((this.isReply || this.limitHeight)) {
-                    this.classList.add(index_css_2.maxHeightStyle);
+                    this.classList.add(index_css_3.maxHeightStyle);
                 }
                 // if(this.isReply) {
                 //     this.showMoreWrapper.height = '100%';
@@ -932,7 +1008,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         handleShowMoreClick() {
             this.showMoreWrapper.visible = false;
             this.expanded = true;
-            this.classList.remove(index_css_2.maxHeightStyle);
+            this.classList.remove(index_css_3.maxHeightStyle);
         }
         onHide() {
             this.removeEventListener("mouseup", this.showBubbleMenu);
@@ -968,7 +1044,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         }
     };
     ScomPost = __decorate([
-        (0, components_7.customElements)('i-scom-post')
+        (0, components_8.customElements)('i-scom-post')
     ], ScomPost);
     exports.ScomPost = ScomPost;
 });

@@ -42,3 +42,9 @@ export interface ICommunity {
 	creatorId?: string;
 	communityId?: string;
 }
+export interface ILinkPreview {
+  url: string;
+  title?: string;
+  description?: string;
+  image?: string;
+}
