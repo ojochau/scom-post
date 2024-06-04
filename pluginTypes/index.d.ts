@@ -75,7 +75,7 @@ declare module "@scom/scom-post/global/index.ts" {
     export * from "@scom/scom-post/global/interface.ts";
     export const MAX_HEIGHT = 352;
     export const getEmbedElement: (postData: IPostData, parent: Control, callback?: any) => Promise<any>;
-    export const getLinkPreview: (url: string) => Promise<ILinkPreview | undefined>;
+    export const getLinkPreview: (apiBaseUrl: string, url: string) => Promise<ILinkPreview | undefined>;
 }
 /// <amd-module name="@scom/scom-post/index.css.ts" />
 declare module "@scom/scom-post/index.css.ts" {
@@ -176,6 +176,7 @@ declare module "@scom/scom-post" {
         overflowEllipse?: boolean;
         isPinned?: boolean;
         pinView?: boolean;
+        apiBaseUrl?: string;
     }
     global {
         namespace JSX {
@@ -232,6 +233,7 @@ declare module "@scom/scom-post" {
         private expanded;
         private _isPinned;
         private pinView;
+        private _apiBaseUrl;
         private _data;
         private _replies;
         onReplyClicked: callbackType;
@@ -254,6 +256,8 @@ declare module "@scom/scom-post" {
         get isQuotedPost(): boolean;
         get isPinned(): boolean;
         set isPinned(value: boolean);
+        get apiBaseUrl(): string;
+        set apiBaseUrl(value: string);
         clear(): void;
         private isMarkdown;
         private constructPostCard;

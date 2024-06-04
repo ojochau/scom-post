@@ -62,6 +62,7 @@ export class ScomPostLinkPreview extends Module {
             <i-panel
                 width="100%"
                 background={{ color: Theme.background.paper }}
+                margin={{ top: '0.5rem' }}
                 border={{ radius: '0.75rem' }}
                 overflow="hidden"
                 cursor="pointer"

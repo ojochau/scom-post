@@ -120,10 +120,11 @@ define("@scom/scom-post/global/index.ts", ["require", "exports", "@ijstech/compo
         return elm;
     };
     exports.getEmbedElement = getEmbedElement;
-    const getLinkPreview = async (url) => {
+    const getLinkPreview = async (apiBaseUrl, url) => {
         try {
-            const NOSTR_V0L_API_BASE = 'https://nostr.api.v0l.io/';
-            const response = await fetch(`${NOSTR_V0L_API_BASE}api/v1/preview?url=${encodeURI(url)}`);
+            if (!apiBaseUrl.endsWith('/'))
+                apiBaseUrl += '/';
+            const response = await fetch(`${apiBaseUrl}preview?url=${encodeURI(url)}`);
             const result = await response.json();
             return {
                 url,
@@ -364,7 +365,7 @@ define("@scom/scom-post/components/linkPreview.tsx", ["require", "exports", "@ij
             window.open(this._data.url, '_blank');
         }
         render() {
-            return (this.$render("i-panel", { width: "100%", background: { color: Theme.background.paper }, border: { radius: '0.75rem' }, overflow: "hidden", cursor: "pointer", onClick: this.handleLinkPreviewClick },
+            return (this.$render("i-panel", { width: "100%", background: { color: Theme.background.paper }, margin: { top: '0.5rem' }, border: { radius: '0.75rem' }, overflow: "hidden", cursor: "pointer", onClick: this.handleLinkPreviewClick },
                 this.$render("i-image", { id: "imgPreview", class: index_css_2.linkPreviewImageStyle, width: "100%", maxHeight: 300, objectFit: "cover", overflow: "hidden", visible: false }),
                 this.$render("i-stack", { direction: "vertical", padding: { top: '0.75rem', bottom: '0.75rem', left: '0.75rem', right: '0.75rem' }, background: { color: Theme.background.paper } },
                     this.$render("i-label", { id: "lblTitle", font: { size: '1rem', color: Theme.text.primary, weight: 600 }, lineHeight: "1.75rem" }),
@@ -432,6 +433,12 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         set isPinned(value) {
             this._isPinned = value || false;
             this.pnlPinned.visible = this._isPinned;
+        }
+        get apiBaseUrl() {
+            return this._apiBaseUrl;
+        }
+        set apiBaseUrl(value) {
+            this._apiBaseUrl = value;
         }
         clear() {
             if (this.pnlOverlay)
@@ -624,17 +631,20 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             });
             label.caption = text || '';
             this.pnlContent.appendChild(label);
-            const links = label.querySelectorAll('a');
-            for (let link of links) {
-                const regex = new RegExp(`${location.origin}/(#!/)?p/\\S+`, "g");
-                // tag mention
-                if (regex.test(link.href) && link.innerHTML.startsWith('@'))
-                    continue;
-                this.replaceLinkPreview(link.href, link.parentElement, link);
+            if (this.apiBaseUrl) {
+                const links = label.querySelectorAll('a');
+                for (let link of links) {
+                    const regex = new RegExp(`${location.origin}/(#!/)?(p|e)/\\S+`, "g");
+                    let match = regex.exec(link.href);
+                    // tag mention
+                    if (match && (match[2] !== 'p' || link.innerHTML.startsWith('@')))
+                        continue;
+                    this.replaceLinkPreview(link.href, link.parentElement, link);
+                }
             }
         }
         async replaceLinkPreview(url, parent, linkElm) {
-            const preview = await (0, global_1.getLinkPreview)(url);
+            const preview = await (0, global_1.getLinkPreview)(this.apiBaseUrl, url);
             if (!preview)
                 return;
             const linkPreview = new linkPreview_1.ScomPostLinkPreview();
@@ -642,7 +652,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             linkPreview.data = preview;
         }
         addQuotedPost(post) {
-            const postEl = (this.$render("i-scom-post", { type: "quoted", data: post, display: "block", border: { radius: '0.5rem', width: '1px', style: 'solid', color: Theme.colors.secondary.dark } }));
+            const postEl = (this.$render("i-scom-post", { type: "quoted", data: post, display: "block", border: { radius: '0.5rem', width: '1px', style: 'solid', color: Theme.colors.secondary.dark }, apiBaseUrl: this.apiBaseUrl }));
             postEl.onClick = this.onQuotedPostClicked;
             postEl.onQuotedPostClicked = this.onQuotedPostClicked;
             this.pnlQuoted.append(postEl);
@@ -816,7 +826,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             }
         }
         renderReply(reply, isPrepend) {
-            const childElm = this.$render("i-scom-post", { overflowEllipse: true, border: { top: { width: 1, style: 'solid', color: 'rgb(47, 51, 54)' } } });
+            const childElm = this.$render("i-scom-post", { overflowEllipse: true, border: { top: { width: 1, style: 'solid', color: 'rgb(47, 51, 54)' } }, apiBaseUrl: this.apiBaseUrl });
             childElm.onReplyClicked = this.onReplyClicked;
             childElm.onZapClicked = this.onZapClicked;
             childElm.onLikeClicked = this.onLikeClicked;
@@ -888,6 +898,9 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             this.isReply = this.getAttribute('isReply', true) || this.isReply;
             this.isPinned = this.getAttribute('isPinned', true, false);
             this.pinView = this.getAttribute('pinView', true, false);
+            const apiBaseUrl = this.getAttribute('apiBaseUrl', true);
+            if (apiBaseUrl)
+                this.apiBaseUrl = apiBaseUrl;
             const data = this.getAttribute('data', true);
             const isActive = this.getAttribute('isActive', true, false);
             const type = this.getAttribute('type', true);
