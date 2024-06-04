@@ -44,6 +44,12 @@ declare module "@scom/scom-post/global/interface.ts" {
         creatorId?: string;
         communityId?: string;
     }
+    export interface ILinkPreview {
+        url: string;
+        title?: string;
+        description?: string;
+        image?: string;
+    }
 }
 /// <amd-module name="@scom/scom-post/store/index.ts" />
 declare module "@scom/scom-post/store/index.ts" {
@@ -64,11 +70,12 @@ declare module "@scom/scom-post/global/utils.ts" {
 /// <amd-module name="@scom/scom-post/global/index.ts" />
 declare module "@scom/scom-post/global/index.ts" {
     import { Control } from '@ijstech/components';
-    import { IPostData } from "@scom/scom-post/global/interface.ts";
+    import { ILinkPreview, IPostData } from "@scom/scom-post/global/interface.ts";
     export * from "@scom/scom-post/global/utils.ts";
     export * from "@scom/scom-post/global/interface.ts";
     export const MAX_HEIGHT = 352;
     export const getEmbedElement: (postData: IPostData, parent: Control, callback?: any) => Promise<any>;
+    export const getLinkPreview: (url: string) => Promise<ILinkPreview | undefined>;
 }
 /// <amd-module name="@scom/scom-post/index.css.ts" />
 declare module "@scom/scom-post/index.css.ts" {
@@ -78,6 +85,7 @@ declare module "@scom/scom-post/index.css.ts" {
     export const maxHeightStyle: string;
     export const customLinkStyle: string;
     export const cardContentStyle: string;
+    export const linkPreviewImageStyle: string;
 }
 /// <amd-module name="@scom/scom-post/assets.ts" />
 declare module "@scom/scom-post/assets.ts" {
@@ -119,6 +127,32 @@ declare module "@scom/scom-post/components/bubbleMenu.tsx" {
         renderUI(): void;
         init(): void;
         render(): void;
+    }
+}
+/// <amd-module name="@scom/scom-post/components/linkPreview.tsx" />
+declare module "@scom/scom-post/components/linkPreview.tsx" {
+    import { ControlElement, Module } from '@ijstech/components';
+    import { ILinkPreview } from "@scom/scom-post/global/index.ts";
+    interface ScomPostLinkPreviewElement extends ControlElement {
+        data?: ILinkPreview;
+    }
+    global {
+        namespace JSX {
+            interface IntrinsicElements {
+                ['i-scom-post--link-preview']: ScomPostLinkPreviewElement;
+            }
+        }
+    }
+    export class ScomPostLinkPreview extends Module {
+        private imgPreview;
+        private lblTitle;
+        private lblDesc;
+        private lblDomain;
+        private _data;
+        set data(value: ILinkPreview);
+        private getDomain;
+        private handleLinkPreviewClick;
+        render(): any;
     }
 }
 /// <amd-module name="@scom/scom-post" />
@@ -226,6 +260,7 @@ declare module "@scom/scom-post" {
         private renderCardContent;
         private renderUI;
         private appendLabel;
+        private replaceLinkPreview;
         private addQuotedPost;
         private renderInfo;
         private renderPostType;

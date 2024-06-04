@@ -1,5 +1,5 @@
 import { Control, application } from '@ijstech/components';
-import { IPostData } from './interface';
+import { ILinkPreview, IPostData } from './interface';
 
 export * from './utils';
 export * from './interface';
@@ -26,3 +26,16 @@ export const getEmbedElement = async (postData: IPostData, parent: Control, call
   return elm;
 }
 
+export const getLinkPreview = async (url: string): Promise<ILinkPreview | undefined> => {
+  try {
+    const NOSTR_V0L_API_BASE = 'https://nostr.api.v0l.io/';
+    const response = await fetch(`${NOSTR_V0L_API_BASE}api/v1/preview?url=${encodeURI(url)}`);
+    const result = await response.json();
+    return {
+      url,
+      title: result.title,
+      description: result.description,
+      image: result.image
+    }
+  } catch (err) {}
+}
