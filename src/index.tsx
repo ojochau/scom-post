@@ -53,6 +53,7 @@ interface ScomPostElement extends ControlElement {
     overflowEllipse?: boolean;
     isPinned?: boolean;
     pinView?: boolean;
+    apiBaseUrl?: string;
 }
 
 declare global {
@@ -121,6 +122,7 @@ export class ScomPost extends Module {
     private expanded = false;
     private _isPinned: boolean;
     private pinView: boolean;
+    private _apiBaseUrl: string;
 
     private _data: IPostConfig;
     private _replies: IPost[];
@@ -192,6 +194,14 @@ export class ScomPost extends Module {
     set isPinned(value: boolean) {
         this._isPinned = value || false;
         this.pnlPinned.visible = this._isPinned;
+    }
+
+    get apiBaseUrl() {
+        return this._apiBaseUrl;
+    }
+
+    set apiBaseUrl(value: string) {
+        this._apiBaseUrl = value;
     }
 
     clear() {
@@ -453,18 +463,20 @@ export class ScomPost extends Module {
         });
         label.caption = text || '';
         this.pnlContent.appendChild(label);
-        const links = label.querySelectorAll('a');
-        for (let link of links) {
-            const regex = new RegExp(`${location.origin}/(#!/)?(p|e)/\\S+`, "g");
-            let match = regex.exec(link.href);
-            // tag mention
-            if (match && (match[2] !== 'p' || link.innerHTML.startsWith('@'))) continue;
-            this.replaceLinkPreview(link.href, link.parentElement, link);
+        if (this.apiBaseUrl) {
+            const links = label.querySelectorAll('a');
+            for (let link of links) {
+                const regex = new RegExp(`${location.origin}/(#!/)?(p|e)/\\S+`, "g");
+                let match = regex.exec(link.href);
+                // tag mention
+                if (match && (match[2] !== 'p' || link.innerHTML.startsWith('@'))) continue;
+                this.replaceLinkPreview(link.href, link.parentElement, link);
+            }
         }
     }
     
     private async replaceLinkPreview(url: string, parent: HTMLElement, linkElm: HTMLAnchorElement) {
-        const preview: ILinkPreview = await getLinkPreview(url);
+        const preview: ILinkPreview = await getLinkPreview(this.apiBaseUrl, url);
         if (!preview) return;
         const linkPreview = new ScomPostLinkPreview();
         parent.replaceChild(linkPreview, linkElm);
@@ -478,6 +490,7 @@ export class ScomPost extends Module {
                 data={post}
                 display="block"
                 border={{ radius: '0.5rem', width: '1px', style: 'solid', color: Theme.colors.secondary.dark }}
+                apiBaseUrl={this.apiBaseUrl}
             // overflowEllipse={true}
             // limitHeight={true}
             ></i-scom-post>
@@ -713,7 +726,7 @@ export class ScomPost extends Module {
     }
 
     private renderReply(reply: IPost, isPrepend?: boolean) {
-        const childElm = <i-scom-post overflowEllipse={true} border={{top: { width: 1, style: 'solid', color: 'rgb(47, 51, 54)'}}}/> as ScomPost;
+        const childElm = <i-scom-post overflowEllipse={true} border={{top: { width: 1, style: 'solid', color: 'rgb(47, 51, 54)'}}} apiBaseUrl={this.apiBaseUrl}/> as ScomPost;
         childElm.onReplyClicked = this.onReplyClicked;
         childElm.onZapClicked = this.onZapClicked;
         childElm.onLikeClicked = this.onLikeClicked;
@@ -797,6 +810,8 @@ export class ScomPost extends Module {
         this.isReply = this.getAttribute('isReply', true) || this.isReply;
         this.isPinned = this.getAttribute('isPinned', true, false);
         this.pinView = this.getAttribute('pinView', true, false);
+        const apiBaseUrl = this.getAttribute('apiBaseUrl', true);
+        if (apiBaseUrl) this.apiBaseUrl = apiBaseUrl;
 
         const data = this.getAttribute('data', true);
         const isActive = this.getAttribute('isActive', true, false);
