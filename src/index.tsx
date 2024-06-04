@@ -455,9 +455,10 @@ export class ScomPost extends Module {
         this.pnlContent.appendChild(label);
         const links = label.querySelectorAll('a');
         for (let link of links) {
-            const regex = new RegExp(`${location.origin}/(#!/)?p/\\S+`, "g");
+            const regex = new RegExp(`${location.origin}/(#!/)?(p|e)/\\S+`, "g");
+            let match = regex.exec(link.href);
             // tag mention
-            if (regex.test(link.href) && link.innerHTML.startsWith('@')) continue;
+            if (match && (match[2] !== 'p' || link.innerHTML.startsWith('@'))) continue;
             this.replaceLinkPreview(link.href, link.parentElement, link);
         }
     }

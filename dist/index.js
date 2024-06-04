@@ -364,7 +364,7 @@ define("@scom/scom-post/components/linkPreview.tsx", ["require", "exports", "@ij
             window.open(this._data.url, '_blank');
         }
         render() {
-            return (this.$render("i-panel", { width: "100%", background: { color: Theme.background.paper }, border: { radius: '0.75rem' }, overflow: "hidden", cursor: "pointer", onClick: this.handleLinkPreviewClick },
+            return (this.$render("i-panel", { width: "100%", background: { color: Theme.background.paper }, margin: { top: '0.5rem' }, border: { radius: '0.75rem' }, overflow: "hidden", cursor: "pointer", onClick: this.handleLinkPreviewClick },
                 this.$render("i-image", { id: "imgPreview", class: index_css_2.linkPreviewImageStyle, width: "100%", maxHeight: 300, objectFit: "cover", overflow: "hidden", visible: false }),
                 this.$render("i-stack", { direction: "vertical", padding: { top: '0.75rem', bottom: '0.75rem', left: '0.75rem', right: '0.75rem' }, background: { color: Theme.background.paper } },
                     this.$render("i-label", { id: "lblTitle", font: { size: '1rem', color: Theme.text.primary, weight: 600 }, lineHeight: "1.75rem" }),
@@ -626,9 +626,10 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             this.pnlContent.appendChild(label);
             const links = label.querySelectorAll('a');
             for (let link of links) {
-                const regex = new RegExp(`${location.origin}/(#!/)?p/\\S+`, "g");
+                const regex = new RegExp(`${location.origin}/(#!/)?(p|e)/\\S+`, "g");
+                let match = regex.exec(link.href);
                 // tag mention
-                if (regex.test(link.href) && link.innerHTML.startsWith('@'))
+                if (match && (match[2] !== 'p' || link.innerHTML.startsWith('@')))
                     continue;
                 this.replaceLinkPreview(link.href, link.parentElement, link);
             }
