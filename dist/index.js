@@ -645,7 +645,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         }
         async replaceLinkPreview(url, parent, linkElm) {
             const preview = await (0, global_1.getLinkPreview)(this.apiBaseUrl, url);
-            if (!preview)
+            if (!preview || !preview.title)
                 return;
             const linkPreview = new linkPreview_1.ScomPostLinkPreview();
             parent.replaceChild(linkPreview, linkElm);
