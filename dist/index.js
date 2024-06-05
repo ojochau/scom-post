@@ -77,6 +77,8 @@ define("@scom/scom-post/global/utils.ts", ["require", "exports", "@ijstech/compo
         const endDate = (0, components_1.moment)(new Date());
         let duration = components_1.moment.duration(endDate.diff(startDate));
         let days = duration.asDays();
+        if (startDate.year() !== endDate.year())
+            return startDate.format('MMM DD, YYYY');
         if (days >= 1)
             return startDate.format('MMM DD');
         let hours = duration.asHours();

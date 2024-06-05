@@ -26,6 +26,7 @@ const getDuration = (date: Date|string) => {
   const endDate = moment(new Date());
   let duration = moment.duration(endDate.diff(startDate));
   let days = duration.asDays();
+  if (startDate.year() !== endDate.year()) return startDate.format('MMM DD, YYYY');
   if (days >= 1) return startDate.format('MMM DD');
   let hours = duration.asHours();
   if (hours >= 1) return `${formatNumber(hours, 0)}h`;
