@@ -77,6 +77,8 @@ define("@scom/scom-post/global/utils.ts", ["require", "exports", "@ijstech/compo
         const endDate = (0, components_1.moment)(new Date());
         let duration = components_1.moment.duration(endDate.diff(startDate));
         let days = duration.asDays();
+        if (startDate.year() !== endDate.year())
+            return startDate.format('MMM DD, YYYY');
         if (days >= 1)
             return startDate.format('MMM DD');
         let hours = duration.asHours();
@@ -645,7 +647,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         }
         async replaceLinkPreview(url, parent, linkElm) {
             const preview = await (0, global_1.getLinkPreview)(this.apiBaseUrl, url);
-            if (!preview)
+            if (!preview || !preview.title)
                 return;
             const linkPreview = new linkPreview_1.ScomPostLinkPreview();
             parent.replaceChild(linkPreview, linkElm);

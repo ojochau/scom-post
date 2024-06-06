@@ -477,7 +477,7 @@ export class ScomPost extends Module {
     
     private async replaceLinkPreview(url: string, parent: HTMLElement, linkElm: HTMLAnchorElement) {
         const preview: ILinkPreview = await getLinkPreview(this.apiBaseUrl, url);
-        if (!preview) return;
+        if (!preview || !preview.title) return;
         const linkPreview = new ScomPostLinkPreview();
         parent.replaceChild(linkPreview, linkElm);
         linkPreview.data = preview;
