@@ -28,7 +28,7 @@ import {
     ILinkPreview,
     getLinkPreview
 } from './global';
-import { getIconStyleClass, hoverStyle, ellipsisStyle, maxHeightStyle, customLinkStyle, cardContentStyle } from './index.css';
+import { getIconStyleClass, hoverStyle, ellipsisStyle, maxHeightStyle, customLinkStyle, cardContentStyle, labelHoverStyle } from './index.css';
 import assets from './assets';
 import { ScomPostBubbleMenu } from './components/bubbleMenu';
 import { ScomPostLinkPreview } from './components/linkPreview';
@@ -415,8 +415,10 @@ export class ScomPost extends Module {
                     <i-icon width="1rem" height="1rem" name="users" fill={Theme.text.secondary}></i-icon>
                 </i-hstack>,
                 <i-label
+                    class={labelHoverStyle}
                     caption={community.communityId}
                     font={{ size: "0.875rem", color: Theme.text.secondary }}
+                    cursor="pointer"
                     onClick={() => this.onGoCommunity(community.communityId, community.creatorId)}
                 ></i-label>
             )
@@ -858,6 +860,7 @@ export class ScomPost extends Module {
                                     overflow={'hidden'}
                                     objectFit='cover'
                                     fallbackUrl={assets.fullPath('img/default_avatar.png')}
+                                    cursor="pointer"
                                     onClick={() => this.onGoProfile()}
                                 ></i-image>
                             </i-panel>
@@ -982,6 +985,7 @@ export class ScomPost extends Module {
                     overflow={'hidden'}
                     objectFit='cover'
                     fallbackUrl={assets.fullPath('img/default_avatar.png')}
+                    cursor="pointer"
                     onClick={() => this.onGoProfile()}
                 ></i-image>
             </i-panel>);
