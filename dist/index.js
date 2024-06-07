@@ -626,12 +626,11 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             }
         }
         appendLabel(text) {
-            const label = this.$render("i-label", { width: '100%', overflowWrap: "anywhere", class: index_css_3.customLinkStyle, lineHeight: "1.3125rem" });
             const hrefRegex = /https?:\/\/\S+/g;
             text = text.replace(/\n/gm, ' <br> ').replace(hrefRegex, (match) => {
                 return ` <a href="${match}" target="_blank">${match}</a> `;
             });
-            label.caption = text || '';
+            const label = this.$render("i-label", { width: '100%', overflowWrap: "anywhere", class: index_css_3.customLinkStyle, lineHeight: "1.3125rem", caption: text || '' });
             this.pnlContent.appendChild(label);
             if (this.apiBaseUrl) {
                 const links = label.querySelectorAll('a');
@@ -651,6 +650,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                 return;
             const linkPreview = new linkPreview_1.ScomPostLinkPreview();
             parent.replaceChild(linkPreview, linkElm);
+            await linkPreview.ready();
             linkPreview.data = preview;
         }
         addQuotedPost(post) {

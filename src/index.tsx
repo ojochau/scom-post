@@ -456,12 +456,11 @@ export class ScomPost extends Module {
     }
 
     private appendLabel(text: string) {
-        const label = <i-label width={'100%'} overflowWrap="anywhere" class={customLinkStyle} lineHeight="1.3125rem"></i-label> as Label;
         const hrefRegex = /https?:\/\/\S+/g;
         text = text.replace(/\n/gm, ' <br> ').replace(hrefRegex, (match) => {
             return ` <a href="${match}" target="_blank">${match}</a> `;
         });
-        label.caption = text || '';
+        const label = <i-label width={'100%'} overflowWrap="anywhere" class={customLinkStyle} lineHeight="1.3125rem" caption={text || ''}></i-label> as Label;
         this.pnlContent.appendChild(label);
         if (this.apiBaseUrl) {
             const links = label.querySelectorAll('a');
@@ -480,6 +479,7 @@ export class ScomPost extends Module {
         if (!preview || !preview.title) return;
         const linkPreview = new ScomPostLinkPreview();
         parent.replaceChild(linkPreview, linkElm);
+        await linkPreview.ready();
         linkPreview.data = preview;
     }
 
