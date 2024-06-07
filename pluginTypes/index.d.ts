@@ -86,6 +86,7 @@ declare module "@scom/scom-post/index.css.ts" {
     export const customLinkStyle: string;
     export const cardContentStyle: string;
     export const linkPreviewImageStyle: string;
+    export const labelHoverStyle: string;
 }
 /// <amd-module name="@scom/scom-post/assets.ts" />
 declare module "@scom/scom-post/assets.ts" {

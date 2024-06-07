@@ -99,3 +99,11 @@ export const linkPreviewImageStyle = Styles.style({
   display: 'inline-flex',
   aspectRatio: '16 / 9'
 });
+
+export const labelHoverStyle = Styles.style({
+  $nest: {
+    '&:hover > span': {
+      color: Theme.text.primary
+    }
+  }
+})
