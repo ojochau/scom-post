@@ -26,12 +26,12 @@ import {
     IAuthor,
     IPostActions,
     ILinkPreview,
-    getLinkPreview
+    getLinkPreview,
+    IShopifyFrame
 } from './global';
 import { getIconStyleClass, hoverStyle, ellipsisStyle, maxHeightStyle, customLinkStyle, cardContentStyle, labelHoverStyle } from './index.css';
 import assets from './assets';
-import { ScomPostBubbleMenu } from './components/bubbleMenu';
-import { ScomPostLinkPreview } from './components/linkPreview';
+import { ScomPostBubbleMenu, ScomPostLinkPreview, ScomPostShopifyFrame } from './components';
 
 const Theme = Styles.Theme.ThemeVars;
 
@@ -475,14 +475,41 @@ export class ScomPost extends Module {
             }
         }
     }
+
+    private constructShopifyFrame(preview: ILinkPreview): IShopifyFrame {
+        let price, currency;
+        for (let tag of preview.og_tags) {
+            if (tag[0] === 'og:price:amount') {
+                price = tag[1];
+            } else if (tag[0] === 'og:price:currency') {
+                currency = tag[1];
+            }
+        }
+        return {
+            title: preview.title,
+            description: preview.description,
+            image: preview.image,
+            price: price,
+            currency: currency,
+            url: preview.url
+        }
+    }
     
     private async replaceLinkPreview(url: string, parent: HTMLElement, linkElm: HTMLAnchorElement) {
         const preview: ILinkPreview = await getLinkPreview(this.apiBaseUrl, url);
         if (!preview || !preview.title) return;
-        const linkPreview = new ScomPostLinkPreview();
-        parent.replaceChild(linkPreview, linkElm);
-        await linkPreview.ready();
-        linkPreview.data = preview;
+        const isShopifyFrame = preview.og_tags?.some(tag => tag[0].startsWith('og:price'));
+        let elm: any;
+        let data: any = preview;
+        if (isShopifyFrame) {
+            elm = new ScomPostShopifyFrame();
+            data = this.constructShopifyFrame(preview);
+        } else {
+            elm = new ScomPostLinkPreview();
+        }
+        parent.replaceChild(elm, linkElm);
+        await elm.ready();
+        elm.data = data;
     }
 
     private addQuotedPost(post: IPost) {

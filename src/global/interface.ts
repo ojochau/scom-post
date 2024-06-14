@@ -47,4 +47,13 @@ export interface ILinkPreview {
   title?: string;
   description?: string;
   image?: string;
+  og_tags?: string[][];
+}
+export interface IShopifyFrame {
+  title: string;
+  description?: string;
+  image: string;
+  price: string;
+  currency?: string;
+  url: string;
 }
