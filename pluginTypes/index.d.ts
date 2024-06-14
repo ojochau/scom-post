@@ -50,6 +50,7 @@ declare module "@scom/scom-post/global/interface.ts" {
         description?: string;
         image?: string;
         og_tags?: string[][];
+        fc_tags?: string[][];
     }
     export interface IShopifyFrame {
         title: string;
@@ -57,6 +58,22 @@ declare module "@scom/scom-post/global/interface.ts" {
         image: string;
         price: string;
         currency?: string;
+        url: string;
+    }
+    type FrameButtonActionType = 'post' | 'post_redirect' | 'link' | 'mint' | 'tx';
+    export interface IFrameButton {
+        action: FrameButtonActionType;
+        caption: string;
+        target?: string;
+        post_url?: string;
+    }
+    export interface IFarcasterFrame {
+        image: string;
+        post_url?: string;
+        buttons?: IFrameButton[];
+        input_text?: string;
+        aspect_ratio?: string;
+        state?: string;
         url: string;
     }
 }
@@ -85,6 +102,7 @@ declare module "@scom/scom-post/global/index.ts" {
     export const MAX_HEIGHT = 352;
     export const getEmbedElement: (postData: IPostData, parent: Control, callback?: any) => Promise<any>;
     export const getLinkPreview: (apiBaseUrl: string, url: string) => Promise<ILinkPreview | undefined>;
+    export const getDomain: (url: string) => string;
 }
 /// <amd-module name="@scom/scom-post/index.css.ts" />
 declare module "@scom/scom-post/index.css.ts" {
@@ -108,7 +126,8 @@ declare module "@scom/scom-post/assets.ts" {
 /// <amd-module name="@scom/scom-post/components/index.css.ts" />
 declare module "@scom/scom-post/components/index.css.ts" {
     export const tooltipStyle: string;
-    export const imageStyle: string;
+    export const getImageStyle: (aspectRatio: string) => string;
+    export const domainLinkStyle: string;
 }
 /// <amd-module name="@scom/scom-post/components/bubbleMenu.tsx" />
 declare module "@scom/scom-post/components/bubbleMenu.tsx" {
@@ -161,7 +180,6 @@ declare module "@scom/scom-post/components/linkPreview.tsx" {
         private lblDomain;
         private _data;
         set data(value: ILinkPreview);
-        private getDomain;
         private handleLinkPreviewClick;
         render(): any;
     }
@@ -170,10 +188,13 @@ declare module "@scom/scom-post/components/linkPreview.tsx" {
 declare module "@scom/scom-post/components/frames/shopify.tsx" {
     import { ControlElement, Module } from '@ijstech/components';
     import { IShopifyFrame } from "@scom/scom-post/global/index.ts";
+    interface ScomPostShopifyFrameElement extends ControlElement {
+        data?: IShopifyFrame;
+    }
     global {
         namespace JSX {
             interface IntrinsicElements {
-                ['i-scom-post--frames-shopify']: ControlElement;
+                ['i-scom-post--frames-shopify']: ScomPostShopifyFrameElement;
             }
         }
     }
@@ -182,15 +203,47 @@ declare module "@scom/scom-post/components/frames/shopify.tsx" {
         private lblTitle;
         private lblPrice;
         private lblDesc;
+        private lblDomain;
         private _data;
         set data(value: IShopifyFrame);
         handleButtonClick(): void;
         render(): any;
     }
 }
+/// <amd-module name="@scom/scom-post/components/frames/farcaster.tsx" />
+declare module "@scom/scom-post/components/frames/farcaster.tsx" {
+    import { ControlElement, Module } from '@ijstech/components';
+    import { IFarcasterFrame } from "@scom/scom-post/global/index.ts";
+    interface ScomPostFarcasterFrameElement extends ControlElement {
+        data?: IFarcasterFrame;
+    }
+    global {
+        namespace JSX {
+            interface IntrinsicElements {
+                ['i-scom-post--frames-farcaster']: ScomPostFarcasterFrameElement;
+            }
+        }
+    }
+    export class ScomPostFarcasterFrame extends Module {
+        private imgFrame;
+        private pnlControls;
+        private inputFrame;
+        private pnlButtons;
+        private lblDomain;
+        private imageStyle;
+        private _data;
+        set data(value: IFarcasterFrame);
+        private updateFrame;
+        private renderButtons;
+        private handleImageClick;
+        private handleButtonClick;
+        render(): any;
+    }
+}
 /// <amd-module name="@scom/scom-post/components/frames/index.ts" />
 declare module "@scom/scom-post/components/frames/index.ts" {
     export { ScomPostShopifyFrame } from "@scom/scom-post/components/frames/shopify.tsx";
+    export { ScomPostFarcasterFrame } from "@scom/scom-post/components/frames/farcaster.tsx";
 }
 /// <amd-module name="@scom/scom-post/components/index.ts" />
 declare module "@scom/scom-post/components/index.ts" {
@@ -307,6 +360,7 @@ declare module "@scom/scom-post" {
         private renderCardContent;
         private renderUI;
         private appendLabel;
+        private constructFarcasterFrame;
         private constructShopifyFrame;
         private replaceLinkPreview;
         private addQuotedPost;

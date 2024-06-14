@@ -7,8 +7,8 @@ import {
     Module,
     Styles
 } from '@ijstech/components';
-import { IShopifyFrame } from '../../global';
-import { imageStyle } from '../index.css';
+import { getDomain, IShopifyFrame } from '../../global';
+import { domainLinkStyle, getImageStyle } from '../index.css';
 
 const Theme = Styles.Theme.ThemeVars;
 
@@ -30,6 +30,7 @@ export class ScomPostShopifyFrame extends Module {
     private lblTitle: Label;
     private lblPrice: Label;
     private lblDesc: Label;
+    private lblDomain: Label;
 
     private _data: IShopifyFrame;
 
@@ -43,6 +44,8 @@ export class ScomPostShopifyFrame extends Module {
         this.lblPrice.visible = this._data.price != null;
         this.lblDesc.caption = this._data.description || "";
         this.lblDesc.visible = this._data.description != null;
+        this.lblDomain.caption = this._data.url ? getDomain(this._data.url) : '';
+        this.lblDomain.link.href = this._data.url || '';
     }
 
     handleButtonClick() {
@@ -51,31 +54,47 @@ export class ScomPostShopifyFrame extends Module {
 
     render() {
         return (
-            <i-panel width="100%" height="100%" border={{ radius: '0.5rem' }} background={{ color: Theme.action.disabledBackground }} overflow="hidden">
-                <i-image id="imgProduct" class={imageStyle} width="100%" height="100%" objectFit="cover"></i-image>
-                <i-stack direction="vertical" padding={{ top: "0.5rem", left: '1rem', right: '1rem' }} gap="0.5rem">
-                    <i-label id="lblTitle" font={{ size: '1.5rem', color: Theme.text.primary, weight: 600 }} lineHeight="2rem"></i-label>
-                    <i-label id="lblPrice" font={{ size: '1.125rem', color: Theme.colors.primary.main, weight: 600 }} lineHeight="1.5rem"></i-label>
-                    <i-label id="lblDesc" font={{ size: '0.875rem', color: Theme.text.secondary, weight: 400 }} lineHeight="1.125rem" lineClamp={3} visible={false}></i-label>
-                </i-stack>
-                <i-stack
-                    direction="horizontal"
-                    alignItems="center"
-                    padding={{ top: '0.5rem', bottom: '0.5rem', left: '1rem', right: '1rem' }}
-                    gap="0.5rem"
+            <i-stack direction="vertical" width="100%" height="100%" gap="0.25rem">
+                <i-panel
+                    width="100%"
+                    height="100%"
+                    border={{ width: 1, style: 'solid', color: Theme.divider, radius: '0.5rem' }}
+                    background={{ color: Theme.action.disabledBackground }}
+                    overflow="hidden"
                 >
-                    <i-button
-                        height="2.25rem"
-                        caption="Buy Now"
+                    <i-image id="imgProduct" class={getImageStyle('1 / 1')} width="100%" height="100%" objectFit="cover"></i-image>
+                    <i-stack direction="vertical" padding={{ top: "0.5rem", left: '1rem', right: '1rem' }} gap="0.5rem">
+                        <i-label id="lblTitle" font={{ size: '1.5rem', color: Theme.text.primary, weight: 600 }} lineHeight="2rem"></i-label>
+                        <i-label id="lblPrice" font={{ size: '1.125rem', color: Theme.colors.primary.main, weight: 600 }} lineHeight="1.5rem"></i-label>
+                        <i-label id="lblDesc" font={{ size: '0.875rem', color: Theme.text.secondary, weight: 400 }} lineHeight="1.125rem" lineClamp={3} visible={false}></i-label>
+                    </i-stack>
+                    <i-stack
+                        direction="horizontal"
+                        alignItems="center"
                         padding={{ top: '0.5rem', bottom: '0.5rem', left: '1rem', right: '1rem' }}
-                        border={{ radius: '0.5rem' }}
-                        stack={{ grow: '1' }}
-                        background={{ color: Theme.colors.secondary.main }}
-                        font={{ size: '0.875rem', color: Theme.colors.secondary.contrastText, weight: 400 }}
-                        onClick={this.handleButtonClick}
-                    ></i-button>
-                </i-stack>
-            </i-panel>
+                        gap="0.5rem"
+                    >
+                        <i-button
+                            height="2.25rem"
+                            caption="Buy Now"
+                            padding={{ top: '0.5rem', bottom: '0.5rem', left: '1rem', right: '1rem' }}
+                            border={{ radius: '0.5rem' }}
+                            stack={{ grow: '1' }}
+                            background={{ color: Theme.colors.secondary.main }}
+                            font={{ size: '0.875rem', color: Theme.colors.secondary.contrastText, weight: 400 }}
+                            onClick={this.handleButtonClick}
+                        ></i-button>
+                    </i-stack>
+                </i-panel>
+                <i-label
+                    id="lblDomain"
+                    class={`text-right ${domainLinkStyle}`}
+                    width="100%"
+                    font={{ size: '0.875rem', color: Theme.text.secondary, weight: 500 }}
+                    lineHeight="1.25rem"
+                    link={{ target: '_blank' }}
+                ></i-label>
+            </i-stack>
         )
     }
 }

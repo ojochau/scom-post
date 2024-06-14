@@ -63,7 +63,7 @@ export const maxHeightStyle = Styles.style({
 export const customLinkStyle = Styles.style({
   $nest: {
     'a': {
-      color: `${Theme.colors.primary.main}!important`,
+      color: Theme.colors.primary.main,
       display: `inline !important`,
     },
     'img': {
