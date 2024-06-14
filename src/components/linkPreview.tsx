@@ -71,6 +71,7 @@ export class ScomPostLinkPreview extends Module {
                 <i-image
                     id="imgPreview"
                     class={linkPreviewImageStyle}
+                    display="block"
                     width="100%"
                     maxHeight={300}
                     objectFit="cover"

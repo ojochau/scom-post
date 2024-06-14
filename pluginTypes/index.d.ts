@@ -49,6 +49,15 @@ declare module "@scom/scom-post/global/interface.ts" {
         title?: string;
         description?: string;
         image?: string;
+        og_tags?: string[][];
+    }
+    export interface IShopifyFrame {
+        title: string;
+        description?: string;
+        image: string;
+        price: string;
+        currency?: string;
+        url: string;
     }
 }
 /// <amd-module name="@scom/scom-post/store/index.ts" />
@@ -99,6 +108,7 @@ declare module "@scom/scom-post/assets.ts" {
 /// <amd-module name="@scom/scom-post/components/index.css.ts" />
 declare module "@scom/scom-post/components/index.css.ts" {
     export const tooltipStyle: string;
+    export const imageStyle: string;
 }
 /// <amd-module name="@scom/scom-post/components/bubbleMenu.tsx" />
 declare module "@scom/scom-post/components/bubbleMenu.tsx" {
@@ -155,6 +165,38 @@ declare module "@scom/scom-post/components/linkPreview.tsx" {
         private handleLinkPreviewClick;
         render(): any;
     }
+}
+/// <amd-module name="@scom/scom-post/components/frames/shopify.tsx" />
+declare module "@scom/scom-post/components/frames/shopify.tsx" {
+    import { ControlElement, Module } from '@ijstech/components';
+    import { IShopifyFrame } from "@scom/scom-post/global/index.ts";
+    global {
+        namespace JSX {
+            interface IntrinsicElements {
+                ['i-scom-post--frames-shopify']: ControlElement;
+            }
+        }
+    }
+    export class ScomPostShopifyFrame extends Module {
+        private imgProduct;
+        private lblTitle;
+        private lblPrice;
+        private lblDesc;
+        private _data;
+        set data(value: IShopifyFrame);
+        handleButtonClick(): void;
+        render(): any;
+    }
+}
+/// <amd-module name="@scom/scom-post/components/frames/index.ts" />
+declare module "@scom/scom-post/components/frames/index.ts" {
+    export { ScomPostShopifyFrame } from "@scom/scom-post/components/frames/shopify.tsx";
+}
+/// <amd-module name="@scom/scom-post/components/index.ts" />
+declare module "@scom/scom-post/components/index.ts" {
+    export { ScomPostBubbleMenu } from "@scom/scom-post/components/bubbleMenu.tsx";
+    export { ScomPostLinkPreview } from "@scom/scom-post/components/linkPreview.tsx";
+    export * from "@scom/scom-post/components/frames/index.ts";
 }
 /// <amd-module name="@scom/scom-post" />
 declare module "@scom/scom-post" {
@@ -265,6 +307,7 @@ declare module "@scom/scom-post" {
         private renderCardContent;
         private renderUI;
         private appendLabel;
+        private constructShopifyFrame;
         private replaceLinkPreview;
         private addQuotedPost;
         private renderInfo;

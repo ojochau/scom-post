@@ -35,7 +35,8 @@ export const getLinkPreview = async (apiBaseUrl: string, url: string): Promise<I
       url,
       title: result.title,
       description: result.description,
-      image: result.image
+      image: result.image,
+      og_tags: result.og_tags
     }
   } catch (err) {}
 }
