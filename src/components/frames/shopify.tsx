@@ -1,13 +1,10 @@
 import {
-    Control,
     ControlElement,
     customElements,
     FormatUtils,
-    HStack,
     Image,
     Label,
     Module,
-    Panel,
     Styles
 } from '@ijstech/components';
 import { IShopifyFrame } from '../../global';
@@ -22,7 +19,7 @@ interface ScomPostShopifyFrameElement extends ControlElement {
 declare global {
     namespace JSX {
         interface IntrinsicElements {
-            ['i-scom-post--frames-shopify']: ControlElement;
+            ['i-scom-post--frames-shopify']: ScomPostShopifyFrameElement;
         }
     }
 }
