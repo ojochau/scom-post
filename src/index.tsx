@@ -27,11 +27,13 @@ import {
     IPostActions,
     ILinkPreview,
     getLinkPreview,
-    IShopifyFrame
+    IShopifyFrame,
+    IFarcasterFrame,
+    IFrameButton
 } from './global';
 import { getIconStyleClass, hoverStyle, ellipsisStyle, maxHeightStyle, customLinkStyle, cardContentStyle, labelHoverStyle } from './index.css';
 import assets from './assets';
-import { ScomPostBubbleMenu, ScomPostLinkPreview, ScomPostShopifyFrame } from './components';
+import { ScomPostBubbleMenu, ScomPostFarcasterFrame, ScomPostLinkPreview, ScomPostShopifyFrame } from './components';
 
 const Theme = Styles.Theme.ThemeVars;
 
@@ -475,6 +477,34 @@ export class ScomPost extends Module {
             }
         }
     }
+    
+    private constructFarcasterFrame(preview: ILinkPreview): IFarcasterFrame {
+        let data: IFarcasterFrame = {
+            image: preview.image,
+            url: preview.url
+        };
+        for (let tag of preview.fc_tags) {
+            if (tag[0] === 'fc:frame:image') {
+                data.image = tag[1];
+            } else if (tag[0] === 'fc:frame:post_url') {
+                data.post_url = tag[1];
+            } else if (tag[0] === 'fc:frame:input:text') {
+                data.input_text = tag[1];
+            } else if (tag[0] === 'fc:frame:image:aspect_ratio') {
+                data.aspect_ratio = tag[1];
+            } else if (tag[0] === 'fc:frame:state') {
+                data.state = tag[1];
+            } else if (tag[0].startsWith('fc:frame:button:')) {
+                if (!data.buttons) data.buttons = [];
+                const arr = tag[0].replace('fc:frame:button:', '').split(':');
+                const idx = Number(arr[0]) - 1;
+                const property = arr[1] || 'caption';
+                if (!data.buttons[idx]) data.buttons[idx] = {} as IFrameButton;
+                data.buttons[idx][property] = tag[1];
+            }
+        }
+        return data;
+    }
 
     private constructShopifyFrame(preview: ILinkPreview): IShopifyFrame {
         let price, currency;
@@ -498,10 +528,14 @@ export class ScomPost extends Module {
     private async replaceLinkPreview(url: string, parent: HTMLElement, linkElm: HTMLAnchorElement) {
         const preview: ILinkPreview = await getLinkPreview(this.apiBaseUrl, url);
         if (!preview || !preview.title) return;
+        const isFarcasterFrame = preview.fc_tags?.some(tag => tag[0] === 'fc:frame');
         const isShopifyFrame = preview.og_tags?.some(tag => tag[0].startsWith('og:price'));
         let elm: any;
         let data: any = preview;
-        if (isShopifyFrame) {
+        if (isFarcasterFrame) {
+            elm = new ScomPostFarcasterFrame();
+            data = this.constructFarcasterFrame(preview);
+        } else if (isShopifyFrame) {
             elm = new ScomPostShopifyFrame();
             data = this.constructShopifyFrame(preview);
         } else {

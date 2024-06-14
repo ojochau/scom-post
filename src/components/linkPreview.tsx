@@ -10,7 +10,7 @@ import {
     Styles
 } from '@ijstech/components';
 import { linkPreviewImageStyle } from '../index.css';
-import { ILinkPreview } from '../global';
+import { getDomain, ILinkPreview } from '../global';
 
 const Theme = Styles.Theme.ThemeVars;
 
@@ -41,16 +41,8 @@ export class ScomPostLinkPreview extends Module {
         this.lblTitle.caption = value.title || '';
         this.lblDesc.caption = value.description || '';
         this.lblDesc.visible = !!value.description;
-        this.lblDomain.caption = value.url ? this.getDomain(value.url) : '';
+        this.lblDomain.caption = value.url ? getDomain(value.url) : '';
         this.lblDomain.visible = !!value.url;
-    }
-
-    private getDomain(url: string) {
-        try {
-            return new URL(url.toLowerCase()).hostname;
-        } catch (err) {
-            return url;
-        }
     }
 
     private handleLinkPreviewClick() {

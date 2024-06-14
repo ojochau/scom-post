@@ -40,3 +40,11 @@ export const getLinkPreview = async (apiBaseUrl: string, url: string): Promise<I
     }
   } catch (err) {}
 }
+
+export const getDomain = (url: string) => {
+  try {
+    return new URL(url.toLowerCase()).hostname;
+  } catch (err) {
+    return url;
+  }
+}

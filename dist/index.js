@@ -95,7 +95,7 @@ define("@scom/scom-post/global/utils.ts", ["require", "exports", "@ijstech/compo
 define("@scom/scom-post/global/index.ts", ["require", "exports", "@ijstech/components", "@scom/scom-post/global/utils.ts", "@scom/scom-post/global/interface.ts"], function (require, exports, components_2, utils_1, interface_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getLinkPreview = exports.getEmbedElement = exports.MAX_HEIGHT = void 0;
+    exports.getDomain = exports.getLinkPreview = exports.getEmbedElement = exports.MAX_HEIGHT = void 0;
     __exportStar(utils_1, exports);
     __exportStar(interface_1, exports);
     exports.MAX_HEIGHT = 352;
@@ -139,6 +139,15 @@ define("@scom/scom-post/global/index.ts", ["require", "exports", "@ijstech/compo
         catch (err) { }
     };
     exports.getLinkPreview = getLinkPreview;
+    const getDomain = (url) => {
+        try {
+            return new URL(url.toLowerCase()).hostname;
+        }
+        catch (err) {
+            return url;
+        }
+    };
+    exports.getDomain = getDomain;
 });
 define("@scom/scom-post/index.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_3) {
     "use strict";
@@ -204,7 +213,7 @@ define("@scom/scom-post/index.css.ts", ["require", "exports", "@ijstech/componen
     exports.customLinkStyle = components_3.Styles.style({
         $nest: {
             'a': {
-                color: `${Theme.colors.primary.main}!important`,
+                color: Theme.colors.primary.main,
                 display: `inline !important`,
             },
             'img': {
@@ -261,7 +270,7 @@ define("@scom/scom-post/assets.ts", ["require", "exports", "@ijstech/components"
 define("@scom/scom-post/components/index.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.imageStyle = exports.tooltipStyle = void 0;
+    exports.domainLinkStyle = exports.getImageStyle = exports.tooltipStyle = void 0;
     const Theme = components_5.Styles.Theme.ThemeVars;
     exports.tooltipStyle = components_5.Styles.style({
         $nest: {
@@ -271,15 +280,30 @@ define("@scom/scom-post/components/index.css.ts", ["require", "exports", "@ijste
             }
         }
     });
-    exports.imageStyle = components_5.Styles.style({
-        display: 'block',
-        aspectRatio: '1 / 1',
+    const getImageStyle = (aspectRatio) => {
+        return components_5.Styles.style({
+            display: 'block',
+            aspectRatio: aspectRatio,
+            $nest: {
+                '> img': {
+                    position: 'absolute',
+                    width: '100%',
+                    height: '100%',
+                    aspectRatio: aspectRatio
+                }
+            }
+        });
+    };
+    exports.getImageStyle = getImageStyle;
+    exports.domainLinkStyle = components_5.Styles.style({
         $nest: {
-            '> img': {
-                position: 'absolute',
-                width: '100%',
-                height: '100%',
-                aspectRatio: '1 / 1'
+            'i-link a': {
+                color: Theme.text.secondary,
+                textDecoration: 'none'
+            },
+            'i-link a:hover': {
+                color: Theme.colors.primary.dark,
+                textDecoration: 'underline'
             }
         }
     });
@@ -359,7 +383,7 @@ define("@scom/scom-post/components/bubbleMenu.tsx", ["require", "exports", "@ijs
     ], ScomPostBubbleMenu);
     exports.ScomPostBubbleMenu = ScomPostBubbleMenu;
 });
-define("@scom/scom-post/components/linkPreview.tsx", ["require", "exports", "@ijstech/components", "@scom/scom-post/index.css.ts"], function (require, exports, components_7, index_css_2) {
+define("@scom/scom-post/components/linkPreview.tsx", ["require", "exports", "@ijstech/components", "@scom/scom-post/index.css.ts", "@scom/scom-post/global/index.ts"], function (require, exports, components_7, index_css_2, global_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ScomPostLinkPreview = void 0;
@@ -372,16 +396,8 @@ define("@scom/scom-post/components/linkPreview.tsx", ["require", "exports", "@ij
             this.lblTitle.caption = value.title || '';
             this.lblDesc.caption = value.description || '';
             this.lblDesc.visible = !!value.description;
-            this.lblDomain.caption = value.url ? this.getDomain(value.url) : '';
+            this.lblDomain.caption = value.url ? (0, global_1.getDomain)(value.url) : '';
             this.lblDomain.visible = !!value.url;
-        }
-        getDomain(url) {
-            try {
-                return new URL(url.toLowerCase()).hostname;
-            }
-            catch (err) {
-                return url;
-            }
         }
         handleLinkPreviewClick() {
             window.open(this._data.url, '_blank');
@@ -400,7 +416,7 @@ define("@scom/scom-post/components/linkPreview.tsx", ["require", "exports", "@ij
     ], ScomPostLinkPreview);
     exports.ScomPostLinkPreview = ScomPostLinkPreview;
 });
-define("@scom/scom-post/components/frames/shopify.tsx", ["require", "exports", "@ijstech/components", "@scom/scom-post/components/index.css.ts"], function (require, exports, components_8, index_css_3) {
+define("@scom/scom-post/components/frames/shopify.tsx", ["require", "exports", "@ijstech/components", "@scom/scom-post/global/index.ts", "@scom/scom-post/components/index.css.ts"], function (require, exports, components_8, global_2, index_css_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ScomPostShopifyFrame = void 0;
@@ -416,19 +432,23 @@ define("@scom/scom-post/components/frames/shopify.tsx", ["require", "exports", "
             this.lblPrice.visible = this._data.price != null;
             this.lblDesc.caption = this._data.description || "";
             this.lblDesc.visible = this._data.description != null;
+            this.lblDomain.caption = this._data.url ? (0, global_2.getDomain)(this._data.url) : '';
+            this.lblDomain.link.href = this._data.url || '';
         }
         handleButtonClick() {
             window.open(this._data.url, '_blank');
         }
         render() {
-            return (this.$render("i-panel", { width: "100%", height: "100%", border: { radius: '0.5rem' }, background: { color: Theme.action.disabledBackground }, overflow: "hidden" },
-                this.$render("i-image", { id: "imgProduct", class: index_css_3.imageStyle, width: "100%", height: "100%", objectFit: "cover" }),
-                this.$render("i-stack", { direction: "vertical", padding: { top: "0.5rem", left: '1rem', right: '1rem' }, gap: "0.5rem" },
-                    this.$render("i-label", { id: "lblTitle", font: { size: '1.5rem', color: Theme.text.primary, weight: 600 }, lineHeight: "2rem" }),
-                    this.$render("i-label", { id: "lblPrice", font: { size: '1.125rem', color: Theme.colors.primary.main, weight: 600 }, lineHeight: "1.5rem" }),
-                    this.$render("i-label", { id: "lblDesc", font: { size: '0.875rem', color: Theme.text.secondary, weight: 400 }, lineHeight: "1.125rem", lineClamp: 3, visible: false })),
-                this.$render("i-stack", { direction: "horizontal", alignItems: "center", padding: { top: '0.5rem', bottom: '0.5rem', left: '1rem', right: '1rem' }, gap: "0.5rem" },
-                    this.$render("i-button", { height: "2.25rem", caption: "Buy Now", padding: { top: '0.5rem', bottom: '0.5rem', left: '1rem', right: '1rem' }, border: { radius: '0.5rem' }, stack: { grow: '1' }, background: { color: Theme.colors.secondary.main }, font: { size: '0.875rem', color: Theme.colors.secondary.contrastText, weight: 400 }, onClick: this.handleButtonClick }))));
+            return (this.$render("i-stack", { direction: "vertical", width: "100%", height: "100%", gap: "0.25rem" },
+                this.$render("i-panel", { width: "100%", height: "100%", border: { width: 1, style: 'solid', color: Theme.divider, radius: '0.5rem' }, background: { color: Theme.action.disabledBackground }, overflow: "hidden" },
+                    this.$render("i-image", { id: "imgProduct", class: (0, index_css_3.getImageStyle)('1 / 1'), width: "100%", height: "100%", objectFit: "cover" }),
+                    this.$render("i-stack", { direction: "vertical", padding: { top: "0.5rem", left: '1rem', right: '1rem' }, gap: "0.5rem" },
+                        this.$render("i-label", { id: "lblTitle", font: { size: '1.5rem', color: Theme.text.primary, weight: 600 }, lineHeight: "2rem" }),
+                        this.$render("i-label", { id: "lblPrice", font: { size: '1.125rem', color: Theme.colors.primary.main, weight: 600 }, lineHeight: "1.5rem" }),
+                        this.$render("i-label", { id: "lblDesc", font: { size: '0.875rem', color: Theme.text.secondary, weight: 400 }, lineHeight: "1.125rem", lineClamp: 3, visible: false })),
+                    this.$render("i-stack", { direction: "horizontal", alignItems: "center", padding: { top: '0.5rem', bottom: '0.5rem', left: '1rem', right: '1rem' }, gap: "0.5rem" },
+                        this.$render("i-button", { height: "2.25rem", caption: "Buy Now", padding: { top: '0.5rem', bottom: '0.5rem', left: '1rem', right: '1rem' }, border: { radius: '0.5rem' }, stack: { grow: '1' }, background: { color: Theme.colors.secondary.main }, font: { size: '0.875rem', color: Theme.colors.secondary.contrastText, weight: 400 }, onClick: this.handleButtonClick }))),
+                this.$render("i-label", { id: "lblDomain", class: `text-right ${index_css_3.domainLinkStyle}`, width: "100%", font: { size: '0.875rem', color: Theme.text.secondary, weight: 500 }, lineHeight: "1.25rem", link: { target: '_blank' } })));
         }
     };
     ScomPostShopifyFrame = __decorate([
@@ -436,11 +456,89 @@ define("@scom/scom-post/components/frames/shopify.tsx", ["require", "exports", "
     ], ScomPostShopifyFrame);
     exports.ScomPostShopifyFrame = ScomPostShopifyFrame;
 });
-define("@scom/scom-post/components/frames/index.ts", ["require", "exports", "@scom/scom-post/components/frames/shopify.tsx"], function (require, exports, shopify_1) {
+define("@scom/scom-post/components/frames/farcaster.tsx", ["require", "exports", "@ijstech/components", "@scom/scom-post/global/index.ts", "@scom/scom-post/components/index.css.ts"], function (require, exports, components_9, global_3, index_css_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.ScomPostShopifyFrame = void 0;
+    exports.ScomPostFarcasterFrame = void 0;
+    const Theme = components_9.Styles.Theme.ThemeVars;
+    let ScomPostFarcasterFrame = class ScomPostFarcasterFrame extends components_9.Module {
+        set data(value) {
+            this._data = value || { image: '', url: '' };
+            this.updateFrame();
+        }
+        updateFrame() {
+            this.imgFrame.url = this._data.image || "";
+            const aspectRatio = this._data.aspect_ratio?.replace(':', '/') || "1 / 1";
+            if (this.imageStyle)
+                this.imgFrame.classList.remove(this.imageStyle);
+            this.imageStyle = (0, index_css_4.getImageStyle)(aspectRatio);
+            this.imgFrame.classList.add(this.imageStyle);
+            this.pnlControls.visible = !!this._data.input_text || this._data.buttons?.length > 0;
+            this.inputFrame.placeholder = this._data.input_text || "";
+            this.inputFrame.visible = !!this._data.input_text;
+            this.lblDomain.caption = this._data.url ? (0, global_3.getDomain)(this._data.url) : '';
+            this.lblDomain.link.href = this._data.url || '';
+            this.renderButtons();
+        }
+        renderButtons() {
+            this.pnlButtons.clearInnerHTML();
+            if (this._data.buttons) {
+                for (let buttonData of this._data.buttons) {
+                    if (!buttonData)
+                        continue;
+                    const options = {
+                        caption: buttonData.caption || "",
+                        height: '2.25rem',
+                        padding: { top: '0.5rem', bottom: '0.5rem', left: '1rem', right: '1rem' },
+                        border: { radius: '0.5rem' },
+                        stack: { grow: '1' },
+                        background: { color: Theme.colors.secondary.main },
+                        font: { size: '0.875rem', color: Theme.colors.secondary.contrastText, weight: 400 },
+                        rightIcon: { name: 'external-link-alt' }
+                    };
+                    if (buttonData.action === 'link') {
+                        options.rightIcon = { width: '0.75rem', height: '0.75rem', name: 'external-link-alt' };
+                    }
+                    const button = new components_9.Button(undefined, options);
+                    button.onClick = () => {
+                        this.handleButtonClick(buttonData);
+                    };
+                    this.pnlButtons.appendChild(button);
+                }
+            }
+            this.pnlButtons.visible = this._data.buttons?.length > 0;
+        }
+        handleImageClick() {
+            if (this._data.url) {
+                window.open(this._data.url, '_blank');
+            }
+        }
+        handleButtonClick(data) {
+            if (data.action === 'link') {
+                window.open(data.target || "", '_blank');
+            }
+        }
+        render() {
+            return (this.$render("i-stack", { direction: "vertical", width: "100%", height: "100%", gap: "0.25rem" },
+                this.$render("i-panel", { width: "100%", height: "100%", border: { width: 1, style: 'solid', color: Theme.divider, radius: '0.5rem' }, background: { color: Theme.action.disabledBackground }, overflow: "hidden" },
+                    this.$render("i-image", { id: "imgFrame", width: "100%", height: "100%", objectFit: "cover", cursor: "pointer", onClick: this.handleImageClick }),
+                    this.$render("i-stack", { id: "pnlControls", direction: "vertical", padding: { top: '0.5rem', bottom: '0.5rem', left: '1rem', right: '1rem' }, gap: "0.5rem", visible: false },
+                        this.$render("i-input", { id: "inputFrame", width: "100%", visible: false }),
+                        this.$render("i-stack", { id: "pnlButtons", direction: "horizontal", alignItems: "center", gap: "0.5rem", visible: false }))),
+                this.$render("i-label", { id: "lblDomain", class: `text-right ${index_css_4.domainLinkStyle}`, width: "100%", font: { size: '0.875rem', color: Theme.text.secondary, weight: 500 }, lineHeight: "1.25rem", link: { target: '_blank' } })));
+        }
+    };
+    ScomPostFarcasterFrame = __decorate([
+        (0, components_9.customElements)('i-scom-post--frames-farcaster')
+    ], ScomPostFarcasterFrame);
+    exports.ScomPostFarcasterFrame = ScomPostFarcasterFrame;
+});
+define("@scom/scom-post/components/frames/index.ts", ["require", "exports", "@scom/scom-post/components/frames/shopify.tsx", "@scom/scom-post/components/frames/farcaster.tsx"], function (require, exports, shopify_1, farcaster_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.ScomPostFarcasterFrame = exports.ScomPostShopifyFrame = void 0;
     Object.defineProperty(exports, "ScomPostShopifyFrame", { enumerable: true, get: function () { return shopify_1.ScomPostShopifyFrame; } });
+    Object.defineProperty(exports, "ScomPostFarcasterFrame", { enumerable: true, get: function () { return farcaster_1.ScomPostFarcasterFrame; } });
 });
 define("@scom/scom-post/components/index.ts", ["require", "exports", "@scom/scom-post/components/bubbleMenu.tsx", "@scom/scom-post/components/linkPreview.tsx", "@scom/scom-post/components/frames/index.ts"], function (require, exports, bubbleMenu_1, linkPreview_1, frames_1) {
     "use strict";
@@ -450,12 +548,12 @@ define("@scom/scom-post/components/index.ts", ["require", "exports", "@scom/scom
     Object.defineProperty(exports, "ScomPostLinkPreview", { enumerable: true, get: function () { return linkPreview_1.ScomPostLinkPreview; } });
     __exportStar(frames_1, exports);
 });
-define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/scom-post/global/index.ts", "@scom/scom-post/index.css.ts", "@scom/scom-post/assets.ts", "@scom/scom-post/components/index.ts"], function (require, exports, components_9, global_1, index_css_4, assets_2, components_10) {
+define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/scom-post/global/index.ts", "@scom/scom-post/index.css.ts", "@scom/scom-post/assets.ts", "@scom/scom-post/components/index.ts"], function (require, exports, components_10, global_4, index_css_5, assets_2, components_11) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ScomPost = void 0;
-    const Theme = components_9.Styles.Theme.ThemeVars;
-    let ScomPost = class ScomPost extends components_9.Module {
+    const Theme = components_10.Styles.Theme.ThemeVars;
+    let ScomPost = class ScomPost extends components_10.Module {
         constructor(parent, options) {
             super(parent, options);
             this.expanded = false;
@@ -593,7 +691,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             return data;
         }
         renderCardContent(data) {
-            this.pnlContent.appendChild(this.$render("i-stack", { class: index_css_4.cardContentStyle, width: '100%', direction: this.pinView ? "vertical" : "horizontal", gap: '0.875rem', mediaQueries: [
+            this.pnlContent.appendChild(this.$render("i-stack", { class: index_css_5.cardContentStyle, width: '100%', direction: this.pinView ? "vertical" : "horizontal", gap: '0.875rem', mediaQueries: [
                     {
                         maxWidth: '767px',
                         properties: {
@@ -644,7 +742,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             this.groupAnalysis.visible = !this.isQuotedPost && !this.pinView;
             this.pnlSubscribe.visible = !this.isQuotedPost && !this.pinView;
             if (repost) {
-                let reposters = repost.displayName || repost.username || components_9.FormatUtils.truncateWalletAddress(repost.npub);
+                let reposters = repost.displayName || repost.username || components_10.FormatUtils.truncateWalletAddress(repost.npub);
                 if (stats?.reposts > 1) {
                     const others = stats.reposts - 1;
                     reposters += ` and ${others} ${others > 1 ? 'others' : 'other'}`;
@@ -657,7 +755,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             if (community) {
                 this.pnlCommunity.clearInnerHTML();
                 this.pnlCommunity.append(this.$render("i-hstack", { width: "2.75rem", horizontalAlignment: 'end' },
-                    this.$render("i-icon", { width: "1rem", height: "1rem", name: "users", fill: Theme.text.secondary })), this.$render("i-label", { class: index_css_4.labelHoverStyle, caption: community.communityId, font: { size: "0.875rem", color: Theme.text.secondary }, cursor: "pointer", onClick: () => this.onGoCommunity(community.communityId, community.creatorId) }));
+                    this.$render("i-icon", { width: "1rem", height: "1rem", name: "users", fill: Theme.text.secondary })), this.$render("i-label", { class: index_css_5.labelHoverStyle, caption: community.communityId, font: { size: "0.875rem", color: Theme.text.secondary }, cursor: "pointer", onClick: () => this.onGoCommunity(community.communityId, community.creatorId) }));
                 this.pnlCommunity.visible = true;
             }
             if (this.type === 'card' && isMarkdown) {
@@ -670,7 +768,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     templateAreas.splice(1, 1);
                 this.gridPost.templateAreas = templateAreas;
                 this.overflowEllipse = false;
-                this.classList.remove(index_css_4.maxHeightStyle);
+                this.classList.remove(index_css_5.maxHeightStyle);
                 let data = await this.constructPostCard();
                 this.renderCardContent(data);
             }
@@ -684,7 +782,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                             item.module = '@scom/scom-markdown-editor';
                         }
                         if (item.module) {
-                            await (0, global_1.getEmbedElement)(item, this.pnlContent, (elm) => {
+                            await (0, global_4.getEmbedElement)(item, this.pnlContent, (elm) => {
                             });
                         }
                         else {
@@ -700,7 +798,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             text = text.replace(/\n/gm, ' <br> ').replace(hrefRegex, (match) => {
                 return ` <a href="${match}" target="_blank">${match}</a> `;
             });
-            const label = this.$render("i-label", { width: '100%', overflowWrap: "anywhere", class: index_css_4.customLinkStyle, lineHeight: "1.3125rem", caption: text || '' });
+            const label = this.$render("i-label", { width: '100%', overflowWrap: "anywhere", class: index_css_5.customLinkStyle, lineHeight: "1.3125rem", caption: text || '' });
             this.pnlContent.appendChild(label);
             if (this.apiBaseUrl) {
                 const links = label.querySelectorAll('a');
@@ -713,6 +811,40 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     this.replaceLinkPreview(link.href, link.parentElement, link);
                 }
             }
+        }
+        constructFarcasterFrame(preview) {
+            let data = {
+                image: preview.image,
+                url: preview.url
+            };
+            for (let tag of preview.fc_tags) {
+                if (tag[0] === 'fc:frame:image') {
+                    data.image = tag[1];
+                }
+                else if (tag[0] === 'fc:frame:post_url') {
+                    data.post_url = tag[1];
+                }
+                else if (tag[0] === 'fc:frame:input:text') {
+                    data.input_text = tag[1];
+                }
+                else if (tag[0] === 'fc:frame:image:aspect_ratio') {
+                    data.aspect_ratio = tag[1];
+                }
+                else if (tag[0] === 'fc:frame:state') {
+                    data.state = tag[1];
+                }
+                else if (tag[0].startsWith('fc:frame:button:')) {
+                    if (!data.buttons)
+                        data.buttons = [];
+                    const arr = tag[0].replace('fc:frame:button:', '').split(':');
+                    const idx = Number(arr[0]) - 1;
+                    const property = arr[1] || 'caption';
+                    if (!data.buttons[idx])
+                        data.buttons[idx] = {};
+                    data.buttons[idx][property] = tag[1];
+                }
+            }
+            return data;
         }
         constructShopifyFrame(preview) {
             let price, currency;
@@ -734,18 +866,23 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             };
         }
         async replaceLinkPreview(url, parent, linkElm) {
-            const preview = await (0, global_1.getLinkPreview)(this.apiBaseUrl, url);
+            const preview = await (0, global_4.getLinkPreview)(this.apiBaseUrl, url);
             if (!preview || !preview.title)
                 return;
+            const isFarcasterFrame = preview.fc_tags?.some(tag => tag[0] === 'fc:frame');
             const isShopifyFrame = preview.og_tags?.some(tag => tag[0].startsWith('og:price'));
             let elm;
             let data = preview;
-            if (isShopifyFrame) {
-                elm = new components_10.ScomPostShopifyFrame();
+            if (isFarcasterFrame) {
+                elm = new components_11.ScomPostFarcasterFrame();
+                data = this.constructFarcasterFrame(preview);
+            }
+            else if (isShopifyFrame) {
+                elm = new components_11.ScomPostShopifyFrame();
                 data = this.constructShopifyFrame(preview);
             }
             else {
-                elm = new components_10.ScomPostLinkPreview();
+                elm = new components_11.ScomPostLinkPreview();
             }
             parent.replaceChild(elm, linkElm);
             await elm.ready();
@@ -769,7 +906,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                 this.$render("i-icon", { id: "imgVerified", width: '0.875rem', height: '0.875rem', name: "certificate", fill: Theme.text.secondary, display: "inline-flex" })));
             const dateEl = (this.$render("i-hstack", { gap: '0.25rem', stack: { shrink: '0' } },
                 this.$render("i-panel", { border: { left: { width: '1px', style: 'solid', color: Theme.text.secondary } } }),
-                this.$render("i-label", { id: "lblDate", font: { size: '0.875rem', color: Theme.text.secondary }, caption: `${(0, global_1.getDuration)(publishDate)}`, lineHeight: '0.875rem' })));
+                this.$render("i-label", { id: "lblDate", font: { size: '0.875rem', color: Theme.text.secondary }, caption: `${(0, global_4.getDuration)(publishDate)}`, lineHeight: '0.875rem' })));
             const usernameEl = (this.$render("i-label", { id: "lblUsername", caption: `${author?.internetIdentifier || ''}`, maxWidth: this.isQuotedPost ? '13.75rem' : '12.5rem', textOverflow: "ellipsis", font: { size: this.isQuotedPost ? '1rem' : '0.875rem', color: Theme.text.secondary }, lineHeight: '0.875rem' }));
             if (oneLine) {
                 this.pnlInfo.append(this.$render("i-hstack", { height: "100%", gap: "0.25rem", verticalAlignment: "center" },
@@ -877,9 +1014,9 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             ];
             this.groupAnalysis.clearInnerHTML();
             for (let item of dataList) {
-                const value = components_9.FormatUtils.formatNumber(item.value, { shortScale: true, decimalFigures: 0 });
+                const value = components_10.FormatUtils.formatNumber(item.value, { shortScale: true, decimalFigures: 0 });
                 const lblValue = (this.$render("i-label", { caption: value, font: { color: Theme.colors.secondary.light, size: '0.8125rem' }, tag: item.value }));
-                let itemEl = (this.$render("i-hstack", { verticalAlignment: "center", gap: '0.5rem', tooltip: { content: value, placement: 'bottomLeft' }, cursor: 'pointer', class: (0, index_css_4.getIconStyleClass)(item.hoveredColor), padding: { top: '0.25rem', bottom: '0.25rem' } },
+                let itemEl = (this.$render("i-hstack", { verticalAlignment: "center", gap: '0.5rem', tooltip: { content: value, placement: 'bottomLeft' }, cursor: 'pointer', class: (0, index_css_5.getIconStyleClass)(item.hoveredColor), padding: { top: '0.25rem', bottom: '0.25rem' } },
                     this.$render("i-icon", { width: '1rem', height: '1rem', fill: Theme.text.secondary, name: item.icon.name }),
                     lblValue));
                 if (item.highlighted)
@@ -891,7 +1028,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                         success = await item.onClick(itemEl, event);
                     if (success && (item.name === 'Like' || item.name === 'Repost')) {
                         const newValue = (lblValue.tag ?? 0) + 1;
-                        lblValue.caption = components_9.FormatUtils.formatNumber(newValue, { shortScale: true, decimalFigures: 0 });
+                        lblValue.caption = components_10.FormatUtils.formatNumber(newValue, { shortScale: true, decimalFigures: 0 });
                         lblValue.tag = newValue;
                         itemEl.classList.add('highlighted');
                     }
@@ -1026,7 +1163,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                             this.$render("i-panel", { id: "pnlInfo", maxWidth: '100%', overflow: 'hidden' })),
                         this.$render("i-hstack", { id: "pnlSubscribe", stack: { shrink: '0' }, horizontalAlignment: "end", gap: "0.5rem", visible: !this.pinView },
                             this.$render("i-button", { id: "btnSubscribe", minHeight: 32, padding: { left: '1rem', right: '1rem' }, background: { color: Theme.colors.primary.main }, font: { color: Theme.colors.primary.contrastText }, border: { radius: '1.875rem' }, visible: false, caption: 'Subscribe' }),
-                            this.$render("i-panel", { onClick: this.onProfileShown, cursor: "pointer", class: index_css_4.hoverStyle },
+                            this.$render("i-panel", { onClick: this.onProfileShown, cursor: "pointer", class: index_css_5.hoverStyle },
                                 this.$render("i-icon", { name: "ellipsis-h", width: '1rem', height: '1rem', fill: Theme.text.secondary })))),
                     this.$render("i-hstack", { id: "pnlReplyPath", verticalAlignment: "center", gap: "0.25rem", visible: false, grid: { area: 'path' }, margin: { top: '0.5rem' } },
                         this.$render("i-label", { caption: 'replying to', font: { size: '0.875rem', color: Theme.colors.secondary.light } }),
@@ -1053,7 +1190,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     this.$render("i-panel", { id: "pnlInfo", maxWidth: '100%', overflow: 'hidden' }),
                     this.$render("i-hstack", { id: "pnlSubscribe", stack: { shrink: '0' }, horizontalAlignment: "end", gap: "0.5rem", visible: !this.pinView },
                         this.$render("i-button", { id: "btnSubscribe", minHeight: 32, padding: { left: '1rem', right: '1rem' }, background: { color: Theme.colors.primary.main }, font: { color: Theme.colors.primary.contrastText }, border: { radius: '1.875rem' }, visible: false, caption: 'Subscribe' }),
-                        this.$render("i-panel", { onClick: this.onProfileShown, cursor: "pointer", class: index_css_4.hoverStyle },
+                        this.$render("i-panel", { onClick: this.onProfileShown, cursor: "pointer", class: index_css_5.hoverStyle },
                             this.$render("i-icon", { name: "ellipsis-h", width: '1rem', height: '1rem', fill: Theme.text.secondary })))));
                 this.gridPost.append(this.$render("i-hstack", { id: "pnlReplyPath", verticalAlignment: "center", gap: "0.25rem", visible: false, grid: { area: 'path' }, margin: { top: '0.5rem' } },
                     this.$render("i-label", { caption: 'replying to', font: { size: '0.875rem', color: Theme.colors.secondary.light } }),
@@ -1073,11 +1210,11 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             if (data)
                 await this.setData({ data, isActive, type });
             if (!this.bubbleMenu) {
-                this.bubbleMenu = await components_10.ScomPostBubbleMenu.create();
+                this.bubbleMenu = await components_11.ScomPostBubbleMenu.create();
             }
             if (this.overflowEllipse) {
                 if ((this.isReply || this.limitHeight)) {
-                    this.classList.add(index_css_4.maxHeightStyle);
+                    this.classList.add(index_css_5.maxHeightStyle);
                 }
                 // if(this.isReply) {
                 //     this.showMoreWrapper.height = '100%';
@@ -1121,7 +1258,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         handleShowMoreClick() {
             this.showMoreWrapper.visible = false;
             this.expanded = true;
-            this.classList.remove(index_css_4.maxHeightStyle);
+            this.classList.remove(index_css_5.maxHeightStyle);
         }
         onHide() {
             this.removeEventListener("mouseup", this.showBubbleMenu);
@@ -1157,7 +1294,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         }
     };
     ScomPost = __decorate([
-        (0, components_9.customElements)('i-scom-post')
+        (0, components_10.customElements)('i-scom-post')
     ], ScomPost);
     exports.ScomPost = ScomPost;
 });

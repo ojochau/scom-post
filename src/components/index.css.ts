@@ -10,15 +10,30 @@ export const tooltipStyle = Styles.style({
   }
 })
 
-export const imageStyle = Styles.style({
-  display: 'block',
-  aspectRatio: '1 / 1',
+export const getImageStyle = (aspectRatio: string) => {
+  return Styles.style({
+    display: 'block',
+    aspectRatio: aspectRatio,
+    $nest: {
+      '> img': {
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        aspectRatio: aspectRatio
+      }
+    }
+  })
+} 
+
+export const domainLinkStyle = Styles.style({
   $nest: {
-    '> img': {
-      position: 'absolute',
-      width: '100%',
-      height: '100%',
-      aspectRatio: '1 / 1'
+    'i-link a': {
+      color: Theme.text.secondary,
+      textDecoration: 'none'
+    },
+    'i-link a:hover': {
+      color: Theme.colors.primary.dark,
+      textDecoration: 'underline'
     }
   }
 })
