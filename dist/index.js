@@ -130,10 +130,7 @@ define("@scom/scom-post/global/index.ts", ["require", "exports", "@ijstech/compo
             const result = await response.json();
             return {
                 url,
-                title: result.title,
-                description: result.description,
-                image: result.image,
-                og_tags: result.og_tags
+                ...result
             };
         }
         catch (err) { }
@@ -493,8 +490,7 @@ define("@scom/scom-post/components/frames/farcaster.tsx", ["require", "exports",
                         border: { radius: '0.5rem' },
                         stack: { grow: '1' },
                         background: { color: Theme.colors.secondary.main },
-                        font: { size: '0.875rem', color: Theme.colors.secondary.contrastText, weight: 400 },
-                        rightIcon: { name: 'external-link-alt' }
+                        font: { size: '0.875rem', color: Theme.colors.secondary.contrastText, weight: 400 }
                     };
                     if (buttonData.action === 'link') {
                         options.rightIcon = { width: '0.75rem', height: '0.75rem', name: 'external-link-alt' };
@@ -1136,7 +1132,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             this.isPinned = this.getAttribute('isPinned', true, false);
             this.pinView = this.getAttribute('pinView', true, false);
             const apiBaseUrl = this.getAttribute('apiBaseUrl', true);
-            if (apiBaseUrl)
+            if (apiBaseUrl && apiBaseUrl !== 'undefined')
                 this.apiBaseUrl = apiBaseUrl;
             const data = this.getAttribute('data', true);
             const isActive = this.getAttribute('isActive', true, false);
