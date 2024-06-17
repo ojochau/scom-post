@@ -51,6 +51,7 @@ declare module "@scom/scom-post/global/interface.ts" {
         image?: string;
         og_tags?: string[][];
         fc_tags?: string[][];
+        sc_tags?: string[][];
     }
     export interface IShopifyFrame {
         title: string;

@@ -49,6 +49,7 @@ export interface ILinkPreview {
   image?: string;
   og_tags?: string[][];
   fc_tags?: string[][]; // farcaster frame
+  sc_tags?: string[][];
 }
 export interface IShopifyFrame {
   title: string;

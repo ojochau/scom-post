@@ -874,7 +874,7 @@ export class ScomPost extends Module {
         this.isPinned = this.getAttribute('isPinned', true, false);
         this.pinView = this.getAttribute('pinView', true, false);
         const apiBaseUrl = this.getAttribute('apiBaseUrl', true);
-        if (apiBaseUrl) this.apiBaseUrl = apiBaseUrl;
+        if (apiBaseUrl && apiBaseUrl !== 'undefined') this.apiBaseUrl = apiBaseUrl;
 
         const data = this.getAttribute('data', true);
         const isActive = this.getAttribute('isActive', true, false);

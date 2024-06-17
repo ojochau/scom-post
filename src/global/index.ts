@@ -33,10 +33,7 @@ export const getLinkPreview = async (apiBaseUrl: string, url: string): Promise<I
     const result = await response.json();
     return {
       url,
-      title: result.title,
-      description: result.description,
-      image: result.image,
-      og_tags: result.og_tags
+      ...result
     }
   } catch (err) {}
 }

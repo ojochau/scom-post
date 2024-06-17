@@ -68,8 +68,7 @@ export class ScomPostFarcasterFrame extends Module {
                     border: { radius: '0.5rem' },
                     stack: { grow: '1' },
                     background: { color: Theme.colors.secondary.main },
-                    font: { size: '0.875rem', color: Theme.colors.secondary.contrastText, weight: 400 },
-                    rightIcon: { name: 'external-link-alt' }
+                    font: { size: '0.875rem', color: Theme.colors.secondary.contrastText, weight: 400 }
                 };
                 if (buttonData.action === 'link') {
                     options.rightIcon = { width: '0.75rem', height: '0.75rem', name: 'external-link-alt' }
