@@ -1006,15 +1006,29 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                             this.onRepostClicked(target, this.postData, event);
                         return true;
                     }
+                },
+                {
+                    name: 'Bookmark',
+                    icon: { name: 'bookmark' },
+                    hoveredColor: Theme.colors.info.main,
+                    onClick: async (target, event) => {
+                        let isBookmarked = true;
+                        if (this.onBookmarkClicked)
+                            isBookmarked = await this.onBookmarkClicked(target, this.postData, event);
+                        return isBookmarked;
+                    }
                 }
             ];
             this.groupAnalysis.clearInnerHTML();
             for (let item of dataList) {
-                const value = components_10.FormatUtils.formatNumber(item.value, { shortScale: true, decimalFigures: 0 });
-                const lblValue = (this.$render("i-label", { caption: value, font: { color: Theme.colors.secondary.light, size: '0.8125rem' }, tag: item.value }));
-                let itemEl = (this.$render("i-hstack", { verticalAlignment: "center", gap: '0.5rem', tooltip: { content: value, placement: 'bottomLeft' }, cursor: 'pointer', class: (0, index_css_5.getIconStyleClass)(item.hoveredColor), padding: { top: '0.25rem', bottom: '0.25rem' } },
+                let value, lblValue;
+                if (item.value != null) {
+                    value = components_10.FormatUtils.formatNumber(item.value, { shortScale: true, decimalFigures: 0 });
+                    lblValue = (this.$render("i-label", { caption: value, font: { color: Theme.colors.secondary.light, size: '0.8125rem' }, tag: item.value }));
+                }
+                let itemEl = (this.$render("i-hstack", { verticalAlignment: "center", gap: '0.5rem', tooltip: value ? { content: value, placement: 'bottomLeft' } : undefined, cursor: 'pointer', class: (0, index_css_5.getIconStyleClass)(item.hoveredColor), padding: { top: '0.25rem', bottom: '0.25rem' } },
                     this.$render("i-icon", { width: '1rem', height: '1rem', fill: Theme.text.secondary, name: item.icon.name }),
-                    lblValue));
+                    lblValue || []));
                 if (item.highlighted)
                     itemEl.classList.add('highlighted');
                 this.groupAnalysis.appendChild(itemEl);
@@ -1027,6 +1041,12 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                         lblValue.caption = components_10.FormatUtils.formatNumber(newValue, { shortScale: true, decimalFigures: 0 });
                         lblValue.tag = newValue;
                         itemEl.classList.add('highlighted');
+                    }
+                    if (item.name === 'Bookmark') {
+                        if (success)
+                            itemEl.classList.add('highlighted');
+                        else
+                            itemEl.classList.remove('highlighted');
                     }
                 };
             }
@@ -1066,6 +1086,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             childElm.onRepostClicked = this.onRepostClicked;
             childElm.onProfileClicked = this.onProfileClicked;
             childElm.onQuotedPostClicked = this.onQuotedPostClicked;
+            childElm.onBookmarkClicked = this.onBookmarkClicked;
             childElm.parent = this.pnlReplies;
             if (isPrepend)
                 this.pnlReplies.prepend(childElm);
@@ -1125,6 +1146,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             this.onRepostClicked = this.getAttribute('onRepostClicked', true) || this.onRepostClicked;
             this.onProfileClicked = this.getAttribute('onProfileClicked', true) || this.onProfileClicked;
             this.onQuotedPostClicked = this.getAttribute('onQuotedPostClicked', true) || this.onQuotedPostClicked;
+            this.onBookmarkClicked = this.getAttribute('onBookmarkClicked', true) || this.onBookmarkClicked;
             this.overflowEllipse = this.getAttribute('overflowEllipse', true) || this.overflowEllipse;
             this.disableGutters = this.getAttribute('disableGutters', true) || this.disableGutters;
             this.limitHeight = this.getAttribute('limitHeight', true) || this.limitHeight;

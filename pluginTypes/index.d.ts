@@ -267,6 +267,7 @@ declare module "@scom/scom-post" {
         onRepostClicked?: (target: ScomPost, event?: MouseEvent) => void;
         onProfileClicked?: callbackType;
         onQuotedPostClicked?: (target: ScomPost, event?: MouseEvent) => void;
+        onBookmarkClicked?: asyncCallbackType;
         disableGutters?: boolean;
         limitHeight?: boolean;
         isReply?: boolean;
@@ -289,7 +290,7 @@ declare module "@scom/scom-post" {
     }
     type PostType = 'full' | 'standard' | 'short' | 'quoted' | 'card';
     type callbackType = (target: Control, data: IPost, event?: Event, contentElement?: Control) => void;
-    type likeCallbackType = (target: Control, data: IPost, event?: Event, contentElement?: Control) => Promise<boolean>;
+    type asyncCallbackType = (target: Control, data: IPost, event?: Event, contentElement?: Control) => Promise<boolean>;
     export class ScomPost extends Module {
         private pnlInfo;
         private imgAvatar;
@@ -335,10 +336,11 @@ declare module "@scom/scom-post" {
         private _replies;
         onReplyClicked: callbackType;
         onZapClicked: callbackType;
-        onLikeClicked: likeCallbackType;
+        onLikeClicked: asyncCallbackType;
         onRepostClicked: callbackType;
         onProfileClicked: callbackType;
         onQuotedPostClicked: (target: ScomPost, event?: MouseEvent) => void;
+        onBookmarkClicked: asyncCallbackType;
         constructor(parent?: Container, options?: any);
         static create(options?: ScomPostElement, parent?: Container): Promise<ScomPost>;
         get isActive(): boolean;

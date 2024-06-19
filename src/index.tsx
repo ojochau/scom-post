@@ -49,6 +49,7 @@ interface ScomPostElement extends ControlElement {
     onRepostClicked?: (target: ScomPost, event?: MouseEvent) => void;
     onProfileClicked?: callbackType;
     onQuotedPostClicked?: (target: ScomPost, event?: MouseEvent) => void;
+    onBookmarkClicked?: asyncCallbackType;
     disableGutters?: boolean;
     limitHeight?: boolean;
     isReply?: boolean;
@@ -80,7 +81,7 @@ interface IPostCard {
 
 type PostType = 'full' | 'standard' | 'short' | 'quoted' | 'card';
 type callbackType = (target: Control, data: IPost, event?: Event, contentElement?: Control) => void;
-type likeCallbackType = (target: Control, data: IPost, event?: Event, contentElement?: Control) => Promise<boolean>;
+type asyncCallbackType = (target: Control, data: IPost, event?: Event, contentElement?: Control) => Promise<boolean>;
 
 @customElements('i-scom-post')
 export class ScomPost extends Module {
@@ -130,10 +131,11 @@ export class ScomPost extends Module {
     private _replies: IPost[];
     public onReplyClicked: callbackType;
     public onZapClicked: callbackType;
-    public onLikeClicked: likeCallbackType;
+    public onLikeClicked: asyncCallbackType;
     public onRepostClicked: callbackType;
     public onProfileClicked: callbackType;
     public onQuotedPostClicked: (target: ScomPost, event?: MouseEvent) => void;
+    public onBookmarkClicked: asyncCallbackType;
 
     constructor(parent?: Container, options?: any) {
         super(parent, options);
@@ -718,23 +720,36 @@ export class ScomPost extends Module {
                     if (this.onRepostClicked) this.onRepostClicked(target, this.postData, event);
                     return true;
                 }
+            },
+            {
+                name: 'Bookmark',
+                icon: { name: 'bookmark' },
+                hoveredColor: Theme.colors.info.main,
+                onClick: async (target: Control, event: Event) => {
+                    let isBookmarked = true;
+                    if (this.onBookmarkClicked) isBookmarked = await this.onBookmarkClicked(target, this.postData, event);
+                    return isBookmarked;
+                }
             }
         ]
         this.groupAnalysis.clearInnerHTML();
         for (let item of dataList) {
-            const value = FormatUtils.formatNumber(item.value, { shortScale: true, decimalFigures: 0 });
-            const lblValue = (
-                <i-label
-                    caption={value}
-                    font={{ color: Theme.colors.secondary.light, size: '0.8125rem' }}
-                    tag={item.value}
-                ></i-label>
-            )
+            let value, lblValue;
+            if (item.value != null) {
+                value = FormatUtils.formatNumber(item.value, { shortScale: true, decimalFigures: 0 });
+                lblValue = (
+                    <i-label
+                        caption={value}
+                        font={{ color: Theme.colors.secondary.light, size: '0.8125rem' }}
+                        tag={item.value}
+                    ></i-label>
+                )
+            }
             let itemEl = (
                 <i-hstack
                     verticalAlignment="center"
                     gap='0.5rem'
-                    tooltip={{ content: value, placement: 'bottomLeft' }}
+                    tooltip={value ? { content: value, placement: 'bottomLeft' } : undefined}
                     cursor='pointer'
                     class={getIconStyleClass(item.hoveredColor)}
                     padding={{ top: '0.25rem', bottom: '0.25rem' }}
@@ -744,7 +759,7 @@ export class ScomPost extends Module {
                         fill={Theme.text.secondary}
                         name={item.icon.name as IconName}
                     ></i-icon>
-                    {lblValue}
+                    {lblValue || []}
                 </i-hstack>
             )
             if (item.highlighted) itemEl.classList.add('highlighted');
@@ -757,6 +772,12 @@ export class ScomPost extends Module {
                     lblValue.caption = FormatUtils.formatNumber(newValue, { shortScale: true, decimalFigures: 0 });
                     lblValue.tag = newValue;
                     itemEl.classList.add('highlighted');
+                }
+                if (item.name === 'Bookmark') {
+                    if (success)
+                        itemEl.classList.add('highlighted');
+                    else
+                        itemEl.classList.remove('highlighted');
                 }
             }
         }
@@ -796,6 +817,7 @@ export class ScomPost extends Module {
         childElm.onRepostClicked = this.onRepostClicked;
         childElm.onProfileClicked = this.onProfileClicked;
         childElm.onQuotedPostClicked = this.onQuotedPostClicked;
+        childElm.onBookmarkClicked = this.onBookmarkClicked;
         childElm.parent = this.pnlReplies;
         if (isPrepend)
             this.pnlReplies.prepend(childElm);
@@ -867,6 +889,7 @@ export class ScomPost extends Module {
         this.onRepostClicked = this.getAttribute('onRepostClicked', true) || this.onRepostClicked;
         this.onProfileClicked = this.getAttribute('onProfileClicked', true) || this.onProfileClicked;
         this.onQuotedPostClicked = this.getAttribute('onQuotedPostClicked', true) || this.onQuotedPostClicked;
+        this.onBookmarkClicked = this.getAttribute('onBookmarkClicked', true) || this.onBookmarkClicked;
         this.overflowEllipse = this.getAttribute('overflowEllipse', true) || this.overflowEllipse;
         this.disableGutters = this.getAttribute('disableGutters', true) || this.disableGutters;
         this.limitHeight = this.getAttribute('limitHeight', true) || this.limitHeight;
