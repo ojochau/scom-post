@@ -1011,6 +1011,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     name: 'Bookmark',
                     icon: { name: 'bookmark' },
                     hoveredColor: Theme.colors.info.main,
+                    highlighted: actions?.bookmarked,
                     onClick: async (target, event) => {
                         let isBookmarked = true;
                         if (this.onBookmarkClicked)

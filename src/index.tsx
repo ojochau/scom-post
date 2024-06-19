@@ -725,6 +725,7 @@ export class ScomPost extends Module {
                 name: 'Bookmark',
                 icon: { name: 'bookmark' },
                 hoveredColor: Theme.colors.info.main,
+                highlighted: actions?.bookmarked,
                 onClick: async (target: Control, event: Event) => {
                     let isBookmarked = true;
                     if (this.onBookmarkClicked) isBookmarked = await this.onBookmarkClicked(target, this.postData, event);

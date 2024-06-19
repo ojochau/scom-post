@@ -33,6 +33,7 @@ declare module "@scom/scom-post/global/interface.ts" {
         replied?: boolean;
         reposted?: boolean;
         zapped?: boolean;
+        bookmarked?: boolean;
     }
     export interface IPostData {
         module: string;
