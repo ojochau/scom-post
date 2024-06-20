@@ -1013,10 +1013,9 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     hoveredColor: Theme.colors.info.main,
                     highlighted: actions?.bookmarked,
                     onClick: async (target, event) => {
-                        let isBookmarked = true;
                         if (this.onBookmarkClicked)
-                            isBookmarked = await this.onBookmarkClicked(target, this.postData, event);
-                        return isBookmarked;
+                            this.onBookmarkClicked(target, this.postData, event);
+                        return true;
                     }
                 }
             ];
@@ -1044,10 +1043,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                         itemEl.classList.add('highlighted');
                     }
                     if (item.name === 'Bookmark') {
-                        if (success)
-                            itemEl.classList.add('highlighted');
-                        else
-                            itemEl.classList.remove('highlighted');
+                        itemEl.classList.toggle('highlighted');
                     }
                 };
             }
