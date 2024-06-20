@@ -49,7 +49,7 @@ interface ScomPostElement extends ControlElement {
     onRepostClicked?: (target: ScomPost, event?: MouseEvent) => void;
     onProfileClicked?: callbackType;
     onQuotedPostClicked?: (target: ScomPost, event?: MouseEvent) => void;
-    onBookmarkClicked?: asyncCallbackType;
+    onBookmarkClicked?: callbackType;
     disableGutters?: boolean;
     limitHeight?: boolean;
     isReply?: boolean;
@@ -135,7 +135,7 @@ export class ScomPost extends Module {
     public onRepostClicked: callbackType;
     public onProfileClicked: callbackType;
     public onQuotedPostClicked: (target: ScomPost, event?: MouseEvent) => void;
-    public onBookmarkClicked: asyncCallbackType;
+    public onBookmarkClicked: callbackType;
 
     constructor(parent?: Container, options?: any) {
         super(parent, options);
@@ -727,9 +727,8 @@ export class ScomPost extends Module {
                 hoveredColor: Theme.colors.info.main,
                 highlighted: actions?.bookmarked,
                 onClick: async (target: Control, event: Event) => {
-                    let isBookmarked = true;
-                    if (this.onBookmarkClicked) isBookmarked = await this.onBookmarkClicked(target, this.postData, event);
-                    return isBookmarked;
+                    if (this.onBookmarkClicked) this.onBookmarkClicked(target, this.postData, event);
+                    return true;
                 }
             }
         ]
@@ -775,10 +774,7 @@ export class ScomPost extends Module {
                     itemEl.classList.add('highlighted');
                 }
                 if (item.name === 'Bookmark') {
-                    if (success)
-                        itemEl.classList.add('highlighted');
-                    else
-                        itemEl.classList.remove('highlighted');
+                    itemEl.classList.toggle('highlighted');
                 }
             }
         }

@@ -268,7 +268,7 @@ declare module "@scom/scom-post" {
         onRepostClicked?: (target: ScomPost, event?: MouseEvent) => void;
         onProfileClicked?: callbackType;
         onQuotedPostClicked?: (target: ScomPost, event?: MouseEvent) => void;
-        onBookmarkClicked?: asyncCallbackType;
+        onBookmarkClicked?: callbackType;
         disableGutters?: boolean;
         limitHeight?: boolean;
         isReply?: boolean;
@@ -341,7 +341,7 @@ declare module "@scom/scom-post" {
         onRepostClicked: callbackType;
         onProfileClicked: callbackType;
         onQuotedPostClicked: (target: ScomPost, event?: MouseEvent) => void;
-        onBookmarkClicked: asyncCallbackType;
+        onBookmarkClicked: callbackType;
         constructor(parent?: Container, options?: any);
         static create(options?: ScomPostElement, parent?: Container): Promise<ScomPost>;
         get isActive(): boolean;
