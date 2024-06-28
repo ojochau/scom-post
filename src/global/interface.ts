@@ -17,6 +17,7 @@ export interface IPost {
   repost?: IAuthor;
   community?: ICommunity;
   actions?: IPostActions;
+  isPublicPost?: boolean;
 };
 export interface IPostStats {
 	replies?: number;
