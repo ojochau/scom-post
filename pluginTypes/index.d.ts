@@ -19,6 +19,7 @@ declare module "@scom/scom-post/global/interface.ts" {
         repost?: IAuthor;
         community?: ICommunity;
         actions?: IPostActions;
+        isPublicPost?: boolean;
     }
     export interface IPostStats {
         replies?: number;
@@ -276,6 +277,7 @@ declare module "@scom/scom-post" {
         isPinned?: boolean;
         pinView?: boolean;
         apiBaseUrl?: string;
+        isPublicPostLabelShown?: boolean;
     }
     global {
         namespace JSX {
@@ -294,6 +296,7 @@ declare module "@scom/scom-post" {
     type asyncCallbackType = (target: Control, data: IPost, event?: Event, contentElement?: Control) => Promise<boolean>;
     export class ScomPost extends Module {
         private pnlInfo;
+        private pnlPublicLabel;
         private imgAvatar;
         private lblOwner;
         private lblUsername;
@@ -333,6 +336,7 @@ declare module "@scom/scom-post" {
         private _isPinned;
         private pinView;
         private _apiBaseUrl;
+        private _isPublicPostLabelShown;
         private _data;
         private _replies;
         onReplyClicked: callbackType;
@@ -358,6 +362,8 @@ declare module "@scom/scom-post" {
         set isPinned(value: boolean);
         get apiBaseUrl(): string;
         set apiBaseUrl(value: string);
+        get isPublicPostLabelShown(): boolean;
+        set isPublicPostLabelShown(value: boolean);
         clear(): void;
         private isMarkdown;
         private constructPostCard;

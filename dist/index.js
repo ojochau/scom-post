@@ -553,6 +553,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         constructor(parent, options) {
             super(parent, options);
             this.expanded = false;
+            this._isPublicPostLabelShown = false;
             this.onProfileShown = this.onProfileShown.bind(this);
             this.onShowMore = this.onShowMore.bind(this);
             this.showBubbleMenu = this.showBubbleMenu.bind(this);
@@ -605,6 +606,14 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         }
         set apiBaseUrl(value) {
             this._apiBaseUrl = value;
+        }
+        get isPublicPostLabelShown() {
+            return this._isPublicPostLabelShown;
+        }
+        set isPublicPostLabelShown(value) {
+            this._isPublicPostLabelShown = value;
+            if (this.pnlPublicLabel)
+                this.pnlPublicLabel.visible = value;
         }
         clear() {
             if (this.pnlOverlay)
@@ -903,7 +912,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             const dateEl = (this.$render("i-hstack", { gap: '0.25rem', stack: { shrink: '0' } },
                 this.$render("i-panel", { border: { left: { width: '1px', style: 'solid', color: Theme.text.secondary } } }),
                 this.$render("i-label", { id: "lblDate", font: { size: '0.875rem', color: Theme.text.secondary }, caption: `${(0, global_4.getDuration)(publishDate)}`, lineHeight: '0.875rem' })));
-            const usernameEl = (this.$render("i-label", { id: "lblUsername", caption: `${author?.internetIdentifier || ''}`, maxWidth: this.isQuotedPost ? '13.75rem' : '12.5rem', textOverflow: "ellipsis", font: { size: this.isQuotedPost ? '1rem' : '0.875rem', color: Theme.text.secondary }, lineHeight: '0.875rem' }));
+            const usernameEl = (this.$render("i-label", { id: "lblUsername", caption: `${author?.internetIdentifier || ''}`, maxWidth: this.isQuotedPost ? '13.75rem' : '12.5rem', textOverflow: "ellipsis", font: { size: this.isQuotedPost ? '1rem' : '0.875rem', color: Theme.text.secondary }, lineHeight: '0.875rem', visible: author?.internetIdentifier != null }));
             if (oneLine) {
                 this.pnlInfo.append(this.$render("i-hstack", { height: "100%", gap: "0.25rem", verticalAlignment: "center" },
                     userEl,
@@ -1153,6 +1162,9 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             const apiBaseUrl = this.getAttribute('apiBaseUrl', true);
             if (apiBaseUrl && apiBaseUrl !== 'undefined')
                 this.apiBaseUrl = apiBaseUrl;
+            const isPublicPostLabelShown = this.getAttribute('isPublicPostLabelShown', true);
+            if (isPublicPostLabelShown != null)
+                this.isPublicPostLabelShown = isPublicPostLabelShown;
             const data = this.getAttribute('data', true);
             const isActive = this.getAttribute('isActive', true, false);
             const type = this.getAttribute('type', true);
@@ -1175,7 +1187,11 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                         this.$render("i-hstack", { alignItems: 'center', gap: 10 },
                             this.$render("i-panel", { id: "pnlAvatar", grid: { area: 'avatar' } },
                                 this.$render("i-image", { id: "imgAvatar", width: '2.75rem', height: '2.75rem', display: "block", background: { color: Theme.background.main }, border: { radius: '50%' }, overflow: 'hidden', objectFit: 'cover', fallbackUrl: assets_2.default.fullPath('img/default_avatar.png'), cursor: "pointer", onClick: () => this.onGoProfile() })),
-                            this.$render("i-panel", { id: "pnlInfo", maxWidth: '100%', overflow: 'hidden' })),
+                            this.$render("i-stack", { direction: "vertical", gap: "0.375rem" },
+                                this.$render("i-panel", { id: "pnlInfo", maxWidth: '100%', overflow: 'hidden' }),
+                                this.$render("i-stack", { id: "pnlPublicLabel", direction: "horizontal", alignItems: "center", gap: "0.25rem", visible: this.isPublicPostLabelShown },
+                                    this.$render("i-icon", { width: "0.875rem", height: "0.875rem", name: "globe-americas", display: 'inline-flex', fill: Theme.text.secondary }),
+                                    this.$render("i-label", { caption: "Public", font: { size: '0.875rem', color: Theme.text.secondary } })))),
                         this.$render("i-hstack", { id: "pnlSubscribe", stack: { shrink: '0' }, horizontalAlignment: "end", gap: "0.5rem", visible: !this.pinView },
                             this.$render("i-button", { id: "btnSubscribe", minHeight: 32, padding: { left: '1rem', right: '1rem' }, background: { color: Theme.colors.primary.main }, font: { color: Theme.colors.primary.contrastText }, border: { radius: '1.875rem' }, visible: false, caption: 'Subscribe' }),
                             this.$render("i-panel", { onClick: this.onProfileShown, cursor: "pointer", class: index_css_5.hoverStyle },
@@ -1202,7 +1218,11 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                 this.gridPost.append(this.$render("i-panel", { id: "pnlAvatar", grid: { area: 'avatar' } },
                     this.$render("i-image", { id: "imgAvatar", width: '2.75rem', height: '2.75rem', display: "block", background: { color: Theme.background.main }, border: { radius: '50%' }, overflow: 'hidden', objectFit: 'cover', fallbackUrl: assets_2.default.fullPath('img/default_avatar.png'), cursor: "pointer", onClick: () => this.onGoProfile() })));
                 this.gridPost.append(this.$render("i-hstack", { horizontalAlignment: "space-between", gap: "0.5rem", width: "100%", grid: { area: 'user' }, position: 'relative' },
-                    this.$render("i-panel", { id: "pnlInfo", maxWidth: '100%', overflow: 'hidden' }),
+                    this.$render("i-stack", { direction: "vertical", gap: "0.375rem" },
+                        this.$render("i-panel", { id: "pnlInfo", maxWidth: '100%', overflow: 'hidden' }),
+                        this.$render("i-stack", { id: "pnlPublicLabel", direction: "horizontal", alignItems: "center", gap: "0.25rem", visible: this.isPublicPostLabelShown },
+                            this.$render("i-icon", { width: "0.875rem", height: "0.875rem", name: "globe-americas", display: 'inline-flex', fill: Theme.text.secondary }),
+                            this.$render("i-label", { caption: "Public", font: { size: '0.875rem', color: Theme.text.secondary } }))),
                     this.$render("i-hstack", { id: "pnlSubscribe", stack: { shrink: '0' }, horizontalAlignment: "end", gap: "0.5rem", visible: !this.pinView },
                         this.$render("i-button", { id: "btnSubscribe", minHeight: 32, padding: { left: '1rem', right: '1rem' }, background: { color: Theme.colors.primary.main }, font: { color: Theme.colors.primary.contrastText }, border: { radius: '1.875rem' }, visible: false, caption: 'Subscribe' }),
                         this.$render("i-panel", { onClick: this.onProfileShown, cursor: "pointer", class: index_css_5.hoverStyle },

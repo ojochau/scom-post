@@ -57,6 +57,7 @@ interface ScomPostElement extends ControlElement {
     isPinned?: boolean;
     pinView?: boolean;
     apiBaseUrl?: string;
+    isPublicPostLabelShown?: boolean;
 }
 
 declare global {
@@ -86,6 +87,7 @@ type asyncCallbackType = (target: Control, data: IPost, event?: Event, contentEl
 @customElements('i-scom-post')
 export class ScomPost extends Module {
     private pnlInfo: Panel;
+    private pnlPublicLabel: StackLayout;
     private imgAvatar: Image;
     private lblOwner: Label;
     private lblUsername: Label;
@@ -126,6 +128,7 @@ export class ScomPost extends Module {
     private _isPinned: boolean;
     private pinView: boolean;
     private _apiBaseUrl: string;
+    private _isPublicPostLabelShown: boolean = false;
 
     private _data: IPostConfig;
     private _replies: IPost[];
@@ -206,6 +209,15 @@ export class ScomPost extends Module {
 
     set apiBaseUrl(value: string) {
         this._apiBaseUrl = value;
+    }
+
+    get isPublicPostLabelShown() {
+        return this._isPublicPostLabelShown;
+    }
+
+    set isPublicPostLabelShown(value: boolean) {
+        this._isPublicPostLabelShown = value;
+        if (this.pnlPublicLabel) this.pnlPublicLabel.visible = value;
     }
 
     clear() {
@@ -610,6 +622,7 @@ export class ScomPost extends Module {
                 textOverflow="ellipsis"
                 font={{ size: this.isQuotedPost ? '1rem' : '0.875rem', color: Theme.text.secondary }}
                 lineHeight={'0.875rem'}
+                visible={author?.internetIdentifier != null}
             ></i-label>
         );
         if (oneLine) {
@@ -895,6 +908,8 @@ export class ScomPost extends Module {
         this.pinView = this.getAttribute('pinView', true, false);
         const apiBaseUrl = this.getAttribute('apiBaseUrl', true);
         if (apiBaseUrl && apiBaseUrl !== 'undefined') this.apiBaseUrl = apiBaseUrl;
+        const isPublicPostLabelShown = this.getAttribute('isPublicPostLabelShown', true);
+        if (isPublicPostLabelShown != null) this.isPublicPostLabelShown = isPublicPostLabelShown;
 
         const data = this.getAttribute('data', true);
         const isActive = this.getAttribute('isActive', true, false);
@@ -945,7 +960,22 @@ export class ScomPost extends Module {
                                     onClick={() => this.onGoProfile()}
                                 ></i-image>
                             </i-panel>
-                            <i-panel id="pnlInfo" maxWidth={'100%'} overflow={'hidden'}></i-panel>
+                            <i-stack direction="vertical" gap="0.375rem">
+                                <i-panel id="pnlInfo" maxWidth={'100%'} overflow={'hidden'}></i-panel>
+                                <i-stack id="pnlPublicLabel" direction="horizontal" alignItems="center" gap="0.25rem" visible={this.isPublicPostLabelShown}>
+                                    <i-icon
+                                        width="0.875rem"
+                                        height="0.875rem"
+                                        name="globe-americas"
+                                        display='inline-flex'
+                                        fill={Theme.text.secondary}
+                                    ></i-icon>
+                                    <i-label
+                                        caption="Public"
+                                        font={{ size: '0.875rem', color: Theme.text.secondary }}
+                                    ></i-label>
+                                </i-stack>
+                            </i-stack>
                         </i-hstack>
                         <i-hstack
                             id="pnlSubscribe" stack={{ shrink: '0' }}
@@ -1073,7 +1103,22 @@ export class ScomPost extends Module {
             this.gridPost.append(<i-hstack horizontalAlignment="space-between" gap="0.5rem" width="100%"
                 grid={{ area: 'user' }}
                 position='relative'>
-                <i-panel id="pnlInfo" maxWidth={'100%'} overflow={'hidden'}></i-panel>
+                <i-stack direction="vertical" gap="0.375rem">
+                    <i-panel id="pnlInfo" maxWidth={'100%'} overflow={'hidden'}></i-panel>
+                    <i-stack id="pnlPublicLabel" direction="horizontal" alignItems="center" gap="0.25rem" visible={this.isPublicPostLabelShown}>
+                        <i-icon
+                            width="0.875rem"
+                            height="0.875rem"
+                            name="globe-americas"
+                            display='inline-flex'
+                            fill={Theme.text.secondary}
+                        ></i-icon>
+                        <i-label
+                            caption="Public"
+                            font={{ size: '0.875rem', color: Theme.text.secondary }}
+                        ></i-label>
+                    </i-stack>
+                </i-stack>
                 <i-hstack
                     id="pnlSubscribe" stack={{ shrink: '0' }}
                     horizontalAlignment="end"
