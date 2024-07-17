@@ -18,12 +18,32 @@ export const getEmbedElement = async (postData: IPostData, parent: Control, call
   if (builderTarget?.setData && data.properties) {
     await builderTarget.setData(data.properties);
   }
-  if (builderTarget?.setTag && data.tag) {
-    await builderTarget.setTag(data.tag);
+  const { dark, light } = data.properties || {};
+  let tag = {};
+  const darkTheme = getThemeValues(dark);
+  const lightTheme = getThemeValues(light);
+  if (darkTheme) {
+    tag['dark'] = darkTheme;
+  }
+  if (lightTheme) {
+    tag['light'] = lightTheme;
+  }
+  tag = { ...tag, ...data.tag };
+  if (builderTarget?.setTag && Object.keys(tag).length) {
+    await builderTarget.setTag(tag);
   }
   application.EventBus.dispatch('POST_CREATED_EMBED_ELEMENT', { module, elm });
   if (callback) callback(elm);
   return elm;
+}
+
+const getThemeValues = (theme: any) => {
+  if (!theme || typeof theme !== 'object') return null;
+  let values = {};
+  for (let prop in theme) {
+    if (theme[prop]) values[prop] = theme[prop];
+  }
+  return Object.keys(values).length ? values : null;
 }
 
 export const getLinkPreview = async (apiBaseUrl: string, url: string): Promise<ILinkPreview | undefined> => {

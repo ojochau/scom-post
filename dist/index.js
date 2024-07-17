@@ -113,8 +113,19 @@ define("@scom/scom-post/global/index.ts", ["require", "exports", "@ijstech/compo
         if (builderTarget?.setData && data.properties) {
             await builderTarget.setData(data.properties);
         }
-        if (builderTarget?.setTag && data.tag) {
-            await builderTarget.setTag(data.tag);
+        const { dark, light } = data.properties || {};
+        let tag = {};
+        const darkTheme = getThemeValues(dark);
+        const lightTheme = getThemeValues(light);
+        if (darkTheme) {
+            tag['dark'] = darkTheme;
+        }
+        if (lightTheme) {
+            tag['light'] = lightTheme;
+        }
+        tag = { ...tag, ...data.tag };
+        if (builderTarget?.setTag && Object.keys(tag).length) {
+            await builderTarget.setTag(tag);
         }
         components_2.application.EventBus.dispatch('POST_CREATED_EMBED_ELEMENT', { module, elm });
         if (callback)
@@ -122,6 +133,16 @@ define("@scom/scom-post/global/index.ts", ["require", "exports", "@ijstech/compo
         return elm;
     };
     exports.getEmbedElement = getEmbedElement;
+    const getThemeValues = (theme) => {
+        if (!theme || typeof theme !== 'object')
+            return null;
+        let values = {};
+        for (let prop in theme) {
+            if (theme[prop])
+                values[prop] = theme[prop];
+        }
+        return Object.keys(values).length ? values : null;
+    };
     const getLinkPreview = async (apiBaseUrl, url) => {
         try {
             if (!apiBaseUrl.endsWith('/'))
