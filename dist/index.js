@@ -105,7 +105,7 @@ define("@scom/scom-post/global/index.ts", ["require", "exports", "@ijstech/compo
         if (!elm)
             throw new Error('not found');
         elm.parent = parent;
-        const builderTarget = elm.getConfigurators ? elm.getConfigurators().find((conf) => conf.target === 'Builders') : null;
+        const builderTarget = elm.getConfigurators ? elm.getConfigurators().find((conf) => conf.target === 'Builders' || conf.target === 'Editor') : null;
         if (elm.ready)
             await elm.ready();
         elm.maxWidth = '100%';
