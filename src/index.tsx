@@ -50,6 +50,7 @@ interface ScomPostElement extends ControlElement {
     onProfileClicked?: callbackType;
     onQuotedPostClicked?: (target: ScomPost, event?: MouseEvent) => void;
     onBookmarkClicked?: callbackType;
+    onCommunityClicked?: callbackType;
     disableGutters?: boolean;
     limitHeight?: boolean;
     isReply?: boolean;
@@ -139,12 +140,14 @@ export class ScomPost extends Module {
     public onProfileClicked: callbackType;
     public onQuotedPostClicked: (target: ScomPost, event?: MouseEvent) => void;
     public onBookmarkClicked: callbackType;
+    public onCommunityClicked: callbackType;
 
     constructor(parent?: Container, options?: any) {
         super(parent, options);
         this.onProfileShown = this.onProfileShown.bind(this);
         this.onShowMore = this.onShowMore.bind(this);
         this.showBubbleMenu = this.showBubbleMenu.bind(this);
+        this.onGoCommunity = this.onGoCommunity.bind(this);
     }
 
     static async create(options?: ScomPostElement, parent?: Container) {
@@ -435,7 +438,7 @@ export class ScomPost extends Module {
                     caption={community.communityId}
                     font={{ size: "0.875rem", color: Theme.text.secondary }}
                     cursor="pointer"
-                    onClick={() => this.onGoCommunity(community.communityId, community.creatorId)}
+                    onClick={this.onGoCommunity}
                 ></i-label>
             )
             this.pnlCommunity.visible = true;
@@ -882,8 +885,8 @@ export class ScomPost extends Module {
         }
     }
 
-    private onGoCommunity(communityId: string, creatorId: string) {
-        window.open(`#!/c/${communityId}/${creatorId}`, '_self');
+    private onGoCommunity(target: Control, event: Event) {
+        if (this.onCommunityClicked) this.onCommunityClicked(target, this.postData, event);
     }
 
     // private handleShowMoreClick() {
@@ -900,6 +903,7 @@ export class ScomPost extends Module {
         this.onProfileClicked = this.getAttribute('onProfileClicked', true) || this.onProfileClicked;
         this.onQuotedPostClicked = this.getAttribute('onQuotedPostClicked', true) || this.onQuotedPostClicked;
         this.onBookmarkClicked = this.getAttribute('onBookmarkClicked', true) || this.onBookmarkClicked;
+        this.onCommunityClicked = this.getAttribute('onCommunityClicked', true) || this.onCommunityClicked;
         this.overflowEllipse = this.getAttribute('overflowEllipse', true) || this.overflowEllipse;
         this.disableGutters = this.getAttribute('disableGutters', true) || this.disableGutters;
         this.limitHeight = this.getAttribute('limitHeight', true) || this.limitHeight;

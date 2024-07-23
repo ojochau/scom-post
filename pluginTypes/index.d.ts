@@ -45,6 +45,8 @@ declare module "@scom/scom-post/global/interface.ts" {
         communityUri?: string;
         creatorId?: string;
         communityId?: string;
+        privateRelay?: string;
+        parentCommunityUri?: string;
     }
     export interface ILinkPreview {
         url: string;
@@ -270,6 +272,7 @@ declare module "@scom/scom-post" {
         onProfileClicked?: callbackType;
         onQuotedPostClicked?: (target: ScomPost, event?: MouseEvent) => void;
         onBookmarkClicked?: callbackType;
+        onCommunityClicked?: callbackType;
         disableGutters?: boolean;
         limitHeight?: boolean;
         isReply?: boolean;
@@ -346,6 +349,7 @@ declare module "@scom/scom-post" {
         onProfileClicked: callbackType;
         onQuotedPostClicked: (target: ScomPost, event?: MouseEvent) => void;
         onBookmarkClicked: callbackType;
+        onCommunityClicked: callbackType;
         constructor(parent?: Container, options?: any);
         static create(options?: ScomPostElement, parent?: Container): Promise<ScomPost>;
         get isActive(): boolean;
