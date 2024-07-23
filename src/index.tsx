@@ -59,6 +59,7 @@ interface ScomPostElement extends ControlElement {
     pinView?: boolean;
     apiBaseUrl?: string;
     isPublicPostLabelShown?: boolean;
+    lazyLoad?: boolean;
 }
 
 declare global {
@@ -1216,8 +1217,10 @@ export class ScomPost extends Module {
             </i-vstack>)
         }
 
-
-        if (data) await this.setData({ data, isActive, type });
+        const lazyLoad = this.getAttribute('lazyLoad', true, false);
+        if (!lazyLoad) {
+            if (data) await this.setData({ data, isActive, type });
+        }
         if (!this.bubbleMenu) {
             this.bubbleMenu = await ScomPostBubbleMenu.create() as ScomPostBubbleMenu;
         }
