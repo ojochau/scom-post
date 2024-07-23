@@ -43,6 +43,8 @@ export interface ICommunity {
   communityUri?: string;
 	creatorId?: string;
 	communityId?: string;
+	privateRelay?: string;
+	parentCommunityUri?: string;
 }
 export interface ILinkPreview {
   url: string;

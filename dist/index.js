@@ -578,6 +578,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             this.onProfileShown = this.onProfileShown.bind(this);
             this.onShowMore = this.onShowMore.bind(this);
             this.showBubbleMenu = this.showBubbleMenu.bind(this);
+            this.onGoCommunity = this.onGoCommunity.bind(this);
         }
         static async create(options, parent) {
             let self = new this(parent, options);
@@ -781,7 +782,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             if (community) {
                 this.pnlCommunity.clearInnerHTML();
                 this.pnlCommunity.append(this.$render("i-hstack", { width: "2.75rem", horizontalAlignment: 'end' },
-                    this.$render("i-icon", { width: "1rem", height: "1rem", name: "users", fill: Theme.text.secondary })), this.$render("i-label", { class: index_css_5.labelHoverStyle, caption: community.communityId, font: { size: "0.875rem", color: Theme.text.secondary }, cursor: "pointer", onClick: () => this.onGoCommunity(community.communityId, community.creatorId) }));
+                    this.$render("i-icon", { width: "1rem", height: "1rem", name: "users", fill: Theme.text.secondary })), this.$render("i-label", { class: index_css_5.labelHoverStyle, caption: community.communityId, font: { size: "0.875rem", color: Theme.text.secondary }, cursor: "pointer", onClick: this.onGoCommunity }));
                 this.pnlCommunity.visible = true;
             }
             if (this.type === 'card' && isMarkdown) {
@@ -1158,8 +1159,9 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                 window.open(`#!/p/${npub}`, '_self');
             }
         }
-        onGoCommunity(communityId, creatorId) {
-            window.open(`#!/c/${communityId}/${creatorId}`, '_self');
+        onGoCommunity(target, event) {
+            if (this.onCommunityClicked)
+                this.onCommunityClicked(target, this.postData, event);
         }
         // private handleShowMoreClick() {
         //     this.pnlContent.classList.remove(ellipsisStyle);
@@ -1174,6 +1176,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             this.onProfileClicked = this.getAttribute('onProfileClicked', true) || this.onProfileClicked;
             this.onQuotedPostClicked = this.getAttribute('onQuotedPostClicked', true) || this.onQuotedPostClicked;
             this.onBookmarkClicked = this.getAttribute('onBookmarkClicked', true) || this.onBookmarkClicked;
+            this.onCommunityClicked = this.getAttribute('onCommunityClicked', true) || this.onCommunityClicked;
             this.overflowEllipse = this.getAttribute('overflowEllipse', true) || this.overflowEllipse;
             this.disableGutters = this.getAttribute('disableGutters', true) || this.disableGutters;
             this.limitHeight = this.getAttribute('limitHeight', true) || this.limitHeight;
