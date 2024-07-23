@@ -1266,8 +1266,11 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                         this.$render("i-icon", { name: "angle-down", width: 16, height: 16, fill: Theme.colors.primary.main })),
                     this.$render("i-hstack", { id: "groupAnalysis", horizontalAlignment: "space-between", padding: { top: '0.563rem' }, width: '100%', visible: !this.pinView })));
             }
-            if (data)
-                await this.setData({ data, isActive, type });
+            const lazyLoad = this.getAttribute('lazyLoad', true, false);
+            if (!lazyLoad) {
+                if (data)
+                    await this.setData({ data, isActive, type });
+            }
             if (!this.bubbleMenu) {
                 this.bubbleMenu = await components_11.ScomPostBubbleMenu.create();
             }

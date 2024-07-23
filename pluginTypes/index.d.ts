@@ -281,6 +281,7 @@ declare module "@scom/scom-post" {
         pinView?: boolean;
         apiBaseUrl?: string;
         isPublicPostLabelShown?: boolean;
+        lazyLoad?: boolean;
     }
     global {
         namespace JSX {
