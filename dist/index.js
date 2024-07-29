@@ -637,6 +637,12 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             if (this.pnlPublicLabel)
                 this.pnlPublicLabel.visible = value;
         }
+        set status(value) {
+            if (this.lblStatus) {
+                this.lblStatus.caption = value;
+                this.lblStatus.parent.visible = value != null;
+            }
+        }
         clear() {
             if (this.pnlOverlay)
                 this.pnlOverlay.visible = false;
@@ -935,24 +941,21 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                 this.$render("i-panel", { border: { left: { width: '1px', style: 'solid', color: Theme.text.secondary } } }),
                 this.$render("i-label", { id: "lblDate", font: { size: '0.875rem', color: Theme.text.secondary }, caption: `${(0, global_4.getDuration)(publishDate)}`, lineHeight: '0.875rem' })));
             const usernameEl = (this.$render("i-label", { id: "lblUsername", caption: `${author?.internetIdentifier || ''}`, maxWidth: this.isQuotedPost ? '13.75rem' : '12.5rem', textOverflow: "ellipsis", font: { size: this.isQuotedPost ? '1rem' : '0.875rem', color: Theme.text.secondary }, lineHeight: '0.875rem', visible: author?.internetIdentifier != null }));
-            let statusEl;
-            if (stats?.status) {
-                statusEl = (this.$render("i-hstack", { gap: '0.25rem', stack: { shrink: '0' } },
-                    this.$render("i-label", { caption: stats.status, padding: { top: 3, bottom: 3, left: 12, right: 12 }, border: { width: 1, style: 'solid', color: Theme.colors.primary.main, radius: 20 }, font: { size: '0.875rem', color: Theme.colors.primary.main }, lineHeight: '0.875rem' })));
-            }
+            let statusEl = (this.$render("i-hstack", { gap: '0.25rem', stack: { shrink: '0' }, visible: stats?.status != null },
+                this.$render("i-label", { id: "lblStatus", caption: stats.status, padding: { top: 3, bottom: 3, left: 12, right: 12 }, border: { width: 1, style: 'solid', color: Theme.colors.primary.main, radius: 20 }, font: { size: '0.875rem', color: Theme.colors.primary.main }, lineHeight: '0.875rem' })));
             if (oneLine) {
                 this.pnlInfo.append(this.$render("i-hstack", { height: "100%", gap: "0.25rem", verticalAlignment: "center" },
                     userEl,
                     usernameEl,
                     dateEl,
-                    statusEl ? statusEl : []));
+                    statusEl));
             }
             else {
                 this.pnlInfo.append(this.$render("i-vstack", { gap: "0.5rem" },
                     this.$render("i-hstack", { gap: "0.25rem", verticalAlignment: "center" },
                         userEl,
                         dateEl,
-                        statusEl ? statusEl : []),
+                        statusEl),
                     usernameEl));
             }
         }
