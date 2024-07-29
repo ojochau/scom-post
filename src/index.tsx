@@ -630,7 +630,7 @@ export class ScomPost extends Module {
             ></i-label>
         );
         let statusEl;
-        if (stats.status) {
+        if (stats?.status) {
             statusEl = (
                 <i-hstack gap={'0.25rem'} stack={{ shrink: '0' }}>
                     <i-label
