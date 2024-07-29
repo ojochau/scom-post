@@ -28,6 +28,7 @@ declare module "@scom/scom-post/global/interface.ts" {
         downvotes?: number;
         views?: number;
         satszapped?: number;
+        status?: string;
     }
     export interface IPostActions {
         liked?: boolean;

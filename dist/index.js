@@ -923,7 +923,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             this.pnlQuoted.visible = true;
         }
         renderInfo(oneLine) {
-            const { publishDate, author } = this.postData;
+            const { publishDate, author, stats } = this.postData;
             this.imgAvatar.url = author?.avatar ?? '';
             this.imgAvatar.objectFit = 'cover';
             const imgWidth = this.isQuotedPost ? '1.75rem' : '2.75rem';
@@ -935,17 +935,24 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                 this.$render("i-panel", { border: { left: { width: '1px', style: 'solid', color: Theme.text.secondary } } }),
                 this.$render("i-label", { id: "lblDate", font: { size: '0.875rem', color: Theme.text.secondary }, caption: `${(0, global_4.getDuration)(publishDate)}`, lineHeight: '0.875rem' })));
             const usernameEl = (this.$render("i-label", { id: "lblUsername", caption: `${author?.internetIdentifier || ''}`, maxWidth: this.isQuotedPost ? '13.75rem' : '12.5rem', textOverflow: "ellipsis", font: { size: this.isQuotedPost ? '1rem' : '0.875rem', color: Theme.text.secondary }, lineHeight: '0.875rem', visible: author?.internetIdentifier != null }));
+            let statusEl;
+            if (stats.status) {
+                statusEl = (this.$render("i-hstack", { gap: '0.25rem', stack: { shrink: '0' } },
+                    this.$render("i-label", { caption: stats.status, padding: { top: 3, bottom: 3, left: 12, right: 12 }, border: { width: 1, style: 'solid', color: Theme.colors.primary.main, radius: 20 }, font: { size: '0.875rem', color: Theme.colors.primary.main }, lineHeight: '0.875rem' })));
+            }
             if (oneLine) {
                 this.pnlInfo.append(this.$render("i-hstack", { height: "100%", gap: "0.25rem", verticalAlignment: "center" },
                     userEl,
                     usernameEl,
-                    dateEl));
+                    dateEl,
+                    statusEl ? statusEl : []));
             }
             else {
                 this.pnlInfo.append(this.$render("i-vstack", { gap: "0.5rem" },
                     this.$render("i-hstack", { gap: "0.25rem", verticalAlignment: "center" },
                         userEl,
-                        dateEl),
+                        dateEl,
+                        statusEl ? statusEl : []),
                     usernameEl));
             }
         }

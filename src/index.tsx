@@ -583,7 +583,7 @@ export class ScomPost extends Module {
     }
 
     private renderInfo(oneLine?: boolean) {
-        const { publishDate, author } = this.postData;
+        const { publishDate, author, stats } = this.postData;
         this.imgAvatar.url = author?.avatar ?? '';
         this.imgAvatar.objectFit = 'cover';
         const imgWidth = this.isQuotedPost ? '1.75rem' : '2.75rem';
@@ -629,6 +629,20 @@ export class ScomPost extends Module {
                 visible={author?.internetIdentifier != null}
             ></i-label>
         );
+        let statusEl;
+        if (stats.status) {
+            statusEl = (
+                <i-hstack gap={'0.25rem'} stack={{ shrink: '0' }}>
+                    <i-label
+                        caption={stats.status}
+                        padding={{ top: 3, bottom: 3, left: 12, right: 12 }}
+                        border={{ width: 1, style: 'solid', color: Theme.colors.primary.main, radius: 20 }}
+                        font={{ size: '0.875rem', color: Theme.colors.primary.main }}
+                        lineHeight={'0.875rem'}
+                    ></i-label>
+                </i-hstack>
+            )
+        }
         if (oneLine) {
             this.pnlInfo.append(
                 <i-hstack
@@ -639,6 +653,7 @@ export class ScomPost extends Module {
                     {userEl}
                     {usernameEl}
                     {dateEl}
+                    {statusEl ? statusEl : []}
                 </i-hstack>
             )
         } else {
@@ -647,6 +662,7 @@ export class ScomPost extends Module {
                     <i-hstack gap="0.25rem" verticalAlignment="center">
                         {userEl}
                         {dateEl}
+                        {statusEl ? statusEl : []}
                     </i-hstack>
                     {usernameEl}
                 </i-vstack>
