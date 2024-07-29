@@ -26,6 +26,7 @@ export interface IPostStats {
   downvotes?: number;
   views?: number;
 	satszapped?: number;
+  status?: string;
 };
 export interface IPostActions {
 	liked?: boolean;
