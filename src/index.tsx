@@ -93,6 +93,7 @@ export class ScomPost extends Module {
     private imgAvatar: Image;
     private lblOwner: Label;
     private lblUsername: Label;
+    private lblStatus: Label;
     private lblDate: Label;
     private imgVerified: Image;
     private pnlQuoted: VStack;
@@ -222,6 +223,13 @@ export class ScomPost extends Module {
     set isPublicPostLabelShown(value: boolean) {
         this._isPublicPostLabelShown = value;
         if (this.pnlPublicLabel) this.pnlPublicLabel.visible = value;
+    }
+
+    set status(value: string) {
+        if (this.lblStatus) {
+            this.lblStatus.caption = value || "";
+            this.lblStatus.parent.visible = value != null;
+        }
     }
 
     clear() {
@@ -629,20 +637,18 @@ export class ScomPost extends Module {
                 visible={author?.internetIdentifier != null}
             ></i-label>
         );
-        let statusEl;
-        if (stats?.status) {
-            statusEl = (
-                <i-hstack gap={'0.25rem'} stack={{ shrink: '0' }}>
-                    <i-label
-                        caption={stats.status}
-                        padding={{ top: 3, bottom: 3, left: 12, right: 12 }}
-                        border={{ width: 1, style: 'solid', color: Theme.colors.primary.main, radius: 20 }}
-                        font={{ size: '0.875rem', color: Theme.colors.primary.main }}
-                        lineHeight={'0.875rem'}
-                    ></i-label>
-                </i-hstack>
-            )
-        }
+        let statusEl = (
+            <i-hstack gap={'0.25rem'} stack={{ shrink: '0' }} visible={stats?.status != null}>
+                <i-label
+                    id="lblStatus"
+                    caption={stats.status}
+                    padding={{ top: 3, bottom: 3, left: 12, right: 12 }}
+                    border={{ width: 1, style: 'solid', color: Theme.colors.primary.main, radius: 20 }}
+                    font={{ size: '0.875rem', color: Theme.colors.primary.main }}
+                    lineHeight={'0.875rem'}
+                ></i-label>
+            </i-hstack>
+        )
         if (oneLine) {
             this.pnlInfo.append(
                 <i-hstack
@@ -653,7 +659,7 @@ export class ScomPost extends Module {
                     {userEl}
                     {usernameEl}
                     {dateEl}
-                    {statusEl ? statusEl : []}
+                    {statusEl}
                 </i-hstack>
             )
         } else {
@@ -662,7 +668,7 @@ export class ScomPost extends Module {
                     <i-hstack gap="0.25rem" verticalAlignment="center">
                         {userEl}
                         {dateEl}
-                        {statusEl ? statusEl : []}
+                        {statusEl}
                     </i-hstack>
                     {usernameEl}
                 </i-vstack>

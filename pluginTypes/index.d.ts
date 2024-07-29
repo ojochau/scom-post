@@ -305,6 +305,7 @@ declare module "@scom/scom-post" {
         private imgAvatar;
         private lblOwner;
         private lblUsername;
+        private lblStatus;
         private lblDate;
         private imgVerified;
         private pnlQuoted;
@@ -370,6 +371,7 @@ declare module "@scom/scom-post" {
         set apiBaseUrl(value: string);
         get isPublicPostLabelShown(): boolean;
         set isPublicPostLabelShown(value: boolean);
+        set status(value: string);
         clear(): void;
         private isMarkdown;
         private constructPostCard;
