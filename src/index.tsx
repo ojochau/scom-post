@@ -641,7 +641,7 @@ export class ScomPost extends Module {
             <i-hstack gap={'0.25rem'} stack={{ shrink: '0' }} visible={stats?.status != null}>
                 <i-label
                     id="lblStatus"
-                    caption={stats.status}
+                    caption={stats?.status || ""}
                     padding={{ top: 3, bottom: 3, left: 12, right: 12 }}
                     border={{ width: 1, style: 'solid', color: Theme.colors.primary.main, radius: 20 }}
                     font={{ size: '0.875rem', color: Theme.colors.primary.main }}
