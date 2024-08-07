@@ -51,6 +51,7 @@ interface ScomPostElement extends ControlElement {
     onQuotedPostClicked?: (target: ScomPost, event?: MouseEvent) => void;
     onBookmarkClicked?: callbackType;
     onCommunityClicked?: callbackType;
+    onUnlockPostClicked?: asyncCallbackType;
     disableGutters?: boolean;
     limitHeight?: boolean;
     isReply?: boolean;
@@ -114,6 +115,7 @@ export class ScomPost extends Module {
     private btnViewMore: HStack;
     private pnlDetail: Panel;
     private pnlOverlay: Panel;
+    private btnUnlockPost: Button;
     private groupAnalysis: HStack;
     private pnlActiveBd: Panel;
     private pnlContent: Panel;
@@ -143,6 +145,7 @@ export class ScomPost extends Module {
     public onQuotedPostClicked: (target: ScomPost, event?: MouseEvent) => void;
     public onBookmarkClicked: callbackType;
     public onCommunityClicked: callbackType;
+    public onUnlockPostClicked: asyncCallbackType;
 
     constructor(parent?: Container, options?: any) {
         super(parent, options);
@@ -150,6 +153,7 @@ export class ScomPost extends Module {
         this.onShowMore = this.onShowMore.bind(this);
         this.showBubbleMenu = this.showBubbleMenu.bind(this);
         this.onGoCommunity = this.onGoCommunity.bind(this);
+        this.handleUnlockPost = this.handleUnlockPost.bind(this);
     }
 
     static async create(options?: ScomPostElement, parent?: Container) {
@@ -400,7 +404,7 @@ export class ScomPost extends Module {
 
     private async renderUI() {
         this.clear();
-        const { actions, stats, parentAuthor, contentElements, repost, community } = this._data?.data || {};
+        const { actions, stats, parentAuthor, contentElements, repost, community, isLocked } = this._data?.data || {};
         this.renderPostType();
         let isMarkdown = await this.isMarkdown();
 
@@ -415,6 +419,8 @@ export class ScomPost extends Module {
         if (!this.isQuotedPost) this.renderAnalytics(stats, actions);
         this.groupAnalysis.visible = !this.isQuotedPost && !this.pinView;
         this.pnlSubscribe.visible = !this.isQuotedPost && !this.pinView;
+
+        this.btnUnlockPost.visible = isLocked || false;
 
         if (repost) {
             let reposters = repost.displayName || repost.username || FormatUtils.truncateWalletAddress(repost.npub);
@@ -912,6 +918,17 @@ export class ScomPost extends Module {
         if (this.onCommunityClicked) this.onCommunityClicked(target, this.postData, event);
     }
 
+    private async handleUnlockPost(target: Control, event: Event) {
+        let success = true;
+        if (this.onUnlockPostClicked) {
+            success = await this.onUnlockPostClicked(target, this.postData, event);
+        }
+        if (success) {
+            if (this._data.data) this._data.data.isLocked = false;
+            this.btnUnlockPost.visible = false;
+        }
+    }
+
     // private handleShowMoreClick() {
     //     this.pnlContent.classList.remove(ellipsisStyle);
     //     this.btnShowMore.visible = false;
@@ -927,6 +944,7 @@ export class ScomPost extends Module {
         this.onQuotedPostClicked = this.getAttribute('onQuotedPostClicked', true) || this.onQuotedPostClicked;
         this.onBookmarkClicked = this.getAttribute('onBookmarkClicked', true) || this.onBookmarkClicked;
         this.onCommunityClicked = this.getAttribute('onCommunityClicked', true) || this.onCommunityClicked;
+        this.onUnlockPostClicked = this.getAttribute('onUnlockPostClicked', true) || this.onUnlockPostClicked;
         this.overflowEllipse = this.getAttribute('overflowEllipse', true) || this.overflowEllipse;
         this.disableGutters = this.getAttribute('disableGutters', true) || this.disableGutters;
         this.limitHeight = this.getAttribute('limitHeight', true) || this.limitHeight;
@@ -1087,6 +1105,18 @@ export class ScomPost extends Module {
                             <i-icon name={"angle-down"} width={16} height={16}
                                 fill={Theme.colors.primary.main}></i-icon>
                         </i-hstack>
+                        <i-button
+                            id="btnUnlockPost"
+                            width="100%"
+                            minHeight={32}
+                            margin={{ top: '0.5rem' }}
+                            padding={{ left: '1rem', right: '1rem' }}
+                            font={{ color: Theme.colors.primary.contrastText, weight: 600 }}
+                            border={{ radius: '0.5rem' }}
+                            visible={false}
+                            caption='Unlock this post'
+                            onClick={this.handleUnlockPost}
+                        ></i-button>
                         <i-hstack
                             id="groupAnalysis"
                             horizontalAlignment="space-between"
@@ -1229,6 +1259,18 @@ export class ScomPost extends Module {
                     <i-icon name={"angle-down"} width={16} height={16}
                         fill={Theme.colors.primary.main}></i-icon>
                 </i-hstack>
+                <i-button
+                    id="btnUnlockPost"
+                    width="100%"
+                    minHeight={32}
+                    margin={{ top: '0.5rem' }}
+                    padding={{ left: '1rem', right: '1rem' }}
+                    font={{ color: Theme.colors.primary.contrastText, weight: 600 }}
+                    border={{ radius: '0.5rem' }}
+                    visible={false}
+                    caption='Unlock this post'
+                    onClick={this.handleUnlockPost}
+                ></i-button>
                 <i-hstack
                     id="groupAnalysis"
                     horizontalAlignment="space-between"

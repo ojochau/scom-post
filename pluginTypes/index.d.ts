@@ -20,6 +20,7 @@ declare module "@scom/scom-post/global/interface.ts" {
         community?: ICommunity;
         actions?: IPostActions;
         isPublicPost?: boolean;
+        isLocked?: boolean;
     }
     export interface IPostStats {
         replies?: number;
@@ -274,6 +275,7 @@ declare module "@scom/scom-post" {
         onQuotedPostClicked?: (target: ScomPost, event?: MouseEvent) => void;
         onBookmarkClicked?: callbackType;
         onCommunityClicked?: callbackType;
+        onUnlockPostClicked?: asyncCallbackType;
         disableGutters?: boolean;
         limitHeight?: boolean;
         isReply?: boolean;
@@ -325,6 +327,7 @@ declare module "@scom/scom-post" {
         private btnViewMore;
         private pnlDetail;
         private pnlOverlay;
+        private btnUnlockPost;
         private groupAnalysis;
         private pnlActiveBd;
         private pnlContent;
@@ -353,6 +356,7 @@ declare module "@scom/scom-post" {
         onQuotedPostClicked: (target: ScomPost, event?: MouseEvent) => void;
         onBookmarkClicked: callbackType;
         onCommunityClicked: callbackType;
+        onUnlockPostClicked: asyncCallbackType;
         constructor(parent?: Container, options?: any);
         static create(options?: ScomPostElement, parent?: Container): Promise<ScomPost>;
         get isActive(): boolean;
@@ -395,6 +399,7 @@ declare module "@scom/scom-post" {
         private onViewMore;
         private onGoProfile;
         private onGoCommunity;
+        private handleUnlockPost;
         init(): Promise<void>;
         private showBubbleMenu;
         private handleShowMoreClick;
