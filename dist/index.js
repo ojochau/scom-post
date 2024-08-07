@@ -579,6 +579,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             this.onShowMore = this.onShowMore.bind(this);
             this.showBubbleMenu = this.showBubbleMenu.bind(this);
             this.onGoCommunity = this.onGoCommunity.bind(this);
+            this.handleUnlockPost = this.handleUnlockPost.bind(this);
         }
         static async create(options, parent) {
             let self = new this(parent, options);
@@ -760,7 +761,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         }
         async renderUI() {
             this.clear();
-            const { actions, stats, parentAuthor, contentElements, repost, community } = this._data?.data || {};
+            const { actions, stats, parentAuthor, contentElements, repost, community, isLocked } = this._data?.data || {};
             this.renderPostType();
             let isMarkdown = await this.isMarkdown();
             if (parentAuthor) {
@@ -774,6 +775,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                 this.renderAnalytics(stats, actions);
             this.groupAnalysis.visible = !this.isQuotedPost && !this.pinView;
             this.pnlSubscribe.visible = !this.isQuotedPost && !this.pinView;
+            this.btnUnlockPost.visible = isLocked || false;
             if (repost) {
                 let reposters = repost.displayName || repost.username || components_10.FormatUtils.truncateWalletAddress(repost.npub);
                 if (stats?.reposts > 1) {
@@ -1173,6 +1175,17 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             if (this.onCommunityClicked)
                 this.onCommunityClicked(target, this.postData, event);
         }
+        async handleUnlockPost(target, event) {
+            let success = true;
+            if (this.onUnlockPostClicked) {
+                success = await this.onUnlockPostClicked(target, this.postData, event);
+            }
+            if (success) {
+                if (this._data.data)
+                    this._data.data.isLocked = false;
+                this.btnUnlockPost.visible = false;
+            }
+        }
         // private handleShowMoreClick() {
         //     this.pnlContent.classList.remove(ellipsisStyle);
         //     this.btnShowMore.visible = false;
@@ -1187,6 +1200,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             this.onQuotedPostClicked = this.getAttribute('onQuotedPostClicked', true) || this.onQuotedPostClicked;
             this.onBookmarkClicked = this.getAttribute('onBookmarkClicked', true) || this.onBookmarkClicked;
             this.onCommunityClicked = this.getAttribute('onCommunityClicked', true) || this.onCommunityClicked;
+            this.onUnlockPostClicked = this.getAttribute('onUnlockPostClicked', true) || this.onUnlockPostClicked;
             this.overflowEllipse = this.getAttribute('overflowEllipse', true) || this.overflowEllipse;
             this.disableGutters = this.getAttribute('disableGutters', true) || this.disableGutters;
             this.limitHeight = this.getAttribute('limitHeight', true) || this.limitHeight;
@@ -1243,6 +1257,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                         this.$render("i-hstack", { id: "btnViewMore", verticalAlignment: "center", padding: { top: '1rem' }, gap: '0.25rem', visible: false, onClick: this.onViewMore },
                             this.$render("i-label", { caption: 'Read more', font: { size: '0.9rem', color: Theme.colors.primary.main } }),
                             this.$render("i-icon", { name: "angle-down", width: 16, height: 16, fill: Theme.colors.primary.main })),
+                        this.$render("i-button", { id: "btnUnlockPost", width: "100%", minHeight: 32, margin: { top: '0.5rem' }, padding: { left: '1rem', right: '1rem' }, font: { color: Theme.colors.primary.contrastText, weight: 600 }, border: { radius: '0.5rem' }, visible: false, caption: 'Unlock this post', onClick: this.handleUnlockPost }),
                         this.$render("i-hstack", { id: "groupAnalysis", horizontalAlignment: "space-between", padding: { top: '0.563rem' }, width: '100%', visible: !this.pinView }))));
             }
             else {
@@ -1274,6 +1289,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     this.$render("i-hstack", { id: "btnViewMore", verticalAlignment: "center", padding: { top: '1rem' }, gap: '0.25rem', visible: false, onClick: this.onViewMore },
                         this.$render("i-label", { caption: 'Read more', font: { size: '0.9rem', color: Theme.colors.primary.main } }),
                         this.$render("i-icon", { name: "angle-down", width: 16, height: 16, fill: Theme.colors.primary.main })),
+                    this.$render("i-button", { id: "btnUnlockPost", width: "100%", minHeight: 32, margin: { top: '0.5rem' }, padding: { left: '1rem', right: '1rem' }, font: { color: Theme.colors.primary.contrastText, weight: 600 }, border: { radius: '0.5rem' }, visible: false, caption: 'Unlock this post', onClick: this.handleUnlockPost }),
                     this.$render("i-hstack", { id: "groupAnalysis", horizontalAlignment: "space-between", padding: { top: '0.563rem' }, width: '100%', visible: !this.pinView })));
             }
             const lazyLoad = this.getAttribute('lazyLoad', true, false);

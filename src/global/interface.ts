@@ -18,6 +18,7 @@ export interface IPost {
   community?: ICommunity;
   actions?: IPostActions;
   isPublicPost?: boolean;
+  isLocked?: boolean;
 };
 export interface IPostStats {
 	replies?: number;
