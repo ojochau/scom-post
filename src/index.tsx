@@ -115,6 +115,7 @@ export class ScomPost extends Module {
     private btnViewMore: HStack;
     private pnlDetail: Panel;
     private pnlOverlay: Panel;
+    private pnlLocked: StackLayout;
     private btnUnlockPost: Button;
     private groupAnalysis: HStack;
     private pnlActiveBd: Panel;
@@ -420,7 +421,8 @@ export class ScomPost extends Module {
         this.groupAnalysis.visible = !this.isQuotedPost && !this.pinView;
         this.pnlSubscribe.visible = !this.isQuotedPost && !this.pinView;
 
-        this.btnUnlockPost.visible = isLocked || false;
+        this.pnlLocked.visible = isLocked || false;
+        this.pnlDetail.visible = !isLocked;
 
         if (repost) {
             let reposters = repost.displayName || repost.username || FormatUtils.truncateWalletAddress(repost.npub);
@@ -457,6 +459,10 @@ export class ScomPost extends Module {
                 ></i-label>
             )
             this.pnlCommunity.visible = true;
+        }
+        if (this.btnUnlockPost) {
+            this.btnUnlockPost.caption = community?.isWhitelist ? "Exclusive content for whitelisted users only" : "Unlock this post";
+            this.btnUnlockPost.enabled = !community?.isWhitelist;
         }
         
         if (this.type === 'card' && isMarkdown) {
@@ -921,11 +927,16 @@ export class ScomPost extends Module {
     private async handleUnlockPost(target: Control, event: Event) {
         let success = true;
         if (this.onUnlockPostClicked) {
+            this.btnUnlockPost.rightIcon.spin = true;
+            this.btnUnlockPost.rightIcon.visible = true;
             success = await this.onUnlockPostClicked(target, this.postData, event);
+            this.btnUnlockPost.rightIcon.spin = false;
+            this.btnUnlockPost.rightIcon.visible = false;
         }
         if (success) {
             if (this._data.data) this._data.data.isLocked = false;
-            this.btnUnlockPost.visible = false;
+            this.pnlLocked.visible = false;
+            this.pnlDetail.visible = true;
         }
     }
 
@@ -1105,18 +1116,29 @@ export class ScomPost extends Module {
                             <i-icon name={"angle-down"} width={16} height={16}
                                 fill={Theme.colors.primary.main}></i-icon>
                         </i-hstack>
-                        <i-button
-                            id="btnUnlockPost"
-                            width="100%"
-                            minHeight={32}
-                            margin={{ top: '0.5rem' }}
-                            padding={{ left: '1rem', right: '1rem' }}
-                            font={{ color: Theme.colors.primary.contrastText, weight: 600 }}
-                            border={{ radius: '0.5rem' }}
-                            visible={false}
-                            caption='Unlock this post'
-                            onClick={this.handleUnlockPost}
-                        ></i-button>
+                        <i-stack id="pnlLocked" direction="vertical" width="100%" gap="0.75rem" visible={false}>
+                            <i-stack
+                                direction="horizontal"
+                                width="100%"
+                                minHeight={300}
+                                border={{ radius: '0.5rem' }}
+                                background={{ color: Theme.background.paper }}
+                                alignItems="center"
+                                justifyContent="center"
+                            >
+                                <i-icon width="2rem" height="2rem" name="lock" fill={Theme.text.primary}></i-icon>
+                            </i-stack>
+                            <i-button
+                                id="btnUnlockPost"
+                                width="100%"
+                                minHeight={36}
+                                padding={{ left: '1rem', right: '1rem' }}
+                                font={{ color: Theme.colors.primary.contrastText, weight: 600 }}
+                                border={{ radius: '0.5rem' }}
+                                caption='Unlock this post'
+                                onClick={this.handleUnlockPost}
+                            ></i-button>
+                        </i-stack>
                         <i-hstack
                             id="groupAnalysis"
                             horizontalAlignment="space-between"
@@ -1259,18 +1281,29 @@ export class ScomPost extends Module {
                     <i-icon name={"angle-down"} width={16} height={16}
                         fill={Theme.colors.primary.main}></i-icon>
                 </i-hstack>
-                <i-button
-                    id="btnUnlockPost"
-                    width="100%"
-                    minHeight={32}
-                    margin={{ top: '0.5rem' }}
-                    padding={{ left: '1rem', right: '1rem' }}
-                    font={{ color: Theme.colors.primary.contrastText, weight: 600 }}
-                    border={{ radius: '0.5rem' }}
-                    visible={false}
-                    caption='Unlock this post'
-                    onClick={this.handleUnlockPost}
-                ></i-button>
+                <i-stack id="pnlLocked" direction="vertical" width="100%" gap="0.75rem" visible={false}>
+                    <i-stack
+                        direction="horizontal"
+                        width="100%"
+                        minHeight={300}
+                        border={{ radius: '0.5rem' }}
+                        background={{ color: Theme.background.paper }}
+                        alignItems="center"
+                        justifyContent="center"
+                    >
+                        <i-icon width="2rem" height="2rem" name="lock" fill={Theme.text.primary}></i-icon>
+                    </i-stack>
+                    <i-button
+                        id="btnUnlockPost"
+                        width="100%"
+                        minHeight={36}
+                        padding={{ left: '1rem', right: '1rem' }}
+                        font={{ color: Theme.colors.primary.contrastText, weight: 600 }}
+                        border={{ radius: '0.5rem' }}
+                        caption='Unlock this post'
+                        onClick={this.handleUnlockPost}
+                    ></i-button>
+                </i-stack>
                 <i-hstack
                     id="groupAnalysis"
                     horizontalAlignment="space-between"

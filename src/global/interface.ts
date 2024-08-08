@@ -41,12 +41,33 @@ export interface IPostData {
   category?: "widget" | "quotedPost";
   data: any;
 };
+enum ProtectedMembershipPolicyType {
+	TokenExclusive = 'TokenExclusive',
+	Whitelist = 'Whitelist'
+}
+enum TokenType {
+	ERC20 = 'ERC20',
+	ERC721	= 'ERC721',
+	ERC1155	= 'ERC1155'
+}
+interface IProtectedMembershipPolicy {
+	policyType: ProtectedMembershipPolicyType;
+	chainId?: number;
+	tokenAddress?: string;
+	tokenType?: TokenType;
+	tokenId?: number;
+	tokenAmount?: string;
+	memberIds?: string[];
+}
 export interface ICommunity {
   communityUri?: string;
 	creatorId?: string;
 	communityId?: string;
 	privateRelay?: string;
 	parentCommunityUri?: string;
+	isExclusive?: boolean;
+	isWhitelist?: boolean;
+	policies?: IProtectedMembershipPolicy[];
 }
 export interface ILinkPreview {
   url: string;
