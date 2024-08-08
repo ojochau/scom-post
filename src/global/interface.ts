@@ -47,6 +47,8 @@ export interface ICommunity {
 	communityId?: string;
 	privateRelay?: string;
 	parentCommunityUri?: string;
+	isExclusive?: boolean;
+	isWhitelist?: boolean;
 }
 export interface ILinkPreview {
   url: string;

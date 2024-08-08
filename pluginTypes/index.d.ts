@@ -49,6 +49,8 @@ declare module "@scom/scom-post/global/interface.ts" {
         communityId?: string;
         privateRelay?: string;
         parentCommunityUri?: string;
+        isExclusive?: boolean;
+        isWhitelist?: boolean;
     }
     export interface ILinkPreview {
         url: string;
@@ -327,6 +329,7 @@ declare module "@scom/scom-post" {
         private btnViewMore;
         private pnlDetail;
         private pnlOverlay;
+        private pnlLocked;
         private btnUnlockPost;
         private groupAnalysis;
         private pnlActiveBd;
