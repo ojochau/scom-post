@@ -25,6 +25,17 @@ define("@scom/scom-post/global/interface.ts", ["require", "exports"], function (
     ;
     ;
     ;
+    var ProtectedMembershipPolicyType;
+    (function (ProtectedMembershipPolicyType) {
+        ProtectedMembershipPolicyType["TokenExclusive"] = "TokenExclusive";
+        ProtectedMembershipPolicyType["Whitelist"] = "Whitelist";
+    })(ProtectedMembershipPolicyType || (ProtectedMembershipPolicyType = {}));
+    var TokenType;
+    (function (TokenType) {
+        TokenType["ERC20"] = "ERC20";
+        TokenType["ERC721"] = "ERC721";
+        TokenType["ERC1155"] = "ERC1155";
+    })(TokenType || (TokenType = {}));
 });
 define("@scom/scom-post/store/index.ts", ["require", "exports"], function (require, exports) {
     "use strict";
