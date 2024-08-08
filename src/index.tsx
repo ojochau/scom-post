@@ -1131,7 +1131,7 @@ export class ScomPost extends Module {
                             <i-button
                                 id="btnUnlockPost"
                                 width="100%"
-                                minHeight={32}
+                                minHeight={36}
                                 padding={{ left: '1rem', right: '1rem' }}
                                 font={{ color: Theme.colors.primary.contrastText, weight: 600 }}
                                 border={{ radius: '0.5rem' }}
@@ -1296,7 +1296,7 @@ export class ScomPost extends Module {
                     <i-button
                         id="btnUnlockPost"
                         width="100%"
-                        minHeight={32}
+                        minHeight={36}
                         padding={{ left: '1rem', right: '1rem' }}
                         font={{ color: Theme.colors.primary.contrastText, weight: 600 }}
                         border={{ radius: '0.5rem' }}

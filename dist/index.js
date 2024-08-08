@@ -1270,7 +1270,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                         this.$render("i-stack", { id: "pnlLocked", direction: "vertical", width: "100%", gap: "0.75rem", visible: false },
                             this.$render("i-stack", { direction: "horizontal", width: "100%", minHeight: 300, border: { radius: '0.5rem' }, background: { color: Theme.background.paper }, alignItems: "center", justifyContent: "center" },
                                 this.$render("i-icon", { width: "2rem", height: "2rem", name: "lock", fill: Theme.text.primary })),
-                            this.$render("i-button", { id: "btnUnlockPost", width: "100%", minHeight: 32, padding: { left: '1rem', right: '1rem' }, font: { color: Theme.colors.primary.contrastText, weight: 600 }, border: { radius: '0.5rem' }, caption: 'Unlock this post', onClick: this.handleUnlockPost })),
+                            this.$render("i-button", { id: "btnUnlockPost", width: "100%", minHeight: 36, padding: { left: '1rem', right: '1rem' }, font: { color: Theme.colors.primary.contrastText, weight: 600 }, border: { radius: '0.5rem' }, caption: 'Unlock this post', onClick: this.handleUnlockPost })),
                         this.$render("i-hstack", { id: "groupAnalysis", horizontalAlignment: "space-between", padding: { top: '0.563rem' }, width: '100%', visible: !this.pinView }))));
             }
             else {
@@ -1305,7 +1305,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     this.$render("i-stack", { id: "pnlLocked", direction: "vertical", width: "100%", gap: "0.75rem", visible: false },
                         this.$render("i-stack", { direction: "horizontal", width: "100%", minHeight: 300, border: { radius: '0.5rem' }, background: { color: Theme.background.paper }, alignItems: "center", justifyContent: "center" },
                             this.$render("i-icon", { width: "2rem", height: "2rem", name: "lock", fill: Theme.text.primary })),
-                        this.$render("i-button", { id: "btnUnlockPost", width: "100%", minHeight: 32, padding: { left: '1rem', right: '1rem' }, font: { color: Theme.colors.primary.contrastText, weight: 600 }, border: { radius: '0.5rem' }, caption: 'Unlock this post', onClick: this.handleUnlockPost })),
+                        this.$render("i-button", { id: "btnUnlockPost", width: "100%", minHeight: 36, padding: { left: '1rem', right: '1rem' }, font: { color: Theme.colors.primary.contrastText, weight: 600 }, border: { radius: '0.5rem' }, caption: 'Unlock this post', onClick: this.handleUnlockPost })),
                     this.$render("i-hstack", { id: "groupAnalysis", horizontalAlignment: "space-between", padding: { top: '0.563rem' }, width: '100%', visible: !this.pinView })));
             }
             const lazyLoad = this.getAttribute('lazyLoad', true, false);
