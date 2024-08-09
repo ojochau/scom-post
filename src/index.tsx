@@ -1120,13 +1120,13 @@ export class ScomPost extends Module {
                             <i-stack
                                 direction="horizontal"
                                 width="100%"
-                                minHeight={300}
+                                minHeight={150}
                                 border={{ radius: '0.5rem' }}
                                 background={{ color: Theme.background.paper }}
                                 alignItems="center"
                                 justifyContent="center"
                             >
-                                <i-icon width="2rem" height="2rem" name="lock" fill={Theme.text.primary}></i-icon>
+                                <i-icon width="1.5rem" height="1.5rem" name="lock" fill={Theme.text.primary}></i-icon>
                             </i-stack>
                             <i-button
                                 id="btnUnlockPost"
@@ -1285,13 +1285,13 @@ export class ScomPost extends Module {
                     <i-stack
                         direction="horizontal"
                         width="100%"
-                        minHeight={300}
+                        minHeight={150}
                         border={{ radius: '0.5rem' }}
                         background={{ color: Theme.background.paper }}
                         alignItems="center"
                         justifyContent="center"
                     >
-                        <i-icon width="2rem" height="2rem" name="lock" fill={Theme.text.primary}></i-icon>
+                        <i-icon width="1.5rem" height="1.5rem" name="lock" fill={Theme.text.primary}></i-icon>
                     </i-stack>
                     <i-button
                         id="btnUnlockPost"
