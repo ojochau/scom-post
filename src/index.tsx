@@ -461,7 +461,7 @@ export class ScomPost extends Module {
             this.pnlCommunity.visible = true;
         }
         if (this.btnUnlockPost) {
-            this.btnUnlockPost.caption = community?.isWhitelist ? "Exclusive content for whitelisted users only" : "Unlock this post";
+            this.btnUnlockPost.caption = community?.isWhitelist ? "Exclusive content for whitelisted users only" : "Unlock";
             this.btnUnlockPost.enabled = !community?.isWhitelist;
         }
         
@@ -1135,7 +1135,7 @@ export class ScomPost extends Module {
                                 padding={{ left: '1rem', right: '1rem' }}
                                 font={{ color: Theme.colors.primary.contrastText, weight: 600 }}
                                 border={{ radius: '0.5rem' }}
-                                caption='Unlock this post'
+                                caption='Unlock'
                                 onClick={this.handleUnlockPost}
                             ></i-button>
                         </i-stack>
@@ -1300,7 +1300,7 @@ export class ScomPost extends Module {
                         padding={{ left: '1rem', right: '1rem' }}
                         font={{ color: Theme.colors.primary.contrastText, weight: 600 }}
                         border={{ radius: '0.5rem' }}
-                        caption='Unlock this post'
+                        caption='Unlock'
                         onClick={this.handleUnlockPost}
                     ></i-button>
                 </i-stack>
