@@ -21,6 +21,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 define("@scom/scom-post/global/interface.ts", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    exports.PaymentModel = void 0;
     ;
     ;
     ;
@@ -36,6 +37,11 @@ define("@scom/scom-post/global/interface.ts", ["require", "exports"], function (
         TokenType["ERC721"] = "ERC721";
         TokenType["ERC1155"] = "ERC1155";
     })(TokenType || (TokenType = {}));
+    var PaymentModel;
+    (function (PaymentModel) {
+        PaymentModel["OneTimePurchase"] = "OneTimePurchase";
+        PaymentModel["Subscription"] = "Subscription";
+    })(PaymentModel = exports.PaymentModel || (exports.PaymentModel = {}));
 });
 define("@scom/scom-post/store/index.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -772,7 +778,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         }
         async renderUI() {
             this.clear();
-            const { actions, stats, parentAuthor, contentElements, repost, community, isLocked } = this._data?.data || {};
+            const { actions, stats, parentAuthor, contentElements, repost, community, isLocked, isSubscription } = this._data?.data || {};
             this.renderPostType();
             let isMarkdown = await this.isMarkdown();
             if (parentAuthor) {
@@ -806,7 +812,9 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                 this.pnlCommunity.visible = true;
             }
             if (this.btnUnlockPost) {
-                this.btnUnlockPost.caption = community?.isWhitelist ? "Exclusive content for whitelisted users only" : "Unlock";
+                const firstPolicy = community?.policies?.[0];
+                const _isSubscription = isSubscription || firstPolicy?.paymentModel === global_4.PaymentModel.Subscription;
+                this.btnUnlockPost.caption = community?.isWhitelist ? "Exclusive content for whitelisted users only" : _isSubscription ? "Subscribe" : "Unlock";
                 this.btnUnlockPost.enabled = !community?.isWhitelist;
             }
             if (this.type === 'card' && isMarkdown) {
