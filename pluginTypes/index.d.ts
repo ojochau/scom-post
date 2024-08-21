@@ -52,13 +52,20 @@ declare module "@scom/scom-post/global/interface.ts" {
         ERC721 = "ERC721",
         ERC1155 = "ERC1155"
     }
+    export enum PaymentModel {
+        OneTimePurchase = "OneTimePurchase",
+        Subscription = "Subscription"
+    }
     interface IProtectedMembershipPolicy {
         policyType: ProtectedMembershipPolicyType;
+        paymentModel?: PaymentModel;
         chainId?: number;
         tokenAddress?: string;
         tokenType?: TokenType;
         tokenId?: number;
         tokenAmount?: string;
+        currency?: string;
+        durationInDays?: number;
         memberIds?: string[];
     }
     export interface ICommunity {
