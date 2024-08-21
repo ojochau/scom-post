@@ -778,7 +778,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         }
         async renderUI() {
             this.clear();
-            const { actions, stats, parentAuthor, contentElements, repost, community, isLocked } = this._data?.data || {};
+            const { actions, stats, parentAuthor, contentElements, repost, community, isLocked, isSubscription } = this._data?.data || {};
             this.renderPostType();
             let isMarkdown = await this.isMarkdown();
             if (parentAuthor) {
@@ -813,7 +813,8 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             }
             if (this.btnUnlockPost) {
                 const firstPolicy = community?.policies?.[0];
-                this.btnUnlockPost.caption = community?.isWhitelist ? "Exclusive content for whitelisted users only" : firstPolicy?.paymentModel === global_4.PaymentModel.Subscription ? "Subscribe" : "Unlock";
+                const _isSubscription = isSubscription || firstPolicy?.paymentModel === global_4.PaymentModel.Subscription;
+                this.btnUnlockPost.caption = community?.isWhitelist ? "Exclusive content for whitelisted users only" : _isSubscription ? "Subscribe" : "Unlock";
                 this.btnUnlockPost.enabled = !community?.isWhitelist;
             }
             if (this.type === 'card' && isMarkdown) {

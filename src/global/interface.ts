@@ -19,6 +19,7 @@ export interface IPost {
   actions?: IPostActions;
   isPublicPost?: boolean;
   isLocked?: boolean;
+  isSubscription?: boolean;
 };
 export interface IPostStats {
 	replies?: number;
