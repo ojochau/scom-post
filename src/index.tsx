@@ -245,7 +245,7 @@ export class ScomPost extends Module {
             this.btnViewMore.visible = false;
         if (this.pnlContent) {
             this.pnlContent.clearInnerHTML();
-            this.pnlContent.minHeight = '5rem';
+            // this.pnlContent.minHeight = '5rem';
         }
         if (this.pnlMore) {
             this.pnlMore.remove();
