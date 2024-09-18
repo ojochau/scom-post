@@ -29,7 +29,8 @@ import {
     getLinkPreview,
     IShopifyFrame,
     IFarcasterFrame,
-    IFrameButton
+    IFrameButton,
+    PaymentModel
 } from './global';
 import { getIconStyleClass, hoverStyle, ellipsisStyle, maxHeightStyle, customLinkStyle, cardContentStyle, labelHoverStyle } from './index.css';
 import assets from './assets';
@@ -405,7 +406,7 @@ export class ScomPost extends Module {
 
     private async renderUI() {
         this.clear();
-        const { actions, stats, parentAuthor, contentElements, repost, community, isLocked } = this._data?.data || {};
+        const { actions, stats, parentAuthor, contentElements, repost, community, isLocked, isSubscription } = this._data?.data || {};
         this.renderPostType();
         let isMarkdown = await this.isMarkdown();
 
@@ -461,7 +462,9 @@ export class ScomPost extends Module {
             this.pnlCommunity.visible = true;
         }
         if (this.btnUnlockPost) {
-            this.btnUnlockPost.caption = community?.isWhitelist ? "Exclusive content for whitelisted users only" : "Unlock";
+            const firstPolicy = community?.policies?.[0];
+            const _isSubscription = isSubscription || firstPolicy?.paymentModel === PaymentModel.Subscription;
+            this.btnUnlockPost.caption = community?.isWhitelist ? "Exclusive content for whitelisted users only" : _isSubscription ? "Subscribe" : "Unlock";
             this.btnUnlockPost.enabled = !community?.isWhitelist;
         }
         
