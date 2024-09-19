@@ -668,7 +668,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                 this.btnViewMore.visible = false;
             if (this.pnlContent) {
                 this.pnlContent.clearInnerHTML();
-                this.pnlContent.minHeight = '5rem';
+                // this.pnlContent.minHeight = '5rem';
             }
             if (this.pnlMore) {
                 this.pnlMore.remove();
@@ -862,10 +862,10 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             if (this.apiBaseUrl) {
                 const links = label.querySelectorAll('a');
                 for (let link of links) {
-                    const regex = new RegExp(`${location.origin}/(#!/)?(p|e)/\\S+`, "g");
+                    const regex = new RegExp(`${location.origin}/(#!/)?p/\\S+`, "g");
                     let match = regex.exec(link.href);
                     // tag mention
-                    if (match && (match[2] !== 'p' || link.innerHTML.startsWith('@')))
+                    if (match && link.innerHTML.startsWith('@'))
                         continue;
                     this.replaceLinkPreview(link.href, link.parentElement, link);
                 }
