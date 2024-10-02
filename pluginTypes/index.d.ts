@@ -73,6 +73,7 @@ declare module "@scom/scom-post/global/interface.ts" {
         communityUri?: string;
         creatorId?: string;
         communityId?: string;
+        photoUrl?: string;
         privateRelay?: string;
         parentCommunityUri?: string;
         isExclusive?: boolean;
