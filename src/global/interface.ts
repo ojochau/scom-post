@@ -71,6 +71,7 @@ export interface ICommunity {
   communityUri?: string;
 	creatorId?: string;
 	communityId?: string;
+	photoUrl?: string;
 	privateRelay?: string;
 	parentCommunityUri?: string;
 	isExclusive?: boolean;
