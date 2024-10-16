@@ -503,13 +503,25 @@ export class ScomPost extends Module {
     private appendLabel(text: string) {
         const hrefRegex = /https?:\/\/\S+/g;
         text = text.replace(/\n/gm, ' <br> ').replace(hrefRegex, (match) => {
-            return ` <a href="${match}" target="_blank">${match}</a> `;
+            return `<a href="${match}" target="_blank">${match}</a>`;
         });
         const label = <i-label width={'100%'} overflowWrap="anywhere" class={customLinkStyle} lineHeight="1.3125rem" caption={text || ''}></i-label> as Label;
         this.pnlContent.appendChild(label);
         if (this.apiBaseUrl) {
             const links = label.querySelectorAll('a');
             for (let link of links) {
+                let previousSibling = link.previousSibling;
+                let nextSibling = link.nextSibling;
+                if (previousSibling?.nodeName === '#text' && !previousSibling.textContent.trim().length) {
+                    previousSibling = previousSibling.previousSibling;
+                }
+                if (nextSibling?.nodeName === '#text' && !nextSibling.textContent.trim().length) {
+                    nextSibling = nextSibling.nextSibling;
+                }
+                if (
+                    (previousSibling && previousSibling['tagName'] !== 'BR') ||
+                    (nextSibling && nextSibling['tagName'] !== 'BR')
+                ) continue;
                 const regex = new RegExp(`${location.origin}/(#!/)?p/\\S+`, "g");
                 let match = regex.exec(link.href);
                 // tag mention
