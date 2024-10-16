@@ -439,7 +439,7 @@ define("@scom/scom-post/components/linkPreview.tsx", ["require", "exports", "@ij
         }
         render() {
             return (this.$render("i-panel", { width: "100%", background: { color: Theme.background.paper }, margin: { top: '0.5rem' }, border: { radius: '0.75rem' }, overflow: "hidden", cursor: "pointer", onClick: this.handleLinkPreviewClick },
-                this.$render("i-image", { id: "imgPreview", class: index_css_2.linkPreviewImageStyle, display: "block", width: "100%", maxHeight: 300, objectFit: "cover", overflow: "hidden", visible: false }),
+                this.$render("i-image", { id: "imgPreview", class: index_css_2.linkPreviewImageStyle, display: "block", width: "100%", maxHeight: 250, objectFit: "cover", overflow: "hidden", visible: false }),
                 this.$render("i-stack", { direction: "vertical", padding: { top: '0.75rem', bottom: '0.75rem', left: '0.75rem', right: '0.75rem' }, background: { color: Theme.background.paper } },
                     this.$render("i-label", { id: "lblTitle", font: { size: '1rem', color: Theme.text.primary, weight: 600 }, lineHeight: "1.75rem" }),
                     this.$render("i-label", { id: "lblDesc", lineClamp: 2, font: { size: '0.875rem', color: Theme.text.secondary }, lineHeight: "1.25rem" }),
@@ -855,13 +855,24 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         appendLabel(text) {
             const hrefRegex = /https?:\/\/\S+/g;
             text = text.replace(/\n/gm, ' <br> ').replace(hrefRegex, (match) => {
-                return ` <a href="${match}" target="_blank">${match}</a> `;
+                return `<a href="${match}" target="_blank">${match}</a>`;
             });
             const label = this.$render("i-label", { width: '100%', overflowWrap: "anywhere", class: index_css_5.customLinkStyle, lineHeight: "1.3125rem", caption: text || '' });
             this.pnlContent.appendChild(label);
             if (this.apiBaseUrl) {
                 const links = label.querySelectorAll('a');
                 for (let link of links) {
+                    let previousSibling = link.previousSibling;
+                    let nextSibling = link.nextSibling;
+                    if (previousSibling?.nodeName === '#text' && !previousSibling.textContent.trim().length) {
+                        previousSibling = previousSibling.previousSibling;
+                    }
+                    if (nextSibling?.nodeName === '#text' && !nextSibling.textContent.trim().length) {
+                        nextSibling = nextSibling.nextSibling;
+                    }
+                    if ((previousSibling && previousSibling['tagName'] !== 'BR') ||
+                        (nextSibling && nextSibling['tagName'] !== 'BR'))
+                        continue;
                     const regex = new RegExp(`${location.origin}/(#!/)?p/\\S+`, "g");
                     let match = regex.exec(link.href);
                     // tag mention

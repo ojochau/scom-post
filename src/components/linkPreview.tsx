@@ -65,7 +65,7 @@ export class ScomPostLinkPreview extends Module {
                     class={linkPreviewImageStyle}
                     display="block"
                     width="100%"
-                    maxHeight={300}
+                    maxHeight={250}
                     objectFit="cover"
                     overflow="hidden"
                     visible={false}
