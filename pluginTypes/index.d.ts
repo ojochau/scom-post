@@ -415,7 +415,7 @@ declare module "@scom/scom-post" {
         private appendLabel;
         private constructFarcasterFrame;
         private constructShopifyFrame;
-        private replaceLinkPreview;
+        private appendLinkPreview;
         private addQuotedPost;
         private renderInfo;
         private renderPostType;

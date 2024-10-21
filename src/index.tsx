@@ -503,7 +503,11 @@ export class ScomPost extends Module {
     private appendLabel(text: string) {
         const hrefRegex = /https?:\/\/\S+/g;
         text = text.replace(/\n/gm, ' <br> ').replace(hrefRegex, (match) => {
-            return `<a href="${match}" target="_blank">${match}</a>`;
+            const regex = /https?:\/\/((([a-z\d]([a-z\d-]*[a-z\d])*)\.?)+[a-z]{2,}|((\d{1,3}\.){3}\d{1,3}))(\:\d+)?(\/#!)?(\/[-a-z\d%_.~+]*)*(\?[;&a-z\d%_.~+=-]*)?(\#[-a-z\d_]*)?$/i;
+            if (regex.test(match))
+                return `<a href="${match}" target="_blank">${match}</a>`;
+            else
+                return match;
         });
         const label = <i-label width={'100%'} overflowWrap="anywhere" class={customLinkStyle} lineHeight="1.3125rem" caption={text || ''}></i-label> as Label;
         this.pnlContent.appendChild(label);
@@ -526,7 +530,7 @@ export class ScomPost extends Module {
                 let match = regex.exec(link.href);
                 // tag mention
                 if (match && link.innerHTML.startsWith('@')) continue;
-                this.replaceLinkPreview(link.href, link.parentElement, link);
+                this.appendLinkPreview(link.href, link);
             }
         }
     }
@@ -578,7 +582,7 @@ export class ScomPost extends Module {
         }
     }
     
-    private async replaceLinkPreview(url: string, parent: HTMLElement, linkElm: HTMLAnchorElement) {
+    private async appendLinkPreview(url: string, linkElm: HTMLAnchorElement) {
         const preview: ILinkPreview = await getLinkPreview(this.apiBaseUrl, url);
         if (!preview || !preview.title) return;
         const isFarcasterFrame = preview.fc_tags?.some(tag => tag[0] === 'fc:frame');
@@ -594,7 +598,7 @@ export class ScomPost extends Module {
         } else {
             elm = new ScomPostLinkPreview();
         }
-        parent.replaceChild(elm, linkElm);
+        linkElm.after(elm);
         await elm.ready();
         elm.data = data;
     }
