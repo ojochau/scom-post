@@ -855,7 +855,11 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         appendLabel(text) {
             const hrefRegex = /https?:\/\/\S+/g;
             text = text.replace(/\n/gm, ' <br> ').replace(hrefRegex, (match) => {
-                return `<a href="${match}" target="_blank">${match}</a>`;
+                const regex = /https?:\/\/((([a-z\d]([a-z\d-]*[a-z\d])*)\.?)+[a-z]{2,}|((\d{1,3}\.){3}\d{1,3}))(\:\d+)?(\/#!)?(\/[-a-z\d%_.~+]*)*(\?[;&a-z\d%_.~+=-]*)?(\#[-a-z\d_]*)?$/i;
+                if (regex.test(match))
+                    return `<a href="${match}" target="_blank">${match}</a>`;
+                else
+                    return match;
             });
             const label = this.$render("i-label", { width: '100%', overflowWrap: "anywhere", class: index_css_5.customLinkStyle, lineHeight: "1.3125rem", caption: text || '' });
             this.pnlContent.appendChild(label);
@@ -878,7 +882,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     // tag mention
                     if (match && link.innerHTML.startsWith('@'))
                         continue;
-                    this.replaceLinkPreview(link.href, link.parentElement, link);
+                    this.appendLinkPreview(link.href, link);
                 }
             }
         }
@@ -935,7 +939,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                 url: preview.url
             };
         }
-        async replaceLinkPreview(url, parent, linkElm) {
+        async appendLinkPreview(url, linkElm) {
             const preview = await (0, global_4.getLinkPreview)(this.apiBaseUrl, url);
             if (!preview || !preview.title)
                 return;
@@ -954,7 +958,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             else {
                 elm = new components_11.ScomPostLinkPreview();
             }
-            parent.replaceChild(elm, linkElm);
+            linkElm.after(elm);
             await elm.ready();
             elm.data = data;
         }
