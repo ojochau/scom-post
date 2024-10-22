@@ -22,6 +22,7 @@ declare module "@scom/scom-post/global/interface.ts" {
         isPublicPost?: boolean;
         isLocked?: boolean;
         isSubscription?: boolean;
+        isPending?: boolean;
     }
     export interface IPostStats {
         replies?: number;
