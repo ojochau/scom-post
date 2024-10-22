@@ -406,7 +406,7 @@ export class ScomPost extends Module {
 
     private async renderUI() {
         this.clear();
-        const { actions, stats, parentAuthor, contentElements, repost, community, isLocked, isSubscription } = this._data?.data || {};
+        const { actions, stats, parentAuthor, contentElements, repost, community, isLocked, isSubscription, isPending } = this._data?.data || {};
         this.renderPostType();
         let isMarkdown = await this.isMarkdown();
 
@@ -420,7 +420,7 @@ export class ScomPost extends Module {
 
         if (!this.isQuotedPost) this.renderAnalytics(stats, actions);
         this.groupAnalysis.visible = !this.isQuotedPost && !this.pinView;
-        this.pnlSubscribe.visible = !this.isQuotedPost && !this.pinView;
+        this.pnlSubscribe.visible = !this.isQuotedPost && !this.pinView && !isPending;
 
         this.pnlLocked.visible = isLocked || false;
         this.pnlDetail.visible = !isLocked;
@@ -823,6 +823,7 @@ export class ScomPost extends Module {
                     cursor='pointer'
                     class={getIconStyleClass(item.hoveredColor)}
                     padding={{ top: '0.25rem', bottom: '0.25rem' }}
+                    enabled={!this.postData?.isPending}
                 >
                     <i-icon
                         width={'1rem'} height={'1rem'}
@@ -835,6 +836,7 @@ export class ScomPost extends Module {
             if (item.highlighted) itemEl.classList.add('highlighted');
             this.groupAnalysis.appendChild(itemEl);
             itemEl.onClick = async (target: Control, event: Event) => {
+                if (this.postData?.isPending) return;
                 let success = true;
                 if (item.onClick) success = await item.onClick(itemEl, event);
                 if (success && (item.name === 'Like' || item.name === 'Repost')) {
@@ -922,6 +924,7 @@ export class ScomPost extends Module {
     }
  
     private onProfileShown(target: Control, event: Event) {
+        if (this.postData?.isPending) return;
         if (this.onProfileClicked) this.onProfileClicked(target, this.postData, event, this.pnlContent);
     }
 

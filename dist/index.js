@@ -778,7 +778,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         }
         async renderUI() {
             this.clear();
-            const { actions, stats, parentAuthor, contentElements, repost, community, isLocked, isSubscription } = this._data?.data || {};
+            const { actions, stats, parentAuthor, contentElements, repost, community, isLocked, isSubscription, isPending } = this._data?.data || {};
             this.renderPostType();
             let isMarkdown = await this.isMarkdown();
             if (parentAuthor) {
@@ -791,7 +791,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             if (!this.isQuotedPost)
                 this.renderAnalytics(stats, actions);
             this.groupAnalysis.visible = !this.isQuotedPost && !this.pinView;
-            this.pnlSubscribe.visible = !this.isQuotedPost && !this.pinView;
+            this.pnlSubscribe.visible = !this.isQuotedPost && !this.pinView && !isPending;
             this.pnlLocked.visible = isLocked || false;
             this.pnlDetail.visible = !isLocked;
             if (repost) {
@@ -1108,13 +1108,15 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     value = components_10.FormatUtils.formatNumber(item.value, { shortScale: true, decimalFigures: 0 });
                     lblValue = (this.$render("i-label", { caption: value, font: { color: Theme.colors.secondary.light, size: '0.8125rem' }, tag: item.value }));
                 }
-                let itemEl = (this.$render("i-hstack", { verticalAlignment: "center", gap: '0.5rem', tooltip: value ? { content: value, placement: 'bottomLeft' } : undefined, cursor: 'pointer', class: (0, index_css_5.getIconStyleClass)(item.hoveredColor), padding: { top: '0.25rem', bottom: '0.25rem' } },
+                let itemEl = (this.$render("i-hstack", { verticalAlignment: "center", gap: '0.5rem', tooltip: value ? { content: value, placement: 'bottomLeft' } : undefined, cursor: 'pointer', class: (0, index_css_5.getIconStyleClass)(item.hoveredColor), padding: { top: '0.25rem', bottom: '0.25rem' }, enabled: !this.postData?.isPending },
                     this.$render("i-icon", { width: '1rem', height: '1rem', fill: Theme.text.secondary, name: item.icon.name }),
                     lblValue || []));
                 if (item.highlighted)
                     itemEl.classList.add('highlighted');
                 this.groupAnalysis.appendChild(itemEl);
                 itemEl.onClick = async (target, event) => {
+                    if (this.postData?.isPending)
+                        return;
                     let success = true;
                     if (item.onClick)
                         success = await item.onClick(itemEl, event);
@@ -1194,6 +1196,8 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             this.renderReplies();
         }
         onProfileShown(target, event) {
+            if (this.postData?.isPending)
+                return;
             if (this.onProfileClicked)
                 this.onProfileClicked(target, this.postData, event, this.pnlContent);
         }

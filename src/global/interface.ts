@@ -20,6 +20,7 @@ export interface IPost {
   isPublicPost?: boolean;
   isLocked?: boolean;
   isSubscription?: boolean;
+  isPending?: boolean;
 };
 export interface IPostStats {
 	replies?: number;
