@@ -53,6 +53,7 @@ interface ScomPostElement extends ControlElement {
     onBookmarkClicked?: callbackType;
     onCommunityClicked?: callbackType;
     onUnlockPostClicked?: asyncCallbackType;
+    onOpenDesigner?: openDesignerCallback;
     disableGutters?: boolean;
     limitHeight?: boolean;
     isReply?: boolean;
@@ -87,6 +88,7 @@ interface IPostCard {
 type PostType = 'full' | 'standard' | 'short' | 'quoted' | 'card';
 type callbackType = (target: Control, data: IPost, event?: Event, contentElement?: Control) => void;
 type asyncCallbackType = (target: Control, data: IPost, event?: Event, contentElement?: Control) => Promise<boolean>;
+type openDesignerCallback =  (target: Control, data: any) => Promise<void>;
 
 @customElements('i-scom-post')
 export class ScomPost extends Module {
@@ -148,6 +150,7 @@ export class ScomPost extends Module {
     public onBookmarkClicked: callbackType;
     public onCommunityClicked: callbackType;
     public onUnlockPostClicked: asyncCallbackType;
+    public onOpenDesigner: openDesignerCallback;
 
     constructor(parent?: Container, options?: any) {
         super(parent, options);
@@ -596,10 +599,12 @@ export class ScomPost extends Module {
             elm = new ScomPostShopifyFrame();
             data = this.constructShopifyFrame(preview);
         } else {
-            elm = new ScomPostLinkPreview();
+            elm = new ScomPostLinkPreview() as ScomPostLinkPreview;
+            if (this.onOpenDesigner) elm.onOpenDesigner = this.onOpenDesigner;
         }
         linkElm.after(elm);
         await elm.ready();
+        elm.parent = this;
         elm.data = data;
     }
 
@@ -978,6 +983,7 @@ export class ScomPost extends Module {
         this.onBookmarkClicked = this.getAttribute('onBookmarkClicked', true) || this.onBookmarkClicked;
         this.onCommunityClicked = this.getAttribute('onCommunityClicked', true) || this.onCommunityClicked;
         this.onUnlockPostClicked = this.getAttribute('onUnlockPostClicked', true) || this.onUnlockPostClicked;
+        this.onOpenDesigner = this.getAttribute('onOpenDesigner', true) || this.onOpenDesigner;
         this.overflowEllipse = this.getAttribute('overflowEllipse', true) || this.overflowEllipse;
         this.disableGutters = this.getAttribute('disableGutters', true) || this.disableGutters;
         this.limitHeight = this.getAttribute('limitHeight', true) || this.limitHeight;

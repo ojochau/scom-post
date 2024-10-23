@@ -199,10 +199,12 @@ declare module "@scom/scom-post/components/bubbleMenu.tsx" {
 }
 /// <amd-module name="@scom/scom-post/components/linkPreview.tsx" />
 declare module "@scom/scom-post/components/linkPreview.tsx" {
-    import { ControlElement, Module } from '@ijstech/components';
+    import { ControlElement, Module, Control } from '@ijstech/components';
     import { ILinkPreview } from "@scom/scom-post/global/index.ts";
+    type openDesignerCallback = (target: Control, data: any) => Promise<void>;
     interface ScomPostLinkPreviewElement extends ControlElement {
         data?: ILinkPreview;
+        onOpenDesigner?: openDesignerCallback;
     }
     global {
         namespace JSX {
@@ -216,9 +218,12 @@ declare module "@scom/scom-post/components/linkPreview.tsx" {
         private lblTitle;
         private lblDesc;
         private lblDomain;
+        private btnOpen;
         private _data;
+        onOpenDesigner: openDesignerCallback;
         set data(value: ILinkPreview);
         private handleLinkPreviewClick;
+        private openDesigner;
         render(): any;
     }
 }
@@ -307,6 +312,7 @@ declare module "@scom/scom-post" {
         onBookmarkClicked?: callbackType;
         onCommunityClicked?: callbackType;
         onUnlockPostClicked?: asyncCallbackType;
+        onOpenDesigner?: openDesignerCallback;
         disableGutters?: boolean;
         limitHeight?: boolean;
         isReply?: boolean;
@@ -332,6 +338,7 @@ declare module "@scom/scom-post" {
     type PostType = 'full' | 'standard' | 'short' | 'quoted' | 'card';
     type callbackType = (target: Control, data: IPost, event?: Event, contentElement?: Control) => void;
     type asyncCallbackType = (target: Control, data: IPost, event?: Event, contentElement?: Control) => Promise<boolean>;
+    type openDesignerCallback = (target: Control, data: any) => Promise<void>;
     export class ScomPost extends Module {
         private pnlInfo;
         private pnlPublicLabel;
@@ -389,6 +396,7 @@ declare module "@scom/scom-post" {
         onBookmarkClicked: callbackType;
         onCommunityClicked: callbackType;
         onUnlockPostClicked: asyncCallbackType;
+        onOpenDesigner: openDesignerCallback;
         constructor(parent?: Container, options?: any);
         static create(options?: ScomPostElement, parent?: Container): Promise<ScomPost>;
         get isActive(): boolean;
