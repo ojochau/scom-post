@@ -372,7 +372,7 @@ declare module "@scom/scom-post" {
         private pnlContent;
         private pnlReplyPath;
         private lbReplyTo;
-        private pnlSubscribe;
+        private pnlContext;
         private bubbleMenu;
         private pnlCardContentBlock;
         private markdownViewer;
