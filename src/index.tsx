@@ -125,7 +125,7 @@ export class ScomPost extends Module {
     private pnlContent: Panel;
     private pnlReplyPath: Panel;
     private lbReplyTo: Label;
-    private pnlSubscribe: Panel;
+    private pnlContext: Panel;
     private bubbleMenu: ScomPostBubbleMenu;
     private pnlCardContentBlock: VStack;
     private markdownViewer: Markdown;
@@ -423,7 +423,7 @@ export class ScomPost extends Module {
 
         if (!this.isQuotedPost) this.renderAnalytics(stats, actions);
         this.groupAnalysis.visible = !this.isQuotedPost && !this.pinView;
-        this.pnlSubscribe.visible = !this.isQuotedPost && !this.pinView && !isPending;
+        this.pnlContext.visible = !this.isQuotedPost && !this.pinView && !isPending;
 
         this.pnlLocked.visible = isLocked || false;
         this.pnlDetail.visible = !isLocked;
@@ -633,14 +633,14 @@ export class ScomPost extends Module {
         const imgWidth = this.isQuotedPost ? '1.75rem' : '2.75rem';
         this.imgAvatar.width = this.imgAvatar.height = imgWidth;
         const userEl = (
-            <i-hstack verticalAlignment='center' gap="0.25rem">
+            <i-hstack minWidth={0} verticalAlignment='center' gap="0.25rem" stack={{ shrink: '1' }}>
                 <i-label
                     id="lblOwner"
                     caption={author?.displayName || author?.username || ''}
                     textOverflow="ellipsis"
-                    maxWidth={this.isQuotedPost ? '9.375rem' : '8.75rem'}
                     font={{ size: this.isQuotedPost ? '1rem' : '0.875rem', weight: 500 }}
                     lineHeight={'0.875rem'}
+                    overflow="hidden"
                 ></i-label>
                 <i-icon
                     id="imgVerified"
@@ -648,6 +648,7 @@ export class ScomPost extends Module {
                     name="certificate"
                     fill={Theme.text.secondary}
                     display="inline-flex"
+                    stack={{ shrink: '0' }}
                 ></i-icon>
             </i-hstack>
         );
@@ -666,10 +667,11 @@ export class ScomPost extends Module {
             <i-label
                 id="lblUsername"
                 caption={`${author?.internetIdentifier || ''}`}
-                maxWidth={this.isQuotedPost ? '13.75rem' : '12.5rem'}
                 textOverflow="ellipsis"
                 font={{ size: this.isQuotedPost ? '1rem' : '0.875rem', color: Theme.text.secondary }}
                 lineHeight={'0.875rem'}
+                stack={{ shrink: '1' }}
+                overflow="hidden"
                 visible={author?.internetIdentifier != null}
             ></i-label>
         );
@@ -689,8 +691,10 @@ export class ScomPost extends Module {
             this.pnlInfo.append(
                 <i-hstack
                     height="100%"
+                    minWidth={0}
                     gap="0.25rem"
                     verticalAlignment="center"
+                    stack={{ shrink: '1' }}
                 >
                     {userEl}
                     {usernameEl}
@@ -700,8 +704,8 @@ export class ScomPost extends Module {
             )
         } else {
             this.pnlInfo.append(
-                <i-vstack gap="0.5rem">
-                    <i-hstack gap="0.25rem" verticalAlignment="center">
+                <i-vstack minWidth={0} gap="0.5rem" stack={{ shrink: '1' }}>
+                    <i-hstack minWidth={0} gap="0.25rem" verticalAlignment="center" stack={{ shrink: '1' }}>
                         {userEl}
                         {dateEl}
                         {statusEl}
@@ -1029,7 +1033,7 @@ export class ScomPost extends Module {
                     <i-hstack horizontalAlignment="space-between" gap="0.5rem" width="100%"
                         grid={{ area: 'user' }}
                         position='relative'>
-                        <i-hstack alignItems={'center'} gap={10}>
+                        <i-hstack minWidth={0} alignItems={'center'} gap={10}>
                             <i-panel id="pnlAvatar" grid={{ area: 'avatar' }}>
                                 <i-image
                                     id="imgAvatar"
@@ -1044,7 +1048,7 @@ export class ScomPost extends Module {
                                     onClick={() => this.onGoProfile()}
                                 ></i-image>
                             </i-panel>
-                            <i-stack direction="vertical" gap="0.375rem">
+                            <i-stack direction="vertical" minWidth={0} gap="0.375rem">
                                 <i-panel id="pnlInfo" maxWidth={'100%'} overflow={'hidden'}></i-panel>
                                 <i-stack id="pnlPublicLabel" direction="horizontal" alignItems="center" gap="0.25rem" visible={this.isPublicPostLabelShown}>
                                     <i-icon
@@ -1062,21 +1066,11 @@ export class ScomPost extends Module {
                             </i-stack>
                         </i-hstack>
                         <i-hstack
-                            id="pnlSubscribe" stack={{ shrink: '0' }}
+                            id="pnlContext" stack={{ shrink: '0' }}
                             horizontalAlignment="end"
                             gap="0.5rem"
                             visible={!this.pinView}
                         >
-                            <i-button
-                                id="btnSubscribe"
-                                minHeight={32}
-                                padding={{ left: '1rem', right: '1rem' }}
-                                background={{ color: Theme.colors.primary.main }}
-                                font={{ color: Theme.colors.primary.contrastText }}
-                                border={{ radius: '1.875rem' }}
-                                visible={false}
-                                caption='Subscribe'
-                            ></i-button>
                             <i-panel
                                 onClick={this.onProfileShown}
                                 cursor="pointer"
@@ -1210,7 +1204,7 @@ export class ScomPost extends Module {
             this.gridPost.append(<i-hstack horizontalAlignment="space-between" gap="0.5rem" width="100%"
                 grid={{ area: 'user' }}
                 position='relative'>
-                <i-stack direction="vertical" gap="0.375rem">
+                <i-stack direction="vertical" minWidth={0} gap="0.375rem">
                     <i-panel id="pnlInfo" maxWidth={'100%'} overflow={'hidden'}></i-panel>
                     <i-stack id="pnlPublicLabel" direction="horizontal" alignItems="center" gap="0.25rem" visible={this.isPublicPostLabelShown}>
                         <i-icon
@@ -1227,21 +1221,11 @@ export class ScomPost extends Module {
                     </i-stack>
                 </i-stack>
                 <i-hstack
-                    id="pnlSubscribe" stack={{ shrink: '0' }}
+                    id="pnlContext" stack={{ shrink: '0' }}
                     horizontalAlignment="end"
                     gap="0.5rem"
                     visible={!this.pinView}
                 >
-                    <i-button
-                        id="btnSubscribe"
-                        minHeight={32}
-                        padding={{ left: '1rem', right: '1rem' }}
-                        background={{ color: Theme.colors.primary.main }}
-                        font={{ color: Theme.colors.primary.contrastText }}
-                        border={{ radius: '1.875rem' }}
-                        visible={false}
-                        caption='Subscribe'
-                    ></i-button>
                     <i-panel
                         onClick={this.onProfileShown}
                         cursor="pointer"

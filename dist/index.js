@@ -806,7 +806,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             if (!this.isQuotedPost)
                 this.renderAnalytics(stats, actions);
             this.groupAnalysis.visible = !this.isQuotedPost && !this.pinView;
-            this.pnlSubscribe.visible = !this.isQuotedPost && !this.pinView && !isPending;
+            this.pnlContext.visible = !this.isQuotedPost && !this.pinView && !isPending;
             this.pnlLocked.visible = isLocked || false;
             this.pnlDetail.visible = !isLocked;
             if (repost) {
@@ -993,25 +993,25 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             this.imgAvatar.objectFit = 'cover';
             const imgWidth = this.isQuotedPost ? '1.75rem' : '2.75rem';
             this.imgAvatar.width = this.imgAvatar.height = imgWidth;
-            const userEl = (this.$render("i-hstack", { verticalAlignment: 'center', gap: "0.25rem" },
-                this.$render("i-label", { id: "lblOwner", caption: author?.displayName || author?.username || '', textOverflow: "ellipsis", maxWidth: this.isQuotedPost ? '9.375rem' : '8.75rem', font: { size: this.isQuotedPost ? '1rem' : '0.875rem', weight: 500 }, lineHeight: '0.875rem' }),
-                this.$render("i-icon", { id: "imgVerified", width: '0.875rem', height: '0.875rem', name: "certificate", fill: Theme.text.secondary, display: "inline-flex" })));
+            const userEl = (this.$render("i-hstack", { minWidth: 0, verticalAlignment: 'center', gap: "0.25rem", stack: { shrink: '1' } },
+                this.$render("i-label", { id: "lblOwner", caption: author?.displayName || author?.username || '', textOverflow: "ellipsis", font: { size: this.isQuotedPost ? '1rem' : '0.875rem', weight: 500 }, lineHeight: '0.875rem', overflow: "hidden" }),
+                this.$render("i-icon", { id: "imgVerified", width: '0.875rem', height: '0.875rem', name: "certificate", fill: Theme.text.secondary, display: "inline-flex", stack: { shrink: '0' } })));
             const dateEl = (this.$render("i-hstack", { gap: '0.25rem', stack: { shrink: '0' } },
                 this.$render("i-panel", { border: { left: { width: '1px', style: 'solid', color: Theme.text.secondary } } }),
                 this.$render("i-label", { id: "lblDate", font: { size: '0.875rem', color: Theme.text.secondary }, caption: `${(0, global_4.getDuration)(publishDate)}`, lineHeight: '0.875rem' })));
-            const usernameEl = (this.$render("i-label", { id: "lblUsername", caption: `${author?.internetIdentifier || ''}`, maxWidth: this.isQuotedPost ? '13.75rem' : '12.5rem', textOverflow: "ellipsis", font: { size: this.isQuotedPost ? '1rem' : '0.875rem', color: Theme.text.secondary }, lineHeight: '0.875rem', visible: author?.internetIdentifier != null }));
+            const usernameEl = (this.$render("i-label", { id: "lblUsername", caption: `${author?.internetIdentifier || ''}`, textOverflow: "ellipsis", font: { size: this.isQuotedPost ? '1rem' : '0.875rem', color: Theme.text.secondary }, lineHeight: '0.875rem', stack: { shrink: '1' }, overflow: "hidden", visible: author?.internetIdentifier != null }));
             let statusEl = (this.$render("i-hstack", { gap: '0.25rem', stack: { shrink: '0' }, visible: stats?.status != null },
                 this.$render("i-label", { id: "lblStatus", caption: stats?.status || "", padding: { top: 3, bottom: 3, left: 12, right: 12 }, border: { width: 1, style: 'solid', color: Theme.colors.primary.main, radius: 20 }, font: { size: '0.875rem', color: Theme.colors.primary.main }, lineHeight: '0.875rem' })));
             if (oneLine) {
-                this.pnlInfo.append(this.$render("i-hstack", { height: "100%", gap: "0.25rem", verticalAlignment: "center" },
+                this.pnlInfo.append(this.$render("i-hstack", { height: "100%", minWidth: 0, gap: "0.25rem", verticalAlignment: "center", stack: { shrink: '1' } },
                     userEl,
                     usernameEl,
                     dateEl,
                     statusEl));
             }
             else {
-                this.pnlInfo.append(this.$render("i-vstack", { gap: "0.5rem" },
-                    this.$render("i-hstack", { gap: "0.25rem", verticalAlignment: "center" },
+                this.pnlInfo.append(this.$render("i-vstack", { minWidth: 0, gap: "0.5rem", stack: { shrink: '1' } },
+                    this.$render("i-hstack", { minWidth: 0, gap: "0.25rem", verticalAlignment: "center", stack: { shrink: '1' } },
                         userEl,
                         dateEl,
                         statusEl),
@@ -1299,16 +1299,15 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     ], padding: { left: '1.25rem', right: '1.25rem', top: '1rem', bottom: '1rem' } },
                     this.$render("i-hstack", { id: "pnlCommunity", padding: { bottom: "0.75rem" }, margin: { top: "-0.5rem" }, gap: "0.75rem", visible: false }),
                     this.$render("i-hstack", { horizontalAlignment: "space-between", gap: "0.5rem", width: "100%", grid: { area: 'user' }, position: 'relative' },
-                        this.$render("i-hstack", { alignItems: 'center', gap: 10 },
+                        this.$render("i-hstack", { minWidth: 0, alignItems: 'center', gap: 10 },
                             this.$render("i-panel", { id: "pnlAvatar", grid: { area: 'avatar' } },
                                 this.$render("i-image", { id: "imgAvatar", width: '2.75rem', height: '2.75rem', display: "block", background: { color: Theme.background.main }, border: { radius: '50%' }, overflow: 'hidden', objectFit: 'cover', fallbackUrl: assets_2.default.fullPath('img/default_avatar.png'), cursor: "pointer", onClick: () => this.onGoProfile() })),
-                            this.$render("i-stack", { direction: "vertical", gap: "0.375rem" },
+                            this.$render("i-stack", { direction: "vertical", minWidth: 0, gap: "0.375rem" },
                                 this.$render("i-panel", { id: "pnlInfo", maxWidth: '100%', overflow: 'hidden' }),
                                 this.$render("i-stack", { id: "pnlPublicLabel", direction: "horizontal", alignItems: "center", gap: "0.25rem", visible: this.isPublicPostLabelShown },
                                     this.$render("i-icon", { width: "0.875rem", height: "0.875rem", name: "globe-americas", display: 'inline-flex', fill: Theme.text.secondary }),
                                     this.$render("i-label", { caption: "Public", font: { size: '0.875rem', color: Theme.text.secondary } })))),
-                        this.$render("i-hstack", { id: "pnlSubscribe", stack: { shrink: '0' }, horizontalAlignment: "end", gap: "0.5rem", visible: !this.pinView },
-                            this.$render("i-button", { id: "btnSubscribe", minHeight: 32, padding: { left: '1rem', right: '1rem' }, background: { color: Theme.colors.primary.main }, font: { color: Theme.colors.primary.contrastText }, border: { radius: '1.875rem' }, visible: false, caption: 'Subscribe' }),
+                        this.$render("i-hstack", { id: "pnlContext", stack: { shrink: '0' }, horizontalAlignment: "end", gap: "0.5rem", visible: !this.pinView },
                             this.$render("i-panel", { onClick: this.onProfileShown, cursor: "pointer", class: index_css_5.hoverStyle },
                                 this.$render("i-icon", { name: "ellipsis-h", width: '1rem', height: '1rem', fill: Theme.text.secondary })))),
                     this.$render("i-hstack", { id: "pnlReplyPath", verticalAlignment: "center", gap: "0.25rem", visible: false, grid: { area: 'path' }, margin: { top: '0.5rem' } },
@@ -1337,13 +1336,12 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                 this.gridPost.append(this.$render("i-panel", { id: "pnlAvatar", grid: { area: 'avatar' } },
                     this.$render("i-image", { id: "imgAvatar", width: '2.75rem', height: '2.75rem', display: "block", background: { color: Theme.background.main }, border: { radius: '50%' }, overflow: 'hidden', objectFit: 'cover', fallbackUrl: assets_2.default.fullPath('img/default_avatar.png'), cursor: "pointer", onClick: () => this.onGoProfile() })));
                 this.gridPost.append(this.$render("i-hstack", { horizontalAlignment: "space-between", gap: "0.5rem", width: "100%", grid: { area: 'user' }, position: 'relative' },
-                    this.$render("i-stack", { direction: "vertical", gap: "0.375rem" },
+                    this.$render("i-stack", { direction: "vertical", minWidth: 0, gap: "0.375rem" },
                         this.$render("i-panel", { id: "pnlInfo", maxWidth: '100%', overflow: 'hidden' }),
                         this.$render("i-stack", { id: "pnlPublicLabel", direction: "horizontal", alignItems: "center", gap: "0.25rem", visible: this.isPublicPostLabelShown },
                             this.$render("i-icon", { width: "0.875rem", height: "0.875rem", name: "globe-americas", display: 'inline-flex', fill: Theme.text.secondary }),
                             this.$render("i-label", { caption: "Public", font: { size: '0.875rem', color: Theme.text.secondary } }))),
-                    this.$render("i-hstack", { id: "pnlSubscribe", stack: { shrink: '0' }, horizontalAlignment: "end", gap: "0.5rem", visible: !this.pinView },
-                        this.$render("i-button", { id: "btnSubscribe", minHeight: 32, padding: { left: '1rem', right: '1rem' }, background: { color: Theme.colors.primary.main }, font: { color: Theme.colors.primary.contrastText }, border: { radius: '1.875rem' }, visible: false, caption: 'Subscribe' }),
+                    this.$render("i-hstack", { id: "pnlContext", stack: { shrink: '0' }, horizontalAlignment: "end", gap: "0.5rem", visible: !this.pinView },
                         this.$render("i-panel", { onClick: this.onProfileShown, cursor: "pointer", class: index_css_5.hoverStyle },
                             this.$render("i-icon", { name: "ellipsis-h", width: '1rem', height: '1rem', fill: Theme.text.secondary })))));
                 this.gridPost.append(this.$render("i-hstack", { id: "pnlReplyPath", verticalAlignment: "center", gap: "0.25rem", visible: false, grid: { area: 'path' }, margin: { top: '0.5rem' } },
