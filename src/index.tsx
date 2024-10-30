@@ -719,7 +719,7 @@ export class ScomPost extends Module {
     private renderPostType() {
         if (!this.disableGutters) {
             this.gridPost.templateColumns = ['2.75rem', 'minmax(auto, calc(100% - 3.5rem))'];
-            this.gridPost.templateRows = ['auto'];
+            this.gridPost.templateRows = ['1fr'];
         }
         // this.pnlGridPost.background.color = Theme.background.paper;
         // this.pnlPost.background.color = Theme.background.paper;
@@ -1438,7 +1438,7 @@ export class ScomPost extends Module {
                         // maxHeight={"calc(100vh - 50px - 94px)"}
                         // overflow={'hidden'}
                         templateColumns={['2.75rem', 'minmax(auto, calc(100% - 3.5rem))']}
-                        templateRows={['auto']}
+                        templateRows={['1fr']}
                         gap={{ column: '0.75rem' }}
                         position='relative'
                     >

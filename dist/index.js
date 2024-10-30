@@ -1021,7 +1021,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         renderPostType() {
             if (!this.disableGutters) {
                 this.gridPost.templateColumns = ['2.75rem', 'minmax(auto, calc(100% - 3.5rem))'];
-                this.gridPost.templateRows = ['auto'];
+                this.gridPost.templateRows = ['1fr'];
             }
             // this.pnlGridPost.background.color = Theme.background.paper;
             // this.pnlPost.background.color = Theme.background.paper;
@@ -1440,7 +1440,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     this.$render("i-grid-layout", { id: "gridPost", 
                         // maxHeight={"calc(100vh - 50px - 94px)"}
                         // overflow={'hidden'}
-                        templateColumns: ['2.75rem', 'minmax(auto, calc(100% - 3.5rem))'], templateRows: ['auto'], gap: { column: '0.75rem' }, position: 'relative' })),
+                        templateColumns: ['2.75rem', 'minmax(auto, calc(100% - 3.5rem))'], templateRows: ['1fr'], gap: { column: '0.75rem' }, position: 'relative' })),
                 this.$render("i-panel", { id: "pnlPost", position: 'relative', border: { radius: '0.5rem' }, mediaQueries: [
                         {
                             maxWidth: '767px',
