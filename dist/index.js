@@ -418,7 +418,79 @@ define("@scom/scom-post/components/bubbleMenu.tsx", ["require", "exports", "@ijs
     ], ScomPostBubbleMenu);
     exports.ScomPostBubbleMenu = ScomPostBubbleMenu;
 });
-define("@scom/scom-post/components/linkPreview.tsx", ["require", "exports", "@ijstech/components", "@scom/scom-post/index.css.ts", "@scom/scom-post/global/index.ts"], function (require, exports, components_7, index_css_2, global_1) {
+define("@scom/scom-post/translations.json.ts", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    ///<amd-module name='@scom/scom-post/translations.json.ts'/> 
+    exports.default = {
+        "en": {
+            "untitled": "Untitled",
+            "reposted": "{{value}} reposted",
+            "liked": "{{value}} liked",
+            "exclusive_content_for_whitelisted_users_only": "Exclusive content for whitelisted users only",
+            "subscribe": "Subscribe",
+            "unlock": "Unlock",
+            "public": "Public",
+            "show_replies": "Show replies",
+            "replying_to": "replying to",
+            "read_more": "Read more",
+            "show_more": "Show more",
+            "buy_now": "Buy Now",
+            "pinned": "Pinned",
+            "open_in_designer": "Open in Designer",
+            "reply": "Reply",
+            "zap": "Zap",
+            "like": "Like",
+            "repost": "Repost",
+            "bookmark": "Bookmark",
+            "copy_note_link": "Copy note link",
+            "the_link_has_been_copied_successfully": "The link has been copied successfully",
+            "copy_note_text": "Copy note text",
+            "the_text_has_been_copied_successfully": "The text has been copied successfully",
+            "copy_note_id": "Copy note ID",
+            "the_id_has_been_copied_successfully": "The ID has been copied successfully",
+            "copy_raw_data": "Copy raw data",
+            "the_raw_data_has_been_copied_successfully": "The raw data has been copied successfully",
+            "copy_user_public_key": "Copy user public key",
+            "the_public_key_has_been_copied_successfully": "The public key has been copied successfully",
+            "mute_user": "Mute user",
+        },
+        "zh-hant": {},
+        "vi": {
+            "untitled": "Chưa có tiêu đề",
+            "reposted": "{{value}} đã đăng lại",
+            "liked": "{{value}} đã thích",
+            "exclusive_content_for_whitelisted_users_only": "Nội dung độc quyền chỉ dành cho người dùng được phép",
+            "subscribe": "Đăng ký",
+            "unlock": "Mở khóa",
+            "public": "Công khai",
+            "show_replies": "Hiển thị danh sách phản hồi",
+            "replying_to": "phản hồi đến",
+            "read_more": "Đọc thêm",
+            "show_more": "Hiển thị thêm",
+            "buy_now": "Mua ngay",
+            "pinned": "Đã ghim",
+            "open_in_designer": "Mở trình chỉnh sửa",
+            "reply": "Phản hồi",
+            "zap": "Zap",
+            "like": "Thích",
+            "repost": "Repost",
+            "bookmark": "Đánh dấu",
+            "copy_note_link": "Sao chép liên kết bài đăng",
+            "the_link_has_been_copied_successfully": "Liên kết đã được sao chép thành công",
+            "copy_note_text": "Sao chép nội dung bài đăng",
+            "the_text_has_been_copied_successfully": "Nội dung đã được sao chép thành công",
+            "copy_note_id": "Sao chép ID",
+            "the_id_has_been_copied_successfully": "ID đã được sao chép thành công",
+            "copy_raw_data": "Sao chép dữ liệu thô",
+            "the_raw_data_has_been_copied_successfully": "Dữ liệu thô đã được sao chép thành công",
+            "copy_user_public_key": "Sao chép khóa công khai người dùng",
+            "the_public_key_has_been_copied_successfully": "Khóa công khai đã được sao chép thành công",
+            "mute_user": "Chặn người dùng",
+        }
+    };
+});
+define("@scom/scom-post/components/linkPreview.tsx", ["require", "exports", "@ijstech/components", "@scom/scom-post/index.css.ts", "@scom/scom-post/global/index.ts", "@scom/scom-post/translations.json.ts"], function (require, exports, components_7, index_css_2, global_1, translations_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ScomPostLinkPreview = void 0;
@@ -448,6 +520,10 @@ define("@scom/scom-post/components/linkPreview.tsx", ["require", "exports", "@ij
                 parent.onOpenDesigner(target, this._data);
             }
         }
+        init() {
+            this.i18n.init({ ...translations_json_1.default });
+            super.init();
+        }
         render() {
             return (this.$render("i-panel", { width: "100%", background: { color: Theme.background.paper }, margin: { top: '0.5rem' }, border: { radius: '0.75rem' }, overflow: "hidden", cursor: "pointer", onClick: this.handleLinkPreviewClick },
                 this.$render("i-image", { id: "imgPreview", class: index_css_2.linkPreviewImageStyle, display: "block", width: "100%", maxHeight: 250, objectFit: "cover", overflow: "hidden", visible: false }),
@@ -456,7 +532,7 @@ define("@scom/scom-post/components/linkPreview.tsx", ["require", "exports", "@ij
                     this.$render("i-label", { id: "lblDesc", lineClamp: 2, font: { size: '0.875rem', color: Theme.text.secondary }, lineHeight: "1.25rem" }),
                     this.$render("i-label", { id: "lblDomain", font: { size: '0.75rem', color: Theme.text.secondary }, lineHeight: "1.25rem" }),
                     this.$render("i-hstack", { horizontalAlignment: 'center' },
-                        this.$render("i-button", { id: "btnOpen", visible: false, padding: { top: '0.5rem', bottom: '0.5rem', left: '0.75rem', right: '0.75rem' }, font: { size: '0.875rem', color: Theme.text.primary }, boxShadow: 'none', background: { color: Theme.colors.primary.main }, caption: 'Open in Designer', onClick: this.openDesigner }))),
+                        this.$render("i-button", { id: "btnOpen", visible: false, padding: { top: '0.5rem', bottom: '0.5rem', left: '0.75rem', right: '0.75rem' }, font: { size: '0.875rem', color: Theme.text.primary }, boxShadow: 'none', background: { color: Theme.colors.primary.main }, caption: '$open_in_designer', onClick: this.openDesigner }))),
                 this.$render("i-modal", { id: "mdDesigner", width: '100dvw', height: '100dvh', popupPlacement: 'center', closeIcon: null },
                     this.$render("i-panel", { id: "pnlDesigner" }))));
         }
@@ -466,7 +542,7 @@ define("@scom/scom-post/components/linkPreview.tsx", ["require", "exports", "@ij
     ], ScomPostLinkPreview);
     exports.ScomPostLinkPreview = ScomPostLinkPreview;
 });
-define("@scom/scom-post/components/frames/shopify.tsx", ["require", "exports", "@ijstech/components", "@scom/scom-post/global/index.ts", "@scom/scom-post/components/index.css.ts"], function (require, exports, components_8, global_2, index_css_3) {
+define("@scom/scom-post/components/frames/shopify.tsx", ["require", "exports", "@ijstech/components", "@scom/scom-post/global/index.ts", "@scom/scom-post/components/index.css.ts", "@scom/scom-post/translations.json.ts"], function (require, exports, components_8, global_2, index_css_3, translations_json_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ScomPostShopifyFrame = void 0;
@@ -488,6 +564,10 @@ define("@scom/scom-post/components/frames/shopify.tsx", ["require", "exports", "
         handleButtonClick() {
             window.open(this._data.url, '_blank');
         }
+        init() {
+            this.i18n.init({ ...translations_json_2.default });
+            super.init();
+        }
         render() {
             return (this.$render("i-stack", { direction: "vertical", width: "100%", height: "100%", gap: "0.25rem" },
                 this.$render("i-panel", { width: "100%", height: "100%", border: { width: 1, style: 'solid', color: Theme.divider, radius: '0.5rem' }, background: { color: Theme.action.disabledBackground }, overflow: "hidden" },
@@ -497,7 +577,7 @@ define("@scom/scom-post/components/frames/shopify.tsx", ["require", "exports", "
                         this.$render("i-label", { id: "lblPrice", font: { size: '1.125rem', color: Theme.colors.primary.main, weight: 600 }, lineHeight: "1.5rem" }),
                         this.$render("i-label", { id: "lblDesc", font: { size: '0.875rem', color: Theme.text.secondary, weight: 400 }, lineHeight: "1.125rem", lineClamp: 3, visible: false })),
                     this.$render("i-stack", { direction: "horizontal", alignItems: "center", padding: { top: '0.5rem', bottom: '0.5rem', left: '1rem', right: '1rem' }, gap: "0.5rem" },
-                        this.$render("i-button", { height: "2.25rem", caption: "Buy Now", padding: { top: '0.5rem', bottom: '0.5rem', left: '1rem', right: '1rem' }, border: { radius: '0.5rem' }, stack: { grow: '1' }, background: { color: Theme.colors.secondary.main }, font: { size: '0.875rem', color: Theme.colors.secondary.contrastText, weight: 400 }, onClick: this.handleButtonClick }))),
+                        this.$render("i-button", { height: "2.25rem", caption: "$buy_now", padding: { top: '0.5rem', bottom: '0.5rem', left: '1rem', right: '1rem' }, border: { radius: '0.5rem' }, stack: { grow: '1' }, background: { color: Theme.colors.secondary.main }, font: { size: '0.875rem', color: Theme.colors.secondary.contrastText, weight: 400 }, onClick: this.handleButtonClick }))),
                 this.$render("i-label", { id: "lblDomain", class: `text-right ${index_css_3.domainLinkStyle}`, width: "100%", font: { size: '0.875rem', color: Theme.text.secondary, weight: 500 }, lineHeight: "1.25rem", link: { target: '_blank' } })));
         }
     };
@@ -597,7 +677,7 @@ define("@scom/scom-post/components/index.ts", ["require", "exports", "@scom/scom
     Object.defineProperty(exports, "ScomPostLinkPreview", { enumerable: true, get: function () { return linkPreview_1.ScomPostLinkPreview; } });
     __exportStar(frames_1, exports);
 });
-define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/scom-post/global/index.ts", "@scom/scom-post/index.css.ts", "@scom/scom-post/assets.ts", "@scom/scom-post/components/index.ts"], function (require, exports, components_10, global_4, index_css_5, assets_2, components_11) {
+define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/scom-post/global/index.ts", "@scom/scom-post/index.css.ts", "@scom/scom-post/assets.ts", "@scom/scom-post/components/index.ts", "@scom/scom-post/translations.json.ts"], function (require, exports, components_10, global_4, index_css_5, assets_2, components_11, translations_json_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ScomPost = void 0;
@@ -786,7 +866,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                         this.$render("i-image", { position: "absolute", display: "block", width: "100%", height: "100%", top: "100%", left: 0, url: data.img, objectFit: "cover" }))),
                 this.$render("i-vstack", { id: "pnlCardContentBlock", justifyContent: 'space-between', gap: '0.5rem', stack: { shrink: '1', grow: '1' }, overflow: 'hidden' },
                     this.$render("i-vstack", { gap: '0.5rem' },
-                        this.$render("i-label", { caption: data.title || 'Untitled', font: { size: '1.25rem', weight: 500 }, wordBreak: "break-word", lineHeight: '1.5rem' }),
+                        this.$render("i-label", { caption: data.title || '$untitled', font: { size: '1.25rem', weight: 500 }, wordBreak: "break-word", lineHeight: '1.5rem' }),
                         this.$render("i-label", { class: "entry-content", caption: data.content || '', lineClamp: this.pinView ? 3 : 1, font: { size: "1rem" }, lineHeight: '1.5rem', visible: !!data.content })))));
             this.groupAnalysis.parent = this.pnlCardContentBlock;
             this.pnlCardContentBlock.appendChild(this.groupAnalysis);
@@ -817,7 +897,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                 }
                 this.pnlRepost.clearInnerHTML();
                 this.pnlRepost.append(this.$render("i-stack", { direction: "horizontal", width: "2.75rem", justifyContent: "end" },
-                    this.$render("i-icon", { width: "1rem", height: "1rem", name: "retweet", fill: Theme.text.secondary })), this.$render("i-label", { caption: reposters + " reposted", font: { size: "0.875rem", color: Theme.text.secondary }, onClick: () => this.onGoProfile(repost.npub || repost.id) }));
+                    this.$render("i-icon", { width: "1rem", height: "1rem", name: "retweet", fill: Theme.text.secondary })), this.$render("i-label", { caption: this.i18n.get('reposted', { value: reposters }), font: { size: "0.875rem", color: Theme.text.secondary }, onClick: () => this.onGoProfile(repost.npub || repost.id) }));
                 this.pnlRepost.visible = true;
             }
             if (community) {
@@ -829,7 +909,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             if (this.btnUnlockPost) {
                 const firstPolicy = community?.policies?.[0];
                 const _isSubscription = isSubscription || firstPolicy?.paymentModel === global_4.PaymentModel.Subscription;
-                this.btnUnlockPost.caption = community?.isWhitelist ? "Exclusive content for whitelisted users only" : _isSubscription ? "Subscribe" : "Unlock";
+                this.btnUnlockPost.caption = community?.isWhitelist ? "$exclusive_content_for_whitelisted_users_only" : _isSubscription ? "$subscribe" : "$unlock";
                 this.btnUnlockPost.enabled = !community?.isWhitelist;
             }
             if (this.type === 'card' && isMarkdown) {
@@ -1060,7 +1140,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             const dataList = [
                 {
                     value: analytics?.replies || 0,
-                    name: 'Reply',
+                    name: '$reply',
                     icon: { name: "comment-alt" },
                     hoveredColor: Theme.text.secondary,
                     highlighted: actions?.replied,
@@ -1072,7 +1152,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                 },
                 {
                     value: analytics?.satszapped || 0,
-                    name: 'Zap',
+                    name: '$zap',
                     icon: { name: "bolt" },
                     hoveredColor: Theme.colors.warning.main,
                     highlighted: actions?.zapped,
@@ -1084,7 +1164,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                 },
                 {
                     value: analytics?.upvotes || 0,
-                    name: 'Like',
+                    name: '$like',
                     icon: { name: "heart" },
                     hoveredColor: Theme.colors.error.main,
                     highlighted: actions?.liked,
@@ -1097,7 +1177,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                 },
                 {
                     value: analytics?.reposts || 0,
-                    name: 'Repost',
+                    name: '$repost',
                     icon: { name: "retweet" },
                     hoveredColor: Theme.colors.success.main,
                     highlighted: actions?.reposted,
@@ -1108,7 +1188,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     }
                 },
                 {
-                    name: 'Bookmark',
+                    name: '$bookmark',
                     icon: { name: 'bookmark' },
                     hoveredColor: Theme.colors.info.main,
                     highlighted: actions?.bookmarked,
@@ -1200,7 +1280,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     this.$render("i-panel", { width: 2, height: 2, background: { color: Theme.colors.secondary.light } }),
                     this.$render("i-panel", { width: 2, height: 2, background: { color: Theme.colors.secondary.light } }),
                     this.$render("i-panel", { width: 2, height: 2, background: { color: Theme.colors.secondary.light } })),
-                this.$render("i-label", { caption: 'Show replies', font: { color: Theme.colors.primary.main, size: '0.9rem' } })));
+                this.$render("i-label", { caption: "$show_replies", font: { color: Theme.colors.primary.main, size: '0.9rem' } })));
             if (this.pnlReply)
                 this.pnlReply.visible = false;
             this.pnlWrapper.appendChild(this.pnlMore);
@@ -1257,6 +1337,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
         //     this.btnShowMore.visible = false;
         // }
         async init() {
+            this.i18n.init({ ...translations_json_3.default });
             super.init();
             this.onReplyClicked = this.getAttribute('onReplyClicked', true) || this.onReplyClicked;
             this.onZapClicked = this.getAttribute('onZapClicked', true) || this.onZapClicked;
@@ -1306,27 +1387,27 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                                 this.$render("i-panel", { id: "pnlInfo", maxWidth: '100%', overflow: 'hidden' }),
                                 this.$render("i-stack", { id: "pnlPublicLabel", direction: "horizontal", alignItems: "center", gap: "0.25rem", visible: this.isPublicPostLabelShown },
                                     this.$render("i-icon", { width: "0.875rem", height: "0.875rem", name: "globe-americas", display: 'inline-flex', fill: Theme.text.secondary }),
-                                    this.$render("i-label", { caption: "Public", font: { size: '0.875rem', color: Theme.text.secondary } })))),
+                                    this.$render("i-label", { caption: "$public", font: { size: '0.875rem', color: Theme.text.secondary } })))),
                         this.$render("i-hstack", { id: "pnlContext", stack: { shrink: '0' }, horizontalAlignment: "end", gap: "0.5rem", visible: !this.pinView },
                             this.$render("i-panel", { onClick: this.onProfileShown, cursor: "pointer", class: index_css_5.hoverStyle },
                                 this.$render("i-icon", { name: "ellipsis-h", width: '1rem', height: '1rem', fill: Theme.text.secondary })))),
                     this.$render("i-hstack", { id: "pnlReplyPath", verticalAlignment: "center", gap: "0.25rem", visible: false, grid: { area: 'path' }, margin: { top: '0.5rem' } },
-                        this.$render("i-label", { caption: 'replying to', font: { size: '0.875rem', color: Theme.colors.secondary.light } }),
+                        this.$render("i-label", { caption: '$replying_to', font: { size: '0.875rem', color: Theme.colors.secondary.light } }),
                         this.$render("i-label", { id: "lbReplyTo", font: { size: '0.875rem', color: Theme.colors.primary.main }, cursor: "pointer", onClick: () => this.onGoProfile() })),
                     this.$render("i-vstack", { width: '100%', grid: { area: 'content' }, margin: { top: '1rem' } },
                         this.$render("i-panel", { id: "pnlDetail" },
                             this.$render("i-hstack", { id: "showMoreWrapper", visible: false, height: 50, bottom: 0, width: '100%', zIndex: 1, background: { color: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(10, 10, 10) 100%)' }, position: 'absolute', justifyContent: 'center', alignItems: 'end' },
-                                this.$render("i-button", { id: "btnShowMore", caption: "Show more", margin: { bottom: 10 }, background: { color: 'transparent' }, font: { color: Theme.colors.primary.main, weight: 800, size: '1rem' }, boxShadow: 'unset', onClick: this.handleShowMoreClick.bind(this) })),
+                                this.$render("i-button", { id: "btnShowMore", caption: "$show_more", margin: { bottom: 10 }, background: { color: 'transparent' }, font: { color: Theme.colors.primary.main, weight: 800, size: '1rem' }, boxShadow: 'unset', onClick: this.handleShowMoreClick.bind(this) })),
                             this.$render("i-vstack", { id: "pnlContent", gap: "0.75rem" }),
                             this.$render("i-vstack", { id: "pnlQuoted", visible: false, gap: '0.5rem', padding: { top: '0.5rem' } }),
                             this.$render("i-panel", { id: "pnlOverlay", visible: false, height: '5rem', width: '100%', position: 'absolute', bottom: "0px", background: { color: `linear-gradient(0, var(--card-bg-color) 0%, transparent 100%)` } })),
                         this.$render("i-hstack", { id: "btnViewMore", verticalAlignment: "center", padding: { top: '1rem' }, gap: '0.25rem', visible: false, onClick: this.onViewMore },
-                            this.$render("i-label", { caption: 'Read more', font: { size: '0.9rem', color: Theme.colors.primary.main } }),
+                            this.$render("i-label", { caption: "$read_more", font: { size: '0.9rem', color: Theme.colors.primary.main } }),
                             this.$render("i-icon", { name: "angle-down", width: 16, height: 16, fill: Theme.colors.primary.main })),
                         this.$render("i-stack", { id: "pnlLocked", direction: "vertical", width: "100%", gap: "0.75rem", visible: false },
                             this.$render("i-stack", { direction: "horizontal", width: "100%", minHeight: 150, border: { radius: '0.5rem' }, background: { color: Theme.background.paper }, alignItems: "center", justifyContent: "center" },
                                 this.$render("i-icon", { width: "1.5rem", height: "1.5rem", name: "lock", fill: Theme.text.primary })),
-                            this.$render("i-button", { id: "btnUnlockPost", width: "100%", minHeight: 36, padding: { left: '1rem', right: '1rem' }, font: { color: Theme.colors.primary.contrastText, weight: 600 }, border: { radius: '0.5rem' }, caption: 'Unlock', onClick: this.handleUnlockPost })),
+                            this.$render("i-button", { id: "btnUnlockPost", width: "100%", minHeight: 36, padding: { left: '1rem', right: '1rem' }, font: { color: Theme.colors.primary.contrastText, weight: 600 }, border: { radius: '0.5rem' }, caption: '$unlock', onClick: this.handleUnlockPost })),
                         this.$render("i-hstack", { id: "groupAnalysis", horizontalAlignment: "space-between", padding: { top: '0.563rem' }, width: '100%', visible: !this.pinView }))));
             }
             else {
@@ -1340,27 +1421,27 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                         this.$render("i-panel", { id: "pnlInfo", maxWidth: '100%', overflow: 'hidden' }),
                         this.$render("i-stack", { id: "pnlPublicLabel", direction: "horizontal", alignItems: "center", gap: "0.25rem", visible: this.isPublicPostLabelShown },
                             this.$render("i-icon", { width: "0.875rem", height: "0.875rem", name: "globe-americas", display: 'inline-flex', fill: Theme.text.secondary }),
-                            this.$render("i-label", { caption: "Public", font: { size: '0.875rem', color: Theme.text.secondary } }))),
+                            this.$render("i-label", { caption: "$public", font: { size: '0.875rem', color: Theme.text.secondary } }))),
                     this.$render("i-hstack", { id: "pnlContext", stack: { shrink: '0' }, horizontalAlignment: "end", gap: "0.5rem", visible: !this.pinView },
                         this.$render("i-panel", { onClick: this.onProfileShown, cursor: "pointer", class: index_css_5.hoverStyle },
                             this.$render("i-icon", { name: "ellipsis-h", width: '1rem', height: '1rem', fill: Theme.text.secondary })))));
                 this.gridPost.append(this.$render("i-hstack", { id: "pnlReplyPath", verticalAlignment: "center", gap: "0.25rem", visible: false, grid: { area: 'path' }, margin: { top: '0.5rem' } },
-                    this.$render("i-label", { caption: 'replying to', font: { size: '0.875rem', color: Theme.colors.secondary.light } }),
+                    this.$render("i-label", { caption: "$replying_to", font: { size: '0.875rem', color: Theme.colors.secondary.light } }),
                     this.$render("i-label", { id: "lbReplyTo", font: { size: '0.875rem', color: Theme.colors.primary.main }, cursor: "pointer", onClick: () => this.onGoProfile() })));
                 this.gridPost.append(this.$render("i-vstack", { width: '100%', grid: { area: 'content' }, margin: { top: '1rem' } },
                     this.$render("i-panel", { id: "pnlDetail" },
                         this.$render("i-hstack", { id: "showMoreWrapper", visible: false, height: 50, bottom: 0, width: '100%', zIndex: 1, background: { color: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(10, 10, 10) 100%)' }, position: 'absolute', justifyContent: 'center', alignItems: 'end' },
-                            this.$render("i-button", { id: "btnShowMore", caption: "Show more", margin: { bottom: 10 }, background: { color: 'transparent' }, font: { color: Theme.colors.primary.main, weight: 800, size: '1rem' }, boxShadow: 'unset', onClick: this.handleShowMoreClick.bind(this) })),
+                            this.$render("i-button", { id: "btnShowMore", caption: "$show_more", margin: { bottom: 10 }, background: { color: 'transparent' }, font: { color: Theme.colors.primary.main, weight: 800, size: '1rem' }, boxShadow: 'unset', onClick: this.handleShowMoreClick.bind(this) })),
                         this.$render("i-vstack", { id: "pnlContent", gap: "0.75rem" }),
                         this.$render("i-vstack", { id: "pnlQuoted", gap: '0.5rem', visible: false, padding: { top: '0.5rem' } }),
                         this.$render("i-panel", { id: "pnlOverlay", visible: false, height: '5rem', width: '100%', position: 'absolute', bottom: "0px", background: { color: `linear-gradient(0, var(--card-bg-color) 0%, transparent 100%)` } })),
                     this.$render("i-hstack", { id: "btnViewMore", verticalAlignment: "center", padding: { top: '1rem' }, gap: '0.25rem', visible: false, onClick: this.onViewMore },
-                        this.$render("i-label", { caption: 'Read more', font: { size: '0.9rem', color: Theme.colors.primary.main } }),
+                        this.$render("i-label", { caption: "$read_more", font: { size: '0.9rem', color: Theme.colors.primary.main } }),
                         this.$render("i-icon", { name: "angle-down", width: 16, height: 16, fill: Theme.colors.primary.main })),
                     this.$render("i-stack", { id: "pnlLocked", direction: "vertical", width: "100%", gap: "0.75rem", visible: false },
                         this.$render("i-stack", { direction: "horizontal", width: "100%", minHeight: 150, border: { radius: '0.5rem' }, background: { color: Theme.background.paper }, alignItems: "center", justifyContent: "center" },
                             this.$render("i-icon", { width: "1.5rem", height: "1.5rem", name: "lock", fill: Theme.text.primary })),
-                        this.$render("i-button", { id: "btnUnlockPost", width: "100%", minHeight: 36, padding: { left: '1rem', right: '1rem' }, font: { color: Theme.colors.primary.contrastText, weight: 600 }, border: { radius: '0.5rem' }, caption: 'Unlock', onClick: this.handleUnlockPost })),
+                        this.$render("i-button", { id: "btnUnlockPost", width: "100%", minHeight: 36, padding: { left: '1rem', right: '1rem' }, font: { color: Theme.colors.primary.contrastText, weight: 600 }, border: { radius: '0.5rem' }, caption: '$unlock', onClick: this.handleUnlockPost })),
                     this.$render("i-hstack", { id: "groupAnalysis", horizontalAlignment: "space-between", padding: { top: '0.563rem' }, width: '100%', visible: !this.pinView })));
             }
             const lazyLoad = this.getAttribute('lazyLoad', true, false);
@@ -1435,7 +1516,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     this.$render("i-stack", { id: "pnlPinned", direction: "horizontal", padding: { bottom: "0.75rem" }, margin: { top: "-0.5rem" }, gap: "0.75rem", visible: false },
                         this.$render("i-stack", { direction: "horizontal", width: "2.75rem", justifyContent: "end" },
                             this.$render("i-icon", { width: "1rem", height: "1rem", name: "thumbtack", fill: Theme.text.secondary })),
-                        this.$render("i-label", { caption: "Pinned", font: { size: "0.875rem", color: Theme.text.secondary } })),
+                        this.$render("i-label", { caption: "$pinned", font: { size: "0.875rem", color: Theme.text.secondary } })),
                     this.$render("i-stack", { id: "pnlRepost", direction: "horizontal", padding: { bottom: "0.75rem" }, margin: { top: "-0.5rem" }, gap: "0.75rem", visible: false }),
                     this.$render("i-grid-layout", { id: "gridPost", 
                         // maxHeight={"calc(100vh - 50px - 94px)"}

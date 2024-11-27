@@ -10,6 +10,7 @@ import {
 } from '@ijstech/components';
 import { linkPreviewImageStyle } from '../index.css';
 import { getDomain, ILinkPreview } from '../global';
+import translations from '../translations.json';
 
 const Theme = Styles.Theme.ThemeVars;
 type openDesignerCallback =  (target: Control, data: any) => Promise<void>;
@@ -65,6 +66,11 @@ export class ScomPostLinkPreview extends Module {
         }
     }
 
+    init() {
+        this.i18n.init({...translations});
+        super.init();
+    }
+
     render() {
         return (
             <i-panel
@@ -102,7 +108,7 @@ export class ScomPostLinkPreview extends Module {
                             font={{ size: '0.875rem', color: Theme.text.primary }}
                             boxShadow='none'
                             background={{ color: Theme.colors.primary.main }}
-                            caption='Open in Designer'
+                            caption='$open_in_designer'
                             onClick={this.openDesigner}
                         ></i-button>
                     </i-hstack>

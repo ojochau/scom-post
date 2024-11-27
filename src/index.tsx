@@ -32,9 +32,10 @@ import {
     IFrameButton,
     PaymentModel
 } from './global';
-import { getIconStyleClass, hoverStyle, ellipsisStyle, maxHeightStyle, customLinkStyle, cardContentStyle, labelHoverStyle } from './index.css';
+import { getIconStyleClass, hoverStyle, maxHeightStyle, customLinkStyle, cardContentStyle, labelHoverStyle } from './index.css';
 import assets from './assets';
 import { ScomPostBubbleMenu, ScomPostFarcasterFrame, ScomPostLinkPreview, ScomPostShopifyFrame } from './components';
+import translations from './translations.json';
 
 const Theme = Styles.Theme.ThemeVars;
 
@@ -390,7 +391,7 @@ export class ScomPost extends Module {
                     overflow={'hidden'}
                 >
                     <i-vstack gap={'0.5rem'}>
-                        <i-label caption={data.title || 'Untitled'} font={{ size: '1.25rem', weight: 500 }} wordBreak="break-word" lineHeight={'1.5rem'}></i-label>
+                        <i-label caption={data.title || '$untitled'} font={{ size: '1.25rem', weight: 500 }} wordBreak="break-word" lineHeight={'1.5rem'}></i-label>
                         <i-label
                             class="entry-content"
                             caption={data.content || ''}
@@ -440,7 +441,7 @@ export class ScomPost extends Module {
                     <i-icon width="1rem" height="1rem" name="retweet" fill={Theme.text.secondary}></i-icon>
                 </i-stack>,
                 <i-label
-                    caption={reposters + " reposted"}
+                    caption={this.i18n.get('reposted', { value: reposters })}
                     font={{ size: "0.875rem", color: Theme.text.secondary }}
                     onClick={() => this.onGoProfile(repost.npub || repost.id)}
                 ></i-label>
@@ -467,7 +468,7 @@ export class ScomPost extends Module {
         if (this.btnUnlockPost) {
             const firstPolicy = community?.policies?.[0];
             const _isSubscription = isSubscription || firstPolicy?.paymentModel === PaymentModel.Subscription;
-            this.btnUnlockPost.caption = community?.isWhitelist ? "Exclusive content for whitelisted users only" : _isSubscription ? "Subscribe" : "Unlock";
+            this.btnUnlockPost.caption = community?.isWhitelist ? "$exclusive_content_for_whitelisted_users_only" : _isSubscription ? "$subscribe" : "$unlock";
             this.btnUnlockPost.enabled = !community?.isWhitelist;
         }
         
@@ -757,7 +758,7 @@ export class ScomPost extends Module {
         const dataList: any[] = [
             {
                 value: analytics?.replies || 0,
-                name: 'Reply',
+                name: '$reply',
                 icon: { name: "comment-alt" },
                 hoveredColor: Theme.text.secondary,
                 highlighted: actions?.replied,
@@ -768,7 +769,7 @@ export class ScomPost extends Module {
             },
             {
                 value: analytics?.satszapped || 0,
-                name: 'Zap',
+                name: '$zap',
                 icon: { name: "bolt" },
                 hoveredColor: Theme.colors.warning.main,
                 highlighted: actions?.zapped,
@@ -779,7 +780,7 @@ export class ScomPost extends Module {
             },
             {
                 value: analytics?.upvotes || 0,
-                name: 'Like',
+                name: '$like',
                 icon: { name: "heart" },
                 hoveredColor: Theme.colors.error.main,
                 highlighted: actions?.liked,
@@ -791,7 +792,7 @@ export class ScomPost extends Module {
             },
             {
                 value: analytics?.reposts || 0,
-                name: 'Repost',
+                name: '$repost',
                 icon: { name: "retweet" },
                 hoveredColor: Theme.colors.success.main,
                 highlighted: actions?.reposted,
@@ -801,7 +802,7 @@ export class ScomPost extends Module {
                 }
             },
             {
-                name: 'Bookmark',
+                name: '$bookmark',
                 icon: { name: 'bookmark' },
                 hoveredColor: Theme.colors.info.main,
                 highlighted: actions?.bookmarked,
@@ -918,7 +919,7 @@ export class ScomPost extends Module {
                     <i-panel width={2} height={2} background={{ color: Theme.colors.secondary.light }}></i-panel>
                     <i-panel width={2} height={2} background={{ color: Theme.colors.secondary.light }}></i-panel>
                 </i-vstack>
-                <i-label caption='Show replies' font={{ color: Theme.colors.primary.main, size: '0.9rem' }}></i-label>
+                <i-label caption="$show_replies" font={{ color: Theme.colors.primary.main, size: '0.9rem' }}></i-label>
             </i-grid-layout>
         );
         if (this.pnlReply) this.pnlReply.visible = false;
@@ -977,6 +978,7 @@ export class ScomPost extends Module {
     // }
 
     async init() {
+        this.i18n.init({...translations});
         super.init();
         this.onReplyClicked = this.getAttribute('onReplyClicked', true) || this.onReplyClicked;
         this.onZapClicked = this.getAttribute('onZapClicked', true) || this.onZapClicked;
@@ -1059,7 +1061,7 @@ export class ScomPost extends Module {
                                         fill={Theme.text.secondary}
                                     ></i-icon>
                                     <i-label
-                                        caption="Public"
+                                        caption="$public"
                                         font={{ size: '0.875rem', color: Theme.text.secondary }}
                                     ></i-label>
                                 </i-stack>
@@ -1092,7 +1094,7 @@ export class ScomPost extends Module {
                         grid={{ area: 'path' }}
                         margin={{ top: '0.5rem' }}
                     >
-                        <i-label caption='replying to' font={{ size: '0.875rem', color: Theme.colors.secondary.light }} />
+                        <i-label caption='$replying_to' font={{ size: '0.875rem', color: Theme.colors.secondary.light }} />
                         <i-label
                             id="lbReplyTo"
                             font={{ size: '0.875rem', color: Theme.colors.primary.main }}
@@ -1112,7 +1114,7 @@ export class ScomPost extends Module {
                                 position={'absolute'}
                                 justifyContent={'center'}
                                 alignItems={'end'}>
-                                <i-button id={"btnShowMore"} caption={"Show more"} margin={{ bottom: 10 }} background={{ color: 'transparent' }} font={{ color: Theme.colors.primary.main, weight: 800, size: '1rem' }} boxShadow={'unset'} onClick={this.handleShowMoreClick.bind(this)} />
+                                <i-button id={"btnShowMore"} caption="$show_more" margin={{ bottom: 10 }} background={{ color: 'transparent' }} font={{ color: Theme.colors.primary.main, weight: 800, size: '1rem' }} boxShadow={'unset'} onClick={this.handleShowMoreClick.bind(this)} />
                             </i-hstack>
                             <i-vstack id="pnlContent" gap="0.75rem"></i-vstack>
                             {/*<i-button id={'btnShowMore'} background={{color: 'transparent'}} onClick={this.handleShowMoreClick.bind(this)} caption={"Show more..."} font={{color: Theme.colors.primary.main}} visible={false}></i-button>*/}
@@ -1133,7 +1135,7 @@ export class ScomPost extends Module {
                             visible={false}
                             onClick={this.onViewMore}
                         >
-                            <i-label caption={'Read more'}
+                            <i-label caption="$read_more"
                                 font={{ size: '0.9rem', color: Theme.colors.primary.main }}></i-label>
                             <i-icon name={"angle-down"} width={16} height={16}
                                 fill={Theme.colors.primary.main}></i-icon>
@@ -1157,7 +1159,7 @@ export class ScomPost extends Module {
                                 padding={{ left: '1rem', right: '1rem' }}
                                 font={{ color: Theme.colors.primary.contrastText, weight: 600 }}
                                 border={{ radius: '0.5rem' }}
-                                caption='Unlock'
+                                caption='$unlock'
                                 onClick={this.handleUnlockPost}
                             ></i-button>
                         </i-stack>
@@ -1215,7 +1217,7 @@ export class ScomPost extends Module {
                             fill={Theme.text.secondary}
                         ></i-icon>
                         <i-label
-                            caption="Public"
+                            caption="$public"
                             font={{ size: '0.875rem', color: Theme.text.secondary }}
                         ></i-label>
                     </i-stack>
@@ -1247,7 +1249,7 @@ export class ScomPost extends Module {
                 grid={{ area: 'path' }}
                 margin={{ top: '0.5rem' }}
             >
-                <i-label caption='replying to' font={{ size: '0.875rem', color: Theme.colors.secondary.light }} />
+                <i-label caption="$replying_to" font={{ size: '0.875rem', color: Theme.colors.secondary.light }} />
                 <i-label
                     id="lbReplyTo"
                     font={{ size: '0.875rem', color: Theme.colors.primary.main }}
@@ -1267,7 +1269,7 @@ export class ScomPost extends Module {
                         position={'absolute'}
                         justifyContent={'center'}
                         alignItems={'end'}>
-                        <i-button id={"btnShowMore"} caption={"Show more"} margin={{ bottom: 10 }} background={{ color: 'transparent' }} font={{ color: Theme.colors.primary.main, weight: 800, size: '1rem' }} boxShadow={'unset'} onClick={this.handleShowMoreClick.bind(this)} />
+                        <i-button id={"btnShowMore"} caption="$show_more" margin={{ bottom: 10 }} background={{ color: 'transparent' }} font={{ color: Theme.colors.primary.main, weight: 800, size: '1rem' }} boxShadow={'unset'} onClick={this.handleShowMoreClick.bind(this)} />
                     </i-hstack>
                     <i-vstack id="pnlContent" gap="0.75rem"></i-vstack>
                     {/*<i-button id={'btnShowMore'} background={{color: 'transparent'}} onClick={this.handleShowMoreClick.bind(this)} caption={"Show more..."} font={{color: Theme.colors.primary.main}} visible={false}></i-button>*/}
@@ -1288,7 +1290,7 @@ export class ScomPost extends Module {
                     visible={false}
                     onClick={this.onViewMore}
                 >
-                    <i-label caption={'Read more'}
+                    <i-label caption="$read_more"
                         font={{ size: '0.9rem', color: Theme.colors.primary.main }}></i-label>
                     <i-icon name={"angle-down"} width={16} height={16}
                         fill={Theme.colors.primary.main}></i-icon>
@@ -1312,7 +1314,7 @@ export class ScomPost extends Module {
                         padding={{ left: '1rem', right: '1rem' }}
                         font={{ color: Theme.colors.primary.contrastText, weight: 600 }}
                         border={{ radius: '0.5rem' }}
-                        caption='Unlock'
+                        caption='$unlock'
                         onClick={this.handleUnlockPost}
                     ></i-button>
                 </i-stack>
@@ -1430,7 +1432,7 @@ export class ScomPost extends Module {
                         <i-stack direction="horizontal" width="2.75rem" justifyContent="end">
                             <i-icon width="1rem" height="1rem" name="thumbtack" fill={Theme.text.secondary}></i-icon>
                         </i-stack>
-                        <i-label caption="Pinned" font={{ size: "0.875rem", color: Theme.text.secondary }}></i-label>
+                        <i-label caption="$pinned" font={{ size: "0.875rem", color: Theme.text.secondary }}></i-label>
                     </i-stack>
                     <i-stack id="pnlRepost" direction="horizontal" padding={{ bottom: "0.75rem" }} margin={{ top: "-0.5rem" }} gap="0.75rem" visible={false}></i-stack>
                     <i-grid-layout
