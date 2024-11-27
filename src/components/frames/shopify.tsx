@@ -9,6 +9,7 @@ import {
 } from '@ijstech/components';
 import { getDomain, IShopifyFrame } from '../../global';
 import { domainLinkStyle, getImageStyle } from '../index.css';
+import translations from '../../translations.json';
 
 const Theme = Styles.Theme.ThemeVars;
 
@@ -52,6 +53,11 @@ export class ScomPostShopifyFrame extends Module {
         window.open(this._data.url, '_blank');
     }
 
+    init() {
+        this.i18n.init({...translations});
+        super.init();
+    }
+
     render() {
         return (
             <i-stack direction="vertical" width="100%" height="100%" gap="0.25rem">
@@ -76,7 +82,7 @@ export class ScomPostShopifyFrame extends Module {
                     >
                         <i-button
                             height="2.25rem"
-                            caption="Buy Now"
+                            caption="$buy_now"
                             padding={{ top: '0.5rem', bottom: '0.5rem', left: '1rem', right: '1rem' }}
                             border={{ radius: '0.5rem' }}
                             stack={{ grow: '1' }}

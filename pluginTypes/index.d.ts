@@ -197,6 +197,77 @@ declare module "@scom/scom-post/components/bubbleMenu.tsx" {
         render(): void;
     }
 }
+/// <amd-module name="@scom/scom-post/translations.json.ts" />
+declare module "@scom/scom-post/translations.json.ts" {
+    const _default_1: {
+        en: {
+            untitled: string;
+            reposted: string;
+            liked: string;
+            exclusive_content_for_whitelisted_users_only: string;
+            subscribe: string;
+            unlock: string;
+            public: string;
+            show_replies: string;
+            replying_to: string;
+            read_more: string;
+            show_more: string;
+            buy_now: string;
+            pinned: string;
+            open_in_designer: string;
+            reply: string;
+            zap: string;
+            like: string;
+            repost: string;
+            bookmark: string;
+            copy_note_link: string;
+            the_link_has_been_copied_successfully: string;
+            copy_note_text: string;
+            the_text_has_been_copied_successfully: string;
+            copy_note_id: string;
+            the_id_has_been_copied_successfully: string;
+            copy_raw_data: string;
+            the_raw_data_has_been_copied_successfully: string;
+            copy_user_public_key: string;
+            the_public_key_has_been_copied_successfully: string;
+            mute_user: string;
+        };
+        "zh-hant": {};
+        vi: {
+            untitled: string;
+            reposted: string;
+            liked: string;
+            exclusive_content_for_whitelisted_users_only: string;
+            subscribe: string;
+            unlock: string;
+            public: string;
+            show_replies: string;
+            replying_to: string;
+            read_more: string;
+            show_more: string;
+            buy_now: string;
+            pinned: string;
+            open_in_designer: string;
+            reply: string;
+            zap: string;
+            like: string;
+            repost: string;
+            bookmark: string;
+            copy_note_link: string;
+            the_link_has_been_copied_successfully: string;
+            copy_note_text: string;
+            the_text_has_been_copied_successfully: string;
+            copy_note_id: string;
+            the_id_has_been_copied_successfully: string;
+            copy_raw_data: string;
+            the_raw_data_has_been_copied_successfully: string;
+            copy_user_public_key: string;
+            the_public_key_has_been_copied_successfully: string;
+            mute_user: string;
+        };
+    };
+    export default _default_1;
+}
 /// <amd-module name="@scom/scom-post/components/linkPreview.tsx" />
 declare module "@scom/scom-post/components/linkPreview.tsx" {
     import { ControlElement, Module, Control } from '@ijstech/components';
@@ -224,6 +295,7 @@ declare module "@scom/scom-post/components/linkPreview.tsx" {
         set data(value: ILinkPreview);
         private handleLinkPreviewClick;
         private openDesigner;
+        init(): void;
         render(): any;
     }
 }
@@ -250,6 +322,7 @@ declare module "@scom/scom-post/components/frames/shopify.tsx" {
         private _data;
         set data(value: IShopifyFrame);
         handleButtonClick(): void;
+        init(): void;
         render(): any;
     }
 }
