@@ -1,4 +1,4 @@
-import { FormatUtils, moment } from "@ijstech/components";
+import { FormatUtils, moment, application } from "@ijstech/components";
 import { getIPFSGatewayUrl } from "../store/index";
 
 const getImageIpfsUrl = (url: string) => {
@@ -21,19 +21,32 @@ const formatNumber = (value: number | string, decimal?: number) => {
   return FormatUtils.formatNumber(value, { decimalFigures: decimal ?? 0 })
 }
 
-const getDuration = (date: Date|string) => {
+const getDuration = (date: Date | string) => {
+  if (!date) return '';
   const startDate = moment(date);
   const endDate = moment(new Date());
-  let duration = moment.duration(endDate.diff(startDate));
-  let days = duration.asDays();
-  if (startDate.year() !== endDate.year()) return startDate.format('MMM DD, YYYY');
+
+  const currentLg = application.locale;
+  const locale = currentLg.startsWith('zh') ? 'zh-hk' : currentLg;
+  if (locale !== moment.locale()) moment.locale(locale);
+
+  if (startDate.year() !== endDate.year()) {
+      return startDate.format('MMM DD, YYYY');
+  }
+
+  const duration = moment.duration(endDate.diff(startDate));
+  const days = duration.days();
   if (days >= 1) return startDate.format('MMM DD');
-  let hours = duration.asHours();
-  if (hours >= 1) return `${formatNumber(hours, 0)}h`;
-  let minutes = duration.asMinutes();
-  if (minutes >= 1) return `${formatNumber(minutes, 0)}m`;
-  let seconds = duration.asSeconds();
-  return `${formatNumber(seconds, 0)}s`;
+  const hours = duration.asHours();
+  if (hours >= 1) {
+    return moment.localeData()?.relativeTime(Number(formatNumber(hours, 0)), false, 'hh', false);
+  }
+  const minutes = duration.asMinutes();
+  if (minutes >= 1) {
+    return moment.localeData()?.relativeTime(Number(formatNumber(minutes, 0)), false, 'mm', false);
+  }
+  const seconds = duration.asSeconds();
+  return moment.localeData()?.relativeTime(Number(formatNumber(seconds, 0)), false, 'ss', false);
 }
 
 export {

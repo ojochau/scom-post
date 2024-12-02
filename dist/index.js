@@ -90,22 +90,31 @@ define("@scom/scom-post/global/utils.ts", ["require", "exports", "@ijstech/compo
     };
     exports.formatNumber = formatNumber;
     const getDuration = (date) => {
+        if (!date)
+            return '';
         const startDate = (0, components_1.moment)(date);
         const endDate = (0, components_1.moment)(new Date());
-        let duration = components_1.moment.duration(endDate.diff(startDate));
-        let days = duration.asDays();
-        if (startDate.year() !== endDate.year())
+        const currentLg = components_1.application.locale;
+        const locale = currentLg.startsWith('zh') ? 'zh-hk' : currentLg;
+        if (locale !== components_1.moment.locale())
+            components_1.moment.locale(locale);
+        if (startDate.year() !== endDate.year()) {
             return startDate.format('MMM DD, YYYY');
+        }
+        const duration = components_1.moment.duration(endDate.diff(startDate));
+        const days = duration.days();
         if (days >= 1)
             return startDate.format('MMM DD');
-        let hours = duration.asHours();
-        if (hours >= 1)
-            return `${formatNumber(hours, 0)}h`;
-        let minutes = duration.asMinutes();
-        if (minutes >= 1)
-            return `${formatNumber(minutes, 0)}m`;
-        let seconds = duration.asSeconds();
-        return `${formatNumber(seconds, 0)}s`;
+        const hours = duration.asHours();
+        if (hours >= 1) {
+            return components_1.moment.localeData()?.relativeTime(Number(formatNumber(hours, 0)), false, 'hh', false);
+        }
+        const minutes = duration.asMinutes();
+        if (minutes >= 1) {
+            return components_1.moment.localeData()?.relativeTime(Number(formatNumber(minutes, 0)), false, 'mm', false);
+        }
+        const seconds = duration.asSeconds();
+        return components_1.moment.localeData()?.relativeTime(Number(formatNumber(seconds, 0)), false, 'ss', false);
     };
     exports.getDuration = getDuration;
 });
