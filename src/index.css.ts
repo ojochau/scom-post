@@ -66,6 +66,9 @@ export const customLinkStyle = Styles.style({
       color: Theme.colors.primary.main,
       display: `inline !important`,
     },
+    'i-link': {
+      display: 'inline !important'
+    },
     'img': {
       maxWidth: '100%'
     }

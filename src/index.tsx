@@ -505,18 +505,32 @@ export class ScomPost extends Module {
     }
 
     private appendLabel(text: string) {
-        const hrefRegex = /https?:\/\/\S+/g;
-        text = text.replace(/\n/gm, ' <br> ').replace(hrefRegex, (match) => {
-            const regex = /https?:\/\/((([a-z\d]([a-z\d-]*[a-z\d])*)\.?)+[a-z]{2,}|((\d{1,3}\.){3}\d{1,3}))(\:\d+)?(\/#!)?(\/[-a-z\d%_.~+]*)*(\?[;&a-z\d%_.~+=-]*)?(\#[-a-z\d_]*)?$/i;
-            if (regex.test(match))
-                return `<a href="${match}" target="_blank">${match}</a>`;
-            else
-                return match;
-        });
-        const label = <i-label width={'100%'} overflowWrap="anywhere" class={customLinkStyle} lineHeight="1.3125rem" caption={text || ''}></i-label> as Label;
-        this.pnlContent.appendChild(label);
+        const elements: Control[] = [];
+        const splitted = text.split(/\n/gm);
+        for (let i = 0; i < splitted.length; i++) {
+            const content = splitted[i];
+            if (!content.trim().length) {
+                elements.push(
+                    new Label(undefined, {
+                        caption: content,
+                        minHeight: "1.3125rem"
+                    })
+                );
+                continue;
+            }
+            const itemElements = this.createElements(content);
+            const panel = new Panel(undefined, {
+                display: 'inline',
+                overflow: 'hidden'
+            });
+            panel.append(...itemElements);
+            elements.push(panel);
+        }
+        const wrapper = new VStack(this.pnlContent, {width: '100%'});
+        wrapper.append(...elements);
+        this.pnlContent.appendChild(wrapper);
         if (this.apiBaseUrl) {
-            const links = label.querySelectorAll('a');
+            const links = wrapper.querySelectorAll('a');
             for (let link of links) {
                 let previousSibling = link.previousSibling;
                 let nextSibling = link.nextSibling;
@@ -537,6 +551,89 @@ export class ScomPost extends Module {
                 this.appendLinkPreview(link.href, link);
             }
         }
+    }
+
+    private createElements(text: string) {
+        const anchorRegex = /<a\s+(?:[^>]*?\s+)?href=(["'])(.*?)\1[^>]*>(.*?)<\/a>/gi;
+        const linkRegex = /https?:\/\/\S+/gi;
+        // const linkRegex = /https?:\/\/((([a-z\d]([a-z\d-]*[a-z\d])*)\.?)+[a-z]{2,}|((\d{1,3}\.){3}\d{1,3}))(\:\d+)?(\/#!)?(\/[-a-z\d%_.~+]*)*(\?[;&a-z\d%_.~+=-]*)?(\#[-a-z\d_]*)?/gi;
+        const elements: Control[] = [];
+        let match;
+        const matches: any[] = [];
+        while ((match = linkRegex.exec(text)) !== null) {
+            matches.push({
+                type: 'link',
+                index: match.index,
+                length: match[0].length,
+                data: {url: match[0], caption: match[0]}
+            })
+        }
+        while ((match = anchorRegex.exec(text)) !== null) {
+            matches.push({
+                type: 'anchor',
+                index: match.index,
+                length: match[0].length,
+                data: {url: match[2], caption: match[3]}
+            })
+        }
+        matches.sort((a, b) => a.index - b.index);
+        let lastIndex = 0;
+        matches.forEach(match => {
+            if (match.index > lastIndex) {
+                const textContent = text.slice(lastIndex, match.index);
+                if (textContent.trim().length > 0) {
+                    elements.push(
+                        new Label(undefined, {
+                            caption: textContent,
+                            display: 'inline',
+                            overflowWrap: "anywhere",
+                            lineHeight: "1.3125rem",
+                            padding: {right: '4px'}
+                        })
+                    );
+                }
+            }
+            if (match.type === 'anchor') {
+                const link = new Label(undefined, {
+                    link: { href: match.data.url, target: '_blank' },
+                    display: 'inline',
+                    class: customLinkStyle,
+                    caption: match.data.caption,
+                    overflowWrap: "anywhere",
+                    lineHeight: "1.3125rem",
+                    padding: {right: '4px'}
+                });
+                elements.push(link);
+            } else if (match.type === 'link') {
+                const link = new Label(undefined, {
+                    link: { href: match.data.url, target: '_blank' },
+                    display: 'inline',
+                    class: customLinkStyle,
+                    caption: match.data.caption,
+                    overflowWrap: "anywhere",
+                    lineHeight: "1.3125rem",
+                    padding: {right: '4px'}
+                });
+                elements.push(link);
+            }
+            lastIndex = match.index + match.length;
+        })
+
+        if (lastIndex < text.length) {
+            let textContent = text.slice(lastIndex);
+            if (textContent.trim().length > 0) {
+                elements.push(
+                    new Label(undefined, {
+                        caption: textContent,
+                        display: 'inline',
+                        verflowWrap: "anywhere",
+                        lineHeight: "1.3125rem",
+                        padding: {right: '4px'}
+                    })
+                );
+            }
+        }
+        return elements;
     }
     
     private constructFarcasterFrame(preview: ILinkPreview): IFarcasterFrame {
