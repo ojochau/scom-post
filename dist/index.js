@@ -260,6 +260,9 @@ define("@scom/scom-post/index.css.ts", ["require", "exports", "@ijstech/componen
                 color: Theme.colors.primary.main,
                 display: `inline !important`,
             },
+            'i-link': {
+                display: 'inline !important'
+            },
             'img': {
                 maxWidth: '100%'
             }
@@ -988,18 +991,30 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             }
         }
         appendLabel(text) {
-            const hrefRegex = /https?:\/\/\S+/g;
-            text = text.replace(/\n/gm, ' <br> ').replace(hrefRegex, (match) => {
-                const regex = /https?:\/\/((([a-z\d]([a-z\d-]*[a-z\d])*)\.?)+[a-z]{2,}|((\d{1,3}\.){3}\d{1,3}))(\:\d+)?(\/#!)?(\/[-a-z\d%_.~+]*)*(\?[;&a-z\d%_.~+=-]*)?(\#[-a-z\d_]*)?$/i;
-                if (regex.test(match))
-                    return `<a href="${match}" target="_blank">${match}</a>`;
-                else
-                    return match;
-            });
-            const label = this.$render("i-label", { width: '100%', overflowWrap: "anywhere", class: index_css_5.customLinkStyle, lineHeight: "1.3125rem", caption: text || '' });
-            this.pnlContent.appendChild(label);
+            const elements = [];
+            const splitted = text.split(/\n/gm);
+            for (let i = 0; i < splitted.length; i++) {
+                const content = splitted[i];
+                if (!content.trim().length) {
+                    elements.push(new components_10.Label(undefined, {
+                        caption: content,
+                        minHeight: "1.3125rem"
+                    }));
+                    continue;
+                }
+                const itemElements = this.createElements(content);
+                const panel = new components_10.Panel(undefined, {
+                    display: 'inline',
+                    overflow: 'hidden'
+                });
+                panel.append(...itemElements);
+                elements.push(panel);
+            }
+            const wrapper = new components_10.VStack(this.pnlContent, { width: '100%' });
+            wrapper.append(...elements);
+            this.pnlContent.appendChild(wrapper);
             if (this.apiBaseUrl) {
-                const links = label.querySelectorAll('a');
+                const links = wrapper.querySelectorAll('a');
                 for (let link of links) {
                     let previousSibling = link.previousSibling;
                     let nextSibling = link.nextSibling;
@@ -1020,6 +1035,84 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     this.appendLinkPreview(link.href, link);
                 }
             }
+        }
+        createElements(text) {
+            const anchorRegex = /<a\s+(?:[^>]*?\s+)?href=(["'])(.*?)\1[^>]*>(.*?)<\/a>/gi;
+            const linkRegex = /https?:\/\/\S+/gi;
+            // const linkRegex = /https?:\/\/((([a-z\d]([a-z\d-]*[a-z\d])*)\.?)+[a-z]{2,}|((\d{1,3}\.){3}\d{1,3}))(\:\d+)?(\/#!)?(\/[-a-z\d%_.~+]*)*(\?[;&a-z\d%_.~+=-]*)?(\#[-a-z\d_]*)?/gi;
+            const elements = [];
+            let match;
+            const matches = [];
+            while ((match = linkRegex.exec(text)) !== null) {
+                matches.push({
+                    type: 'link',
+                    index: match.index,
+                    length: match[0].length,
+                    data: { url: match[0], caption: match[0] }
+                });
+            }
+            while ((match = anchorRegex.exec(text)) !== null) {
+                matches.push({
+                    type: 'anchor',
+                    index: match.index,
+                    length: match[0].length,
+                    data: { url: match[2], caption: match[3] }
+                });
+            }
+            matches.sort((a, b) => a.index - b.index);
+            let lastIndex = 0;
+            matches.forEach(match => {
+                if (match.index > lastIndex) {
+                    const textContent = text.slice(lastIndex, match.index);
+                    if (textContent.trim().length > 0) {
+                        elements.push(new components_10.Label(undefined, {
+                            caption: textContent,
+                            display: 'inline',
+                            overflowWrap: "anywhere",
+                            lineHeight: "1.3125rem",
+                            padding: { right: '4px' }
+                        }));
+                    }
+                }
+                if (match.type === 'anchor') {
+                    const link = new components_10.Label(undefined, {
+                        link: { href: match.data.url, target: '_blank' },
+                        display: 'inline',
+                        class: index_css_5.customLinkStyle,
+                        caption: match.data.caption,
+                        overflowWrap: "anywhere",
+                        lineHeight: "1.3125rem",
+                        padding: { right: '4px' }
+                    });
+                    elements.push(link);
+                }
+                else if (match.type === 'link') {
+                    const link = new components_10.Label(undefined, {
+                        link: { href: match.data.url, target: '_blank' },
+                        display: 'inline',
+                        class: index_css_5.customLinkStyle,
+                        caption: match.data.caption,
+                        overflowWrap: "anywhere",
+                        lineHeight: "1.3125rem",
+                        padding: { right: '4px' }
+                    });
+                    elements.push(link);
+                }
+                lastIndex = match.index + match.length;
+            });
+            if (lastIndex < text.length) {
+                let textContent = text.slice(lastIndex);
+                if (textContent.trim().length > 0) {
+                    elements.push(new components_10.Label(undefined, {
+                        caption: textContent,
+                        display: 'inline',
+                        verflowWrap: "anywhere",
+                        lineHeight: "1.3125rem",
+                        padding: { right: '4px' }
+                    }));
+                }
+            }
+            return elements;
         }
         constructFarcasterFrame(preview) {
             let data = {

@@ -526,6 +526,7 @@ declare module "@scom/scom-post" {
         private renderCardContent;
         private renderUI;
         private appendLabel;
+        private createElements;
         private constructFarcasterFrame;
         private constructShopifyFrame;
         private appendLinkPreview;
