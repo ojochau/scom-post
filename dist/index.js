@@ -1030,7 +1030,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                     const regex = new RegExp(`${location.origin}/(#!/)?p/\\S+`, "g");
                     let match = regex.exec(link.href);
                     // tag mention
-                    if (match && link.innerHTML.startsWith('@'))
+                    if (match && (link.innerHTML.startsWith('@') || link.innerHTML.startsWith('<span>@')))
                         continue;
                     this.appendLinkPreview(link.href, link);
                 }
