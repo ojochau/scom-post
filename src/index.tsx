@@ -547,7 +547,7 @@ export class ScomPost extends Module {
                 const regex = new RegExp(`${location.origin}/(#!/)?p/\\S+`, "g");
                 let match = regex.exec(link.href);
                 // tag mention
-                if (match && link.innerHTML.startsWith('@')) continue;
+                if (match && (link.innerHTML.startsWith('@') || link.innerHTML.startsWith('<span>@'))) continue;
                 this.appendLinkPreview(link.href, link);
             }
         }
