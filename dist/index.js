@@ -470,9 +470,9 @@ define("@scom/scom-post/translations.json.ts", ["require", "exports"], function 
         "zh-hant": {
             "bookmark": "書籤",
             "buy_now": "立即購買",
-            "copy_note_id": "複製筆記 ID",
-            "copy_note_link": "複製筆記連結",
-            "copy_note_text": "複製筆記內容",
+            "copy_note_id": "複製帖子ID",
+            "copy_note_link": "複製連結",
+            "copy_note_text": "複製內容",
             "copy_raw_data": "複製原始數據",
             "copy_user_public_key": "複製用戶公鑰",
             "exclusive_content_for_whitelisted_users_only": "獨家內容僅限白名單用戶",
@@ -480,7 +480,7 @@ define("@scom/scom-post/translations.json.ts", ["require", "exports"], function 
             "liked": "{{value}} 喜歡",
             "mute_user": "靜音用戶",
             "open_in_designer": "在設計器中打開",
-            "pinned": "已固定",
+            "pinned": "已置頂",
             "public": "公開",
             "read_more": "閱讀更多",
             "reply": "回覆",
@@ -497,7 +497,7 @@ define("@scom/scom-post/translations.json.ts", ["require", "exports"], function 
             "the_text_has_been_copied_successfully": "內容已成功複製",
             "unlock": "解鎖",
             "untitled": "無標題",
-            "zap": "Zap"
+            "zap": "打閃"
         },
         "vi": {
             "bookmark": "Đánh dấu",
