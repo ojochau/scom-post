@@ -542,6 +542,7 @@ declare module "@scom/scom-post" {
         private onShowMore;
         private onProfileShown;
         private onViewMore;
+        private viewParentAuthor;
         private onGoProfile;
         private onGoCommunity;
         private handleUnlockPost;

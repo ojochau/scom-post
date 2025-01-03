@@ -1438,6 +1438,10 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             this.pnlOverlay.visible = false;
             this.btnViewMore.visible = false;
         }
+        viewParentAuthor() {
+            const { parentAuthor } = this.postData || {};
+            this.onGoProfile(parentAuthor?.id || parentAuthor?.npub);
+        }
         onGoProfile(npub) {
             if (!npub)
                 npub = this.postData?.author?.npub;
@@ -1526,7 +1530,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                                 this.$render("i-icon", { name: "ellipsis-h", width: '1rem', height: '1rem', fill: Theme.text.secondary })))),
                     this.$render("i-hstack", { id: "pnlReplyPath", verticalAlignment: "center", gap: "0.25rem", visible: false, grid: { area: 'path' }, margin: { top: '0.5rem' } },
                         this.$render("i-label", { caption: '$replying_to', font: { size: '0.875rem', color: Theme.colors.secondary.light } }),
-                        this.$render("i-label", { id: "lbReplyTo", font: { size: '0.875rem', color: Theme.colors.primary.main }, cursor: "pointer", onClick: () => this.onGoProfile() })),
+                        this.$render("i-label", { id: "lbReplyTo", font: { size: '0.875rem', color: Theme.colors.primary.main }, cursor: "pointer", onClick: this.viewParentAuthor.bind(this) })),
                     this.$render("i-vstack", { width: '100%', grid: { area: 'content' }, margin: { top: '1rem' } },
                         this.$render("i-panel", { id: "pnlDetail" },
                             this.$render("i-hstack", { id: "showMoreWrapper", visible: false, height: 50, bottom: 0, width: '100%', zIndex: 1, background: { color: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(10, 10, 10) 100%)' }, position: 'absolute', justifyContent: 'center', alignItems: 'end' },
@@ -1560,7 +1564,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
                             this.$render("i-icon", { name: "ellipsis-h", width: '1rem', height: '1rem', fill: Theme.text.secondary })))));
                 this.gridPost.append(this.$render("i-hstack", { id: "pnlReplyPath", verticalAlignment: "center", gap: "0.25rem", visible: false, grid: { area: 'path' }, margin: { top: '0.5rem' } },
                     this.$render("i-label", { caption: "$replying_to", font: { size: '0.875rem', color: Theme.colors.secondary.light } }),
-                    this.$render("i-label", { id: "lbReplyTo", font: { size: '0.875rem', color: Theme.colors.primary.main }, cursor: "pointer", onClick: () => this.onGoProfile() })));
+                    this.$render("i-label", { id: "lbReplyTo", font: { size: '0.875rem', color: Theme.colors.primary.main }, cursor: "pointer", onClick: this.viewParentAuthor.bind(this) })));
                 this.gridPost.append(this.$render("i-vstack", { width: '100%', grid: { area: 'content' }, margin: { top: '1rem' } },
                     this.$render("i-panel", { id: "pnlDetail" },
                         this.$render("i-hstack", { id: "showMoreWrapper", visible: false, height: 50, bottom: 0, width: '100%', zIndex: 1, background: { color: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(10, 10, 10) 100%)' }, position: 'absolute', justifyContent: 'center', alignItems: 'end' },

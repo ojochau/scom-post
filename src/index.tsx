@@ -1042,6 +1042,11 @@ export class ScomPost extends Module {
         this.btnViewMore.visible = false;
     }
 
+    private viewParentAuthor() {
+        const { parentAuthor } = this.postData || {};
+        this.onGoProfile(parentAuthor?.id || parentAuthor?.npub);
+    }
+
     private onGoProfile(npub?: string) {
         if (!npub) npub = this.postData?.author?.npub;
         if (npub) {
@@ -1196,7 +1201,7 @@ export class ScomPost extends Module {
                             id="lbReplyTo"
                             font={{ size: '0.875rem', color: Theme.colors.primary.main }}
                             cursor="pointer"
-                            onClick={() => this.onGoProfile()}
+                            onClick={this.viewParentAuthor.bind(this)}
                         />
                     </i-hstack>
                     <i-vstack width={'100%'} grid={{ area: 'content' }} margin={{ top: '1rem' }}>
@@ -1351,7 +1356,7 @@ export class ScomPost extends Module {
                     id="lbReplyTo"
                     font={{ size: '0.875rem', color: Theme.colors.primary.main }}
                     cursor="pointer"
-                    onClick={() => this.onGoProfile()}
+                    onClick={this.viewParentAuthor.bind(this)}
                 />
             </i-hstack>)
             this.gridPost.append(<i-vstack width={'100%'} grid={{ area: 'content' }} margin={{ top: '1rem' }}>
