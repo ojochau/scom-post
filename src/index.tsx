@@ -946,13 +946,13 @@ export class ScomPost extends Module {
                 if (this.postData?.isPending) return;
                 let success = true;
                 if (item.onClick) success = await item.onClick(itemEl, event);
-                if (success && (item.name === 'Like' || item.name === 'Repost')) {
+                if (success && (item.name === '$like' || item.name === '$repost')) {
                     const newValue = (lblValue.tag ?? 0) + 1;
                     lblValue.caption = FormatUtils.formatNumber(newValue, { shortScale: true, decimalFigures: 0 });
                     lblValue.tag = newValue;
                     itemEl.classList.add('highlighted');
                 }
-                if (item.name === 'Bookmark') {
+                if (item.name === '$bookmark') {
                     itemEl.classList.toggle('highlighted');
                 }
             }
