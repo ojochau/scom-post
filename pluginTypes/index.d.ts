@@ -47,7 +47,8 @@ declare module "@scom/scom-post/global/interface.ts" {
     }
     enum ProtectedMembershipPolicyType {
         TokenExclusive = "TokenExclusive",
-        Whitelist = "Whitelist"
+        Whitelist = "Whitelist",
+        IdentityExclusive = "IdentityExclusive"
     }
     enum TokenType {
         ERC20 = "ERC20",

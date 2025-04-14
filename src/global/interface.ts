@@ -45,7 +45,8 @@ export interface IPostData {
 };
 enum ProtectedMembershipPolicyType {
 	TokenExclusive = 'TokenExclusive',
-	Whitelist = 'Whitelist'
+	Whitelist = 'Whitelist',
+	IdentityExclusive = 'IdentityExclusive',
 }
 enum TokenType {
 	ERC20 = 'ERC20',
