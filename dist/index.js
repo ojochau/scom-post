@@ -30,6 +30,7 @@ define("@scom/scom-post/global/interface.ts", ["require", "exports"], function (
     (function (ProtectedMembershipPolicyType) {
         ProtectedMembershipPolicyType["TokenExclusive"] = "TokenExclusive";
         ProtectedMembershipPolicyType["Whitelist"] = "Whitelist";
+        ProtectedMembershipPolicyType["IdentityExclusive"] = "IdentityExclusive";
     })(ProtectedMembershipPolicyType || (ProtectedMembershipPolicyType = {}));
     var TokenType;
     (function (TokenType) {
