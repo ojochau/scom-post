@@ -1400,6 +1400,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             childElm.onProfileClicked = this.onProfileClicked;
             childElm.onQuotedPostClicked = this.onQuotedPostClicked;
             childElm.onBookmarkClicked = this.onBookmarkClicked;
+            childElm.onAvatarClick = this.onAvatarClick;
             childElm.parent = this.pnlReplies;
             if (isPrepend)
                 this.pnlReplies.prepend(childElm);
@@ -1447,7 +1448,12 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             if (!npub)
                 npub = this.postData?.author?.npub;
             if (npub) {
-                window.open(`#!/p/${npub}`, '_self');
+                if (this.onAvatarClick) {
+                    this.onAvatarClick(npub);
+                }
+                else {
+                    window.open(`/p/${npub}`, '_self');
+                }
             }
         }
         onGoCommunity(target, event) {
@@ -1487,6 +1493,7 @@ define("@scom/scom-post", ["require", "exports", "@ijstech/components", "@scom/s
             this.onCommunityClicked = this.getAttribute('onCommunityClicked', true) || this.onCommunityClicked;
             this.onUnlockPostClicked = this.getAttribute('onUnlockPostClicked', true) || this.onUnlockPostClicked;
             this.onOpenDesigner = this.getAttribute('onOpenDesigner', true) || this.onOpenDesigner;
+            this.onAvatarClick = this.getAttribute('onAvatarClick', true) || this.onAvatarClick;
             this.overflowEllipse = this.getAttribute('overflowEllipse', true) || this.overflowEllipse;
             this.disableGutters = this.getAttribute('disableGutters', true) || this.disableGutters;
             this.limitHeight = this.getAttribute('limitHeight', true) || this.limitHeight;

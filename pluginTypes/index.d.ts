@@ -418,6 +418,7 @@ declare module "@scom/scom-post" {
         onCommunityClicked?: callbackType;
         onUnlockPostClicked?: asyncCallbackType;
         onOpenDesigner?: openDesignerCallback;
+        onAvatarClick?: (npub: string) => void;
         disableGutters?: boolean;
         limitHeight?: boolean;
         isReply?: boolean;
@@ -502,6 +503,7 @@ declare module "@scom/scom-post" {
         onCommunityClicked: callbackType;
         onUnlockPostClicked: asyncCallbackType;
         onOpenDesigner: openDesignerCallback;
+        onAvatarClick: (npub: string) => void;
         constructor(parent?: Container, options?: any);
         static create(options?: ScomPostElement, parent?: Container): Promise<ScomPost>;
         get isActive(): boolean;
