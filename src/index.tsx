@@ -55,6 +55,7 @@ interface ScomPostElement extends ControlElement {
     onCommunityClicked?: callbackType;
     onUnlockPostClicked?: asyncCallbackType;
     onOpenDesigner?: openDesignerCallback;
+    onAvatarClick?: (npub: string) => void;
     disableGutters?: boolean;
     limitHeight?: boolean;
     isReply?: boolean;
@@ -152,6 +153,7 @@ export class ScomPost extends Module {
     public onCommunityClicked: callbackType;
     public onUnlockPostClicked: asyncCallbackType;
     public onOpenDesigner: openDesignerCallback;
+    public onAvatarClick: (npub: string) => void;
 
     constructor(parent?: Container, options?: any) {
         super(parent, options);
@@ -994,6 +996,7 @@ export class ScomPost extends Module {
         childElm.onProfileClicked = this.onProfileClicked;
         childElm.onQuotedPostClicked = this.onQuotedPostClicked;
         childElm.onBookmarkClicked = this.onBookmarkClicked;
+        childElm.onAvatarClick = this.onAvatarClick;
         childElm.parent = this.pnlReplies;
         if (isPrepend)
             this.pnlReplies.prepend(childElm);
@@ -1050,7 +1053,11 @@ export class ScomPost extends Module {
     private onGoProfile(npub?: string) {
         if (!npub) npub = this.postData?.author?.npub;
         if (npub) {
-            window.open(`#!/p/${npub}`, '_self');
+            if (this.onAvatarClick) {
+                this.onAvatarClick(npub);
+            } else {
+                window.open(`/p/${npub}`, '_self');
+            }
         }
     }
 
@@ -1092,6 +1099,7 @@ export class ScomPost extends Module {
         this.onCommunityClicked = this.getAttribute('onCommunityClicked', true) || this.onCommunityClicked;
         this.onUnlockPostClicked = this.getAttribute('onUnlockPostClicked', true) || this.onUnlockPostClicked;
         this.onOpenDesigner = this.getAttribute('onOpenDesigner', true) || this.onOpenDesigner;
+        this.onAvatarClick = this.getAttribute('onAvatarClick', true) || this.onAvatarClick;
         this.overflowEllipse = this.getAttribute('overflowEllipse', true) || this.overflowEllipse;
         this.disableGutters = this.getAttribute('disableGutters', true) || this.disableGutters;
         this.limitHeight = this.getAttribute('limitHeight', true) || this.limitHeight;
